@@ -1,9 +1,9 @@
 import torch.nn as nn
 
 
-class ModelA(nn.Module):
+class ModelBaseline(nn.Module):
     def __init__(self):
-        super(ModelA, self).__init__()
+        super(ModelBaseline, self).__init__()
         self.layer = nn.Linear(10, 2)  # Example layer
 
     def forward(self, x):

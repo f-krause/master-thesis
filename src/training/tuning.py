@@ -3,9 +3,15 @@ import optuna
 import yaml
 import datetime
 from ..training.training import train
+from ..logs.logger import setup_logger
+
+# TODO add arguments to define values like n_trials?
 
 
 def objective(trial):
+    logger = setup_logger()
+    logger.info("Starting hyperparameter tuning")
+
     config = {
         'batch_size': trial.suggest_categorical('batch_size', [16, 32, 64]),
         'num_workers': trial.suggest_int('num_workers', 2, 8),
@@ -17,7 +23,13 @@ def objective(trial):
             'momentum': 0.9  # Only for SGD
         }
     }
-    train(config)
+    try:
+        train(config)
+    except Exception as e:
+        logger.error(f"Error during hyperparameter tuning: {e}")
+        raise e
+
+    logger.info("Hyperparameter tuning completed")
 
 
 def store_best_config(study_obj):
@@ -28,6 +40,6 @@ def store_best_config(study_obj):
 
 
 study = optuna.create_study(direction='minimize')
-study.optimize(objective, n_trials=100)
+study.optimize(objective, n_trials=10)
 store_best_config(study)
 print(f"Best hyperparameters: {study.best_params}")
