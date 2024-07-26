@@ -1,6 +1,7 @@
+log_file: "logs/test/train.log"
 batch_size: 32
-num_workers: 4
-epochs: 20
+num_workers: 1
+epochs: 10
 save_freq: 5
 optimizer:
   name: adam

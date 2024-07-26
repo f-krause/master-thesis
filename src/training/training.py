@@ -1,10 +1,10 @@
 import torch
 from tqdm import tqdm
-from ..data.data_loader import get_data_loaders
-from ..optimization.optimizer import get_optimizer
-from ..models.model_template import ModelBaseline
-from ..training.utils import save_checkpoint
-from ..logs.logger import setup_logger
+from data.data_loader import get_data_loaders
+from optimization.optimizer import get_optimizer
+from models.model_template import ModelBaseline
+from utils import save_checkpoint
+from logs.logger import setup_logger
 
 
 def train(config):

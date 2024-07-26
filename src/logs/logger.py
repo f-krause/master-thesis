@@ -1,7 +1,10 @@
+import os
 import logging
 
 
-def setup_logger(log_file='training.log'):
+def setup_logger():
+    log_file = os.environ.get("LOG_FILE")
+
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
 

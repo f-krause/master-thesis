@@ -1,14 +1,14 @@
 # TODO https://medium.com/optuna/scaling-up-optuna-with-ray-tune-88f6ca87b8c7
 import optuna
 import yaml
-import datetime
-from ..training.training import train
-from ..logs.logger import setup_logger
+from training.training import train
+from logs.logger import setup_logger
+from utils import get_timestamp
 
 # TODO add arguments to define values like n_trials?
 
 
-def objective(trial):
+def tuning_objective(trial):
     logger = setup_logger()
     logger.info("Starting hyperparameter tuning")
 
@@ -34,12 +34,13 @@ def objective(trial):
 
 def store_best_config(study_obj):
     print("Storing best hyperparameters")
-    timestamp = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M')
-    with open(f'../config/config_{timestamp}.yml', 'w') as f:
+    with open(f'../config/config_{get_timestamp()}.yml', 'w') as f:
         yaml.dump(study_obj.best_params, f)
 
 
-study = optuna.create_study(direction='minimize')
-study.optimize(objective, n_trials=10)
-store_best_config(study)
-print(f"Best hyperparameters: {study.best_params}")
+def run_tuning():
+    logger = setup_logger()
+    study = optuna.create_study(direction='minimize')
+    study.optimize(tuning_objective, n_trials=10)
+    store_best_config(study)
+    logger.info(f"Best hyperparameters: {study.best_params}")
