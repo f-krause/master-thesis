@@ -30,10 +30,15 @@ root
 ```
 
 
-## Command selection
+## Command collection
 Connect to the university server with the following command:
 ```shell
 ssh krausef99dm@rey.dm.univie.ac.at
+```
+
+Export environment variables for the project
+```shell
+mamba env export -n master-thesis > environment.yml
 ```
 
 
