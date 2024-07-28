@@ -21,11 +21,17 @@ root
 ├── krausef99dm_thesis  (project folder)
 │   ├── data
 │   ├── dev
-│   ├── model_weights
-|   │   ├── lstm
-│   │   ├── xlstm
-│   │   ├── gru
-│   │   ├── transformer
+|   │   ├── logs
+|   │   ├── weights
+|   │   ├── weights_best
+│   ├── lstm
+|   │   ├── ...
+│   ├── xlstm
+|   │   ├── ...
+│   ├── gru
+|   │   ├── ...
+│   ├── transformer
+|   │   ├── ...
 ├── master-thesis  (this repo)
 ```
 
