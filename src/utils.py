@@ -37,18 +37,19 @@ def get_timestamp():
     return datetime.datetime.now().strftime('%Y-%m-%d-%H-%M')
 
 
-def check_file_exists(file_path, create_unique=False):
-    logger = setup_logger()
-    if create_unique:
-        if os.path.exists(file_path):
-            logger.warning(f"File {file_path} already exists. Creating a unique file name.")
-            file_path = file_path.split(".")
-            file_path = f"{file_path[0]}_{get_timestamp()}.{file_path[1]}"
-            return file_path
-    if os.path.exists(file_path):
-        logger.error(f"File {file_path} already exists. Exiting.")
-        raise FileExistsError
-    return file_path
+# def check_file_exists(file_path, create_unique=False):
+#     # FIXME DELETE?
+#     logger = setup_logger()
+#     if create_unique:
+#         if os.path.exists(file_path):
+#             logger.warning(f"File {file_path} already exists. Creating a unique file name.")
+#             file_path = file_path.split(".")
+#             file_path = f"{file_path[0]}_{get_timestamp()}.{file_path[1]}"
+#             return file_path
+#     if os.path.exists(file_path):
+#         logger.error(f"File {file_path} already exists. Exiting.")
+#         raise FileExistsError
+#     return file_path
 
 
 def check_path_exists(file_path, create_unique=False):
@@ -57,7 +58,8 @@ def check_path_exists(file_path, create_unique=False):
     if os.path.isdir(file_path) and os.listdir(file_path):
         if create_unique:
             logger.warning(f"Overwriting risk for path {file_path}. Creating a unique path.")
-            file_path = f"{file_path}_{get_timestamp()}"
+            timestamp = os.environ["LOG_FILE"].split("_")[-1].split(".")[0]
+            file_path = f"{file_path}_{timestamp}"
             return file_path
         else:
             logger.error(f"Path {file_path} already exists. Exiting.")

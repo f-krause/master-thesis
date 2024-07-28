@@ -15,11 +15,9 @@ if __name__ == "__main__":
     set_log_file(config)
 
     logger = setup_logger()
-    logger.info(f"Project path:", os.environ['PROJECT_PATH'] + '/' + os.environ['SUBPROJECT'])
-    logger.info("Starting training")
+    logger.info(f"Project path: {os.path.join(os.environ['PROJECT_PATH'], os.environ['SUBPROJECT'])}")
 
     try:
-        # TODO try training/tuning with simple models and mockup data!
         logger.info("TRAINING TEST")
         training.train(config)
     except Exception as e:

@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, train=True):
         self.data = torch.rand(100, 10)
-        self.targets = torch.randint(0, 2, (100,))
+        self.targets = torch.rand(100, 1)
 
     def __len__(self):
         return len(self.data)
