@@ -4,13 +4,17 @@ from tqdm import tqdm
 from data_handling.data_loader import get_data_loaders
 from training.optimizer import get_optimizer
 from models.model_template import ModelBaseline
-from utils import save_checkpoint, mkdir
+from utils import save_checkpoint, mkdir, check_path_exists
 from log.logger import setup_logger
 
 
 def train(config):
     logger = setup_logger()
     logger.info("Starting training process")
+
+    checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], os.environ["SUBPROJECT"], "weights")
+    checkpoint_path = check_path_exists(checkpoint_path, create_unique=True)
+    logger.info("Checkpoint path:", checkpoint_path)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Using device: {device}")
@@ -36,7 +40,6 @@ def train(config):
         logger.info(f'Epoch {epoch}, Loss: {running_loss / len(train_loader)}')
 
         if epoch % config['save_freq'] == 0:
-            checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], os.environ["SUBPROJECT"], "weights")
             mkdir(checkpoint_path)
 
             save_checkpoint({

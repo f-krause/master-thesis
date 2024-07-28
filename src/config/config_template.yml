@@ -3,8 +3,8 @@ project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 batch_size: 32
 num_workers: 1
-epochs: 10
-save_freq: 5
+epochs: 2
+save_freq: 2
 optimizer:
   name: adam
   lr: 0.001

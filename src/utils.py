@@ -51,6 +51,20 @@ def check_file_exists(file_path, create_unique=False):
     return file_path
 
 
+def check_path_exists(file_path, create_unique=False):
+    logger = setup_logger()
+
+    if os.path.isdir(file_path) and os.listdir(file_path):
+        if create_unique:
+            logger.warning(f"Overwriting risk for path {file_path}. Creating a unique path.")
+            file_path = f"{file_path}_{get_timestamp()}"
+            return file_path
+        else:
+            logger.error(f"Path {file_path} already exists. Exiting.")
+            raise FileExistsError
+    return file_path
+
+
 def save_checkpoint(state, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
 
