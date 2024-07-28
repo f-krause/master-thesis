@@ -8,6 +8,28 @@ Main Repository for Data Science Master Thesis at University of Vienna 2024
 used in DAP 2024 on university servers
 
 
+## Set up environment
+Create virtual environment with mamba/conda
+```shell
+mamba env create -f environment.yml
+mamba activate master-thesis
+```
+
+Create project structure, and specify project path and subproject in ``main.py``
+```
+root
+├── krausef99dm_thesis  (project folder)
+│   ├── data
+│   ├── dev
+│   ├── model_weights
+|   │   ├── lstm
+│   │   ├── xlstm
+│   │   ├── gru
+│   │   ├── transformer
+├── master-thesis  (this repo)
+```
+
+
 ## Command selection
 Connect to the university server with the following command:
 ```shell

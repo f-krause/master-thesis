@@ -3,7 +3,7 @@ import os
 import yaml
 from training import training, tuning
 from logs.logger import setup_logger
-from utils import unique_log_file
+from utils import unique_log_file, set_log_file, set_project_path
 
 CONFIG_PATH = "config/config_template.yml"
 
@@ -12,10 +12,12 @@ if __name__ == "__main__":
     with open(CONFIG_PATH, "r") as f:
         config = yaml.safe_load(f)
 
-    os.environ["LOG_FILE"] = config["log_file"]
+    set_log_file(config)
 
     logger = setup_logger()
     logger.info("Starting training")
+
+    set_project_path(config)
 
     try:
         # TODO try training/tuning with simple models and mockup data!

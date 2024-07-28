@@ -1,4 +1,6 @@
-log_file: "logs/test/train.log"
+subproject: "dev"
+project_path: ""  # optional, project path with data and model weights
+log_file_path: "" # optional
 batch_size: 32
 num_workers: 1
 epochs: 10

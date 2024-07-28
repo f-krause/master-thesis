@@ -1,7 +1,38 @@
-import torch
-import datetime
 import os
+import datetime
+import platform
+import torch
 from logs.logger import setup_logger
+
+
+def mkdir(path: str):
+    if not os.path.isdir(path):
+        os.makedirs(path, exist_ok=True)
+
+
+def set_log_file(config):
+    if not config["log_file_path"]:
+        os.environ["LOG_FILE"] = os.path.join("logs", config["subproject"], "logging.log")
+        mkdir(os.path.join("logs", config["subproject"]))
+    else:
+        os.environ["LOG_FILE"] = os.path.join(config["log_file_path"], "logging.log")
+        mkdir(config["log_file_path"])
+
+
+def set_project_path(config):
+    logger = setup_logger()
+    if config["project_path"]:
+        project_path = config["project_path"]
+    elif platform.node() == "Felix-PC":
+        project_path = r"C:\Users\Felix\code\uni\UniVie\master-thesis-data"
+    else:
+        project_path = "krausef99dm_thesis"
+
+    os.environ["PROJECT_PATH"] = project_path
+    os.environ["SUBPROJECT"] = config["subproject"]
+    logger.info(f"Project path set to {project_path}")
+    logger.info(f"Subproject set to {config['subproject']}")
+    return project_path
 
 
 def get_timestamp():
