@@ -2,10 +2,10 @@
 import optuna
 import yaml
 from training.training import train
-from logs.logger import setup_logger
+from log.logger import setup_logger
 from utils import get_timestamp
 
-# TODO add arguments to define values like n_trials?
+# TODO get arguments like n_trials from config
 
 
 def tuning_objective(trial):

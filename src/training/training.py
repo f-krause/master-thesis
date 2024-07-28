@@ -1,10 +1,11 @@
+import os
 import torch
 from tqdm import tqdm
-from data.data_loader import get_data_loaders
-from optimization.optimizer import get_optimizer
+from data_handling.data_loader import get_data_loaders
+from training.optimizer import get_optimizer
 from models.model_template import ModelBaseline
-from utils import save_checkpoint
-from logs.logger import setup_logger
+from utils import save_checkpoint, mkdir
+from log.logger import setup_logger
 
 
 def train(config):
@@ -35,11 +36,14 @@ def train(config):
         logger.info(f'Epoch {epoch}, Loss: {running_loss / len(train_loader)}')
 
         if epoch % config['save_freq'] == 0:
+            checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], os.environ["SUBPROJECT"], "weights")
+            mkdir(checkpoint_path)
+
             save_checkpoint({
                 'epoch': epoch,
                 'state_dict': model.state_dict(),
                 'optimizer': optimizer.state_dict(),
-            }, filename=f'checkpoint_{epoch}.pth.tar')
+            }, filename=os.path.join(checkpoint_path, f'checkpoint_{epoch}.pth.tar'))
             logger.info(f'Checkpoint saved at epoch {epoch}')
 
     logger.info("Training process completed")
