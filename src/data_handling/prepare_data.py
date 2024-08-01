@@ -2,6 +2,7 @@
 Creates labeled sequences for processing.
 
 ptr.csv - Sheet 2 from Additional File 2 from Hernandez-Alias
+link: https://figshare.com/articles/dataset/Additional_file_2_Protein-to-mRNA_ratios_among_tissues/21379197?file=37938894
 
 Options:
 - codon frequencies
@@ -17,13 +18,17 @@ from Bio import SeqIO
 import numpy as np
 from collections import OrderedDict
 
-BED_FILES_FOLDER = "data/BED6__protein_coding_strict"
-FASTA_FILES_FOLDER = "data/FA_protein_coding_strict_mRNA/"
+BED_FILES_FOLDER = "../../data/BED6__protein_coding_strict"
+FASTA_FILES_FOLDER = "../../data/FA_protein_coding_strict_mRNA"
+PTR_CSV_FILE = "../../data/ptr.csv"
 TISSUES = ['Adrenal', 'Appendices', 'Brain', 'Colon', 'Duodenum', 'Uterus',
            'Esophagus', 'Fallopiantube', 'Fat', 'Gallbladder', 'Heart', 'Kidney',
            'Liver', 'Lung', 'Lymphnode', 'Ovary', 'Pancreas', 'Placenta',
            'Prostate', 'Rectum', 'Salivarygland', 'Smallintestine', 'Smoothmuscle',
            'Spleen', 'Stomach', 'Testis', 'Thyroid', 'Tonsil', 'Urinarybladder']
+LOAD_LIMIT = 1_000_000
+# For limit 1000 loaded only 419 in the end? What is wrong with the other fasta files?
+# For all files loaded 11.279 sequences
 
 base_to_int = {
     'A': 0,
@@ -109,7 +114,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     ## (0) read in PTRs
-    df = pd.read_csv('data/ptr.csv')
+    df = pd.read_csv(PTR_CSV_FILE)
 
     ## (1) preparse dict of FASTA/BED files with same transcript ID
     transcripts = df['EnsemblTranscriptID'].to_list()
@@ -122,29 +127,37 @@ if __name__ == "__main__":
         PTRs[transcript] = data
 
     # convert list of bed files to only the transcription name
-    _bed_files = os.listdir(BED_FILES_FOLDER)
+    _bed_files = sorted(os.listdir(BED_FILES_FOLDER))
     bed_files = {}
+    counter = 0
     for file in _bed_files:
         try:
             tokens = file.split('.')
             if tokens[-1] == 'bed':
                 bed_files[tokens[0]] = file
+            counter += 1
         except:
-            logging.warn(f"Can't process filename {file}.")
+            logging.warning(f"Can't process filename {file}.")
+        if counter >= LOAD_LIMIT:
+            break
+
 
     logging.info(f"Considering {len(bed_files)} .bed files")
 
-    #
 
-    _fasta_files = os.listdir(FASTA_FILES_FOLDER)
+    _fasta_files = sorted(os.listdir(FASTA_FILES_FOLDER))
     fasta_files = {}
+    counter = 0
     for file in _fasta_files:
         try:
             tokens = file.split('.')
             if tokens[-1] == 'fasta':
                 fasta_files[tokens[0]] = file
+            counter += 1
         except:
-            logging.warn(f"Can't process filename {file}.")
+            logging.warning(f"Can't process filename {file}.")
+        if counter >= LOAD_LIMIT:
+            break
 
     logging.info(f"Considering {len(fasta_files)} .fasta files")
 
@@ -157,9 +170,10 @@ if __name__ == "__main__":
             fasta_file = os.path.join(FASTA_FILES_FOLDER, fasta_files[transcript])
             with open(fasta_file) as f:
                 content = list(SeqIO.parse(f, "fasta"))
-                data[transcript]['fasta'] = _seq_to_int(str(content[0].seq))
-        except:
-            logging.warning(f"Could not read fasta file for {transcript}.")
+                data[transcript]['fasta'] = str(content[0].seq)
+                data[transcript]['fasta_ohe'] = _seq_to_int(str(content[0].seq))
+        except Exception as e:
+            logging.warning(f"Could not read fasta file for {transcript}. Error: {e}")
             del data[transcript]
             continue
 
@@ -174,7 +188,7 @@ if __name__ == "__main__":
 
         # compute codon_frequncies
         try:
-            data[transcript]['codon_frequeny'] = _seq_to_frequency(data[transcript]['fasta'], data[transcript]['bed'])
+            data[transcript]['codon_freq'] = _seq_to_frequency(data[transcript]['fasta_ohe'], data[transcript]['bed'])
         except:
             logging.warning(f"Could not compute vector of codon frequencies for {transcript}.")
             del data[transcript]
@@ -222,10 +236,14 @@ if __name__ == "__main__":
 
     logging.info(f"Considering {len(data)} sequences...")
 
+
     # save data
     import pickle
+    try:
+        pickle.dump(data, open('../../data/ptr_data.pkl', 'wb'))
+    except:
+        logging.error("Could not save data.pkl.")
 
-    pickle.dump(data, open('data.pkl', 'wb'))
 
     # import IPython
     # IPython.embed()
