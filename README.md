@@ -12,7 +12,7 @@ used in DAP 2024 on university servers
 Create virtual environment with mamba/conda
 ```shell
 mamba env create -f environment.yml
-mamba activate master-thesis
+mamba activate master-env
 ```
 
 Create project structure, and specify project path and subproject in ``main.py``
@@ -44,7 +44,7 @@ ssh krausef99dm@rey.dm.univie.ac.at
 
 Export environment variables for the project
 ```shell
-mamba env export -n master-thesis > environment.yml
+mamba env export -n master-env > environment.yml
 ```
 
 
