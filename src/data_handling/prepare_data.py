@@ -20,10 +20,10 @@ from collections import OrderedDict
 BED_FILES_FOLDER = "data/BED6__protein_coding_strict"
 FASTA_FILES_FOLDER = "data/FA_protein_coding_strict_mRNA/"
 TISSUES = ['Adrenal', 'Appendices', 'Brain', 'Colon', 'Duodenum', 'Uterus',
-       'Esophagus', 'Fallopiantube', 'Fat', 'Gallbladder', 'Heart', 'Kidney',
-       'Liver', 'Lung', 'Lymphnode', 'Ovary', 'Pancreas', 'Placenta',
-       'Prostate', 'Rectum', 'Salivarygland', 'Smallintestine', 'Smoothmuscle',
-       'Spleen', 'Stomach', 'Testis', 'Thyroid', 'Tonsil', 'Urinarybladder']
+           'Esophagus', 'Fallopiantube', 'Fat', 'Gallbladder', 'Heart', 'Kidney',
+           'Liver', 'Lung', 'Lymphnode', 'Ovary', 'Pancreas', 'Placenta',
+           'Prostate', 'Rectum', 'Salivarygland', 'Smallintestine', 'Smoothmuscle',
+           'Spleen', 'Stomach', 'Testis', 'Thyroid', 'Tonsil', 'Urinarybladder']
 
 base_to_int = {
     'A': 0,
@@ -39,12 +39,14 @@ int_to_base = {
     3: 'T'
 }
 
+
 def _seq_to_int(seq):
     """
     Convert a sequence of base pairs to integers.
     """
     seq = np.array(list(map(lambda x: base_to_int[x], seq)), dtype=np.int8)
     return seq
+
 
 def _seq_to_frequency(seq, bed):
     """
@@ -56,18 +58,20 @@ def _seq_to_frequency(seq, bed):
     end = int(bed[idx][2])
 
     # compute codon frequencies
-    codons = np.sum(seq[start:end].reshape(-1,3) * np.array([[4**0, 4**1, 4**2]]), axis=1)
+    codons = np.sum(seq[start:end].reshape(-1, 3) * np.array([[4 ** 0, 4 ** 1, 4 ** 2]]), axis=1)
     counts = np.histogram(codons, range(65))[0]
     freq = counts / np.sum(counts)
 
     return(freq)
+    return freq
 
 def read_bed_file(filename):
     with open(filename, 'rt') as f:
         lines = f.readlines()
         data = [l.split() for l in lines]
-    
+
     return data
+
 
 def _annotate_bed(content):
     seq_length = np.max([int(line[2]) for line in content])
@@ -80,16 +84,15 @@ def _annotate_bed(content):
         elif line[3] == '3UTR':
             out[start:end] = 3
         elif line[3] == 'CDS':
-            if (end-start) % 3 > 0:
+            if (end - start) % 3 > 0:
                 logging.error(f"line: {line}")
-            assert (end-start) % 3 == 0, "Invalid CDS length."
-            out[start:end] = np.array([[0,1,2]]).repeat((end-start) // 3, axis=0).ravel()
+            assert (end - start) % 3 == 0, "Invalid CDS length."
+            out[start:end] = np.array([[0, 1, 2]]).repeat((end - start) // 3, axis=0).ravel()
         else:
             logging.error(f"Invalid type: {line[3]}")
             raise ValueError(f"Invalid type: {line[3]}")
-    
-    return out
 
+    return out
 
 
 if __name__ == "__main__":
@@ -134,7 +137,7 @@ if __name__ == "__main__":
             logging.warn(f"Can't process filename {file}.")
 
     logging.info(f"Considering {len(fasta_files)} .fasta files")
-    
+
     ## (2) 
     data = OrderedDict()
     for transcript in tqdm(transcripts):
@@ -173,7 +176,7 @@ if __name__ == "__main__":
     ## compute discrete labels
     keys = data.keys()
     n_tissues = len(TISSUES)
-    all_targets = np.vstack([data[t]['targets'].reshape(1,-1) for t in keys])
+    all_targets = np.vstack([data[t]['targets'].reshape(1, -1) for t in keys])
     max_others = []
     min_others = []
     avg_others = []
@@ -184,33 +187,34 @@ if __name__ == "__main__":
         idx = list(range(n_tissues))
         del idx[tidx]
 
-        max_others.append(np.nanmax(all_targets[:,idx], axis=1))
-        min_others.append(np.nanmin(all_targets[:,idx], axis=1))
-        avg_others.append(np.nanmean(all_targets[:,idx], axis=1))
-        n_others.append(np.sum(np.logical_not(np.isnan(all_targets[:,idx])), axis=1))
+        max_others.append(np.nanmax(all_targets[:, idx], axis=1))
+        min_others.append(np.nanmin(all_targets[:, idx], axis=1))
+        avg_others.append(np.nanmean(all_targets[:, idx], axis=1))
+        n_others.append(np.sum(np.logical_not(np.isnan(all_targets[:, idx])), axis=1))
 
     all_targets_bin = np.nan * np.ones_like(all_targets)
     for tidx, tissue in enumerate(TISSUES):
-        isUP = ((all_targets[:,tidx] - max_others[tidx]) >= np.log10(n_fold_glob)) & \
-            ((all_targets[:,tidx] - avg_others[tidx]) >= np.log10(n_fold_avg)) & \
-            (n_others[tidx] >= 3)
-        isDOWN = ((all_targets[:,tidx] - min_others[tidx]) <= -np.log10(n_fold_glob)) & \
-            ((all_targets[:,tidx] - avg_others[tidx]) <= -np.log10(n_fold_avg)) & \
-            (n_others[tidx] >= 3)
+        isUP = ((all_targets[:, tidx] - max_others[tidx]) >= np.log10(n_fold_glob)) & \
+               ((all_targets[:, tidx] - avg_others[tidx]) >= np.log10(n_fold_avg)) & \
+               (n_others[tidx] >= 3)
+        isDOWN = ((all_targets[:, tidx] - min_others[tidx]) <= -np.log10(n_fold_glob)) & \
+                 ((all_targets[:, tidx] - avg_others[tidx]) <= -np.log10(n_fold_avg)) & \
+                 (n_others[tidx] >= 3)
 
-        all_targets_bin[isUP,tidx] = 1
-        all_targets_bin[isDOWN,tidx] = 0
-        
+        all_targets_bin[isUP, tidx] = 1
+        all_targets_bin[isDOWN, tidx] = 0
+
         logging.info(f"There are {np.sum(isUP)} ups and {np.sum(isDOWN)} downs.")
 
     # put labels back
     for idx, transcript in enumerate(keys):
-        data[transcript]['targets_bin'] = all_targets_bin[idx,:]
-    
+        data[transcript]['targets_bin'] = all_targets_bin[idx, :]
+
     logging.info(f"Considering {len(data)} sequences...")
 
     # save data
     import pickle
+
     pickle.dump(data, open('data.pkl', 'wb'))
 
     # import IPython
