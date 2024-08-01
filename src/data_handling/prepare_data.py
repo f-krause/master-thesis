@@ -62,8 +62,18 @@ def _seq_to_frequency(seq, bed):
     counts = np.histogram(codons, range(65))[0]
     freq = counts / np.sum(counts)
 
-    return(freq)
     return freq
+
+
+# TODO
+def _seq_to_bpp(seq):
+    """
+    Convert a sequence of base pairs to a binary matrix of base pair probabilities.
+    """
+    # use arnie for this
+    # allow for data augmentation, by using different folding algorithms
+    pass
+
 
 def read_bed_file(filename):
     with open(filename, 'rt') as f:
