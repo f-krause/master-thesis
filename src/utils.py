@@ -25,11 +25,15 @@ def set_project_path(config):
         project_path = config["project_path"]
     elif platform.node() == "Felix-PC":
         project_path = r"C:\Users\Felix\code\uni\UniVie\master-thesis-data"
+    # TODO add work laptop here
+    # elif platform.node() == "XY":
+    #     pass
     else:
         project_path = "krausef99dm_thesis"
 
     os.environ["PROJECT_PATH"] = project_path
     os.environ["SUBPROJECT"] = config["subproject"]
+
     return project_path
 
 
@@ -64,6 +68,7 @@ def check_path_exists(file_path, create_unique=False):
         else:
             logger.error(f"Path {file_path} already exists. Exiting.")
             raise FileExistsError
+
     return file_path
 
 
