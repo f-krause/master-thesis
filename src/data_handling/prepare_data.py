@@ -1,7 +1,7 @@
 """
 Creates labeled sequences for processing.
 
-ptr.csv - Sheet 2 from Additional File 2 from Hernandez-Alias
+ptr.csv - Sheet 2 from Additional File 2 from Hernandez-Alias (Base: Human Proteine Atlas)
 link: https://figshare.com/articles/dataset/Additional_file_2_Protein-to-mRNA_ratios_among_tissues/21379197?file=37938894
 
 Options:
@@ -186,7 +186,7 @@ if __name__ == "__main__":
             del data[transcript]
             continue
 
-        # compute codon_frequncies
+        # compute codon_frequencies
         try:
             data[transcript]['codon_freq'] = _seq_to_frequency(data[transcript]['fasta_ohe'], data[transcript]['bed'])
         except:
@@ -225,8 +225,8 @@ if __name__ == "__main__":
                  ((all_targets[:, tidx] - avg_others[tidx]) <= -np.log10(n_fold_avg)) & \
                  (n_others[tidx] >= 3)
 
-        all_targets_bin[isUP, tidx] = 1
-        all_targets_bin[isDOWN, tidx] = 0
+        all_targets_bin[isUP, tidx] = 1  # up = 1 -> high PTR
+        all_targets_bin[isDOWN, tidx] = 0  # down = 0 -> low PTR
 
         logging.info(f"There are {np.sum(isUP)} ups and {np.sum(isDOWN)} downs.")
 
