@@ -1,12 +1,17 @@
 subproject: "dev"
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
-batch_size: 32
-num_workers: 1
+
+nr_folds: 5
+
 epochs: 4
 save_freq: 2
 val_freq: 2
 warmup: 0
+
+batch_size: 32
+num_workers: 1
+
 optimizer:
   name: adam
   lr: 0.001
