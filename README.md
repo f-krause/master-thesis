@@ -32,7 +32,7 @@ root
 |   │   ├── ...
 │   ├── transformer
 |   │   ├── ...
-├── master-thesis  (this repo)
+└── master-thesis  (this repo)
 ```
 
 
