@@ -35,6 +35,10 @@ root
 └── master-thesis  (this repo)
 ```
 
+Install BPP prediction folding algorithms. Follow [arnie tutorial](https://github.com/DasLab/arnie/blob/master/docs/setup_doc.md).
+
+
+
 
 ## Command collection
 Connect to the university server with the following command:
@@ -42,9 +46,14 @@ Connect to the university server with the following command:
 ssh krausef99dm@rey.dm.univie.ac.at
 ```
 
-Export environment variables for the project
+Export environment dependencies
 ```shell
 mamba env export -n master-env > environment.yml
+```
+
+Update environment dependencies
+```shell
+mamba env update -n master-env -f environment.yml
 ```
 
 
