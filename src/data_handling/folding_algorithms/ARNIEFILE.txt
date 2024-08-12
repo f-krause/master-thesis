@@ -1,0 +1,26 @@
+# Vienna RNAfold 2 Mac using installer:
+vienna_2=C:\Users\felix.krause\AppData\Local\Programs\ViennaRNA Package
+
+# NUPACK build:
+# nupack: /path/to/nupack3.0.6/src/bin
+
+# CONTRAfold build
+# contrafold_2: /path/to/contrafold-se/src
+
+# RNASoft build
+rnasoft=C:\Users\felix.krause\code\uni\master-thesis\src\data_handling\folding_algorithms\MultiRNAFold
+
+# RNAstructure (precompiled command line src)
+# rnastructure: /path/to/RNAstructure/exe
+
+# Path to EternaFold
+# eternafold: /path/to/EternaFold/src
+
+# LinearFold build
+# linearfold: /path/to/LinearFold/bin
+
+#LinearPartition build
+# linearpartition: /path/to/LinearPartition/bin
+
+#directory to write temp files
+TMP=C:\Users\felix.krause\code\uni\master-thesis\src\data_handling\folding_algorithms\tmp
