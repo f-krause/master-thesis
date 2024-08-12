@@ -25,11 +25,13 @@ def set_project_path(config):
         project_path = config["project_path"]
     elif platform.node() == "Felix-PC":
         project_path = r"C:\Users\Felix\code\uni\UniVie\master-thesis-data"
-    # TODO add work laptop here
+    elif platform.node() == "TGA-NB-060":
+        project_path = r"C:\Users\felix.krause\code\uni\master-thesis-data"
+    # TODO set path for server (krausef99dm_thesis)
     # elif platform.node() == "XY":
     #     pass
     else:
-        project_path = "krausef99dm_thesis"
+        project_path = "DEV_PROJECT"
 
     os.environ["PROJECT_PATH"] = project_path
     os.environ["SUBPROJECT"] = config["subproject"]
