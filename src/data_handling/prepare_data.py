@@ -12,11 +12,11 @@ Options:
 
 import os
 import pandas as pd
+import numpy as np
 from tqdm import tqdm
 import logging
-from Bio import SeqIO
-import numpy as np
 from collections import OrderedDict
+from Bio import SeqIO
 
 BED_FILES_FOLDER = "../../data/BED6__protein_coding_strict"
 FASTA_FILES_FOLDER = "../../data/FA_protein_coding_strict_mRNA"
@@ -26,7 +26,7 @@ TISSUES = ['Adrenal', 'Appendices', 'Brain', 'Colon', 'Duodenum', 'Uterus',
            'Liver', 'Lung', 'Lymphnode', 'Ovary', 'Pancreas', 'Placenta',
            'Prostate', 'Rectum', 'Salivarygland', 'Smallintestine', 'Smoothmuscle',
            'Spleen', 'Stomach', 'Testis', 'Thyroid', 'Tonsil', 'Urinarybladder']
-LOAD_LIMIT = 1_000_000
+LOAD_LIMIT = 2
 # For limit 1000 loaded only 419 in the end? What is wrong with the other fasta files?
 # For all files loaded 11.279 sequences
 
@@ -68,16 +68,6 @@ def _seq_to_frequency(seq, bed):
     freq = counts / np.sum(counts)
 
     return freq
-
-
-# TODO
-def _seq_to_bpp(seq):
-    """
-    Convert a sequence of base pairs to a binary matrix of base pair probabilities.
-    """
-    # use arnie for this
-    # allow for data augmentation, by using different folding algorithms
-    pass
 
 
 def read_bed_file(filename):
@@ -164,8 +154,9 @@ if __name__ == "__main__":
     ## (2) 
     data = OrderedDict()
     for transcript in tqdm(transcripts):
-        # load corresponding file
         data[transcript] = {}
+
+        # get sequence
         try:
             fasta_file = os.path.join(FASTA_FILES_FOLDER, fasta_files[transcript])
             with open(fasta_file) as f:
@@ -177,6 +168,7 @@ if __name__ == "__main__":
             del data[transcript]
             continue
 
+        # get 5UTR and 3UTR info
         try:
             bed_file = os.path.join(BED_FILES_FOLDER, bed_files[transcript])
             data[transcript]['bed'] = read_bed_file(bed_file)
@@ -240,7 +232,7 @@ if __name__ == "__main__":
     # save data
     import pickle
     try:
-        pickle.dump(data, open('../../data/ptr_data.pkl', 'wb'))
+        pickle.dump(data, open('../../data/ptr_data_TEST.pkl', 'wb'))
     except:
         logging.error("Could not save data.pkl.")
 
