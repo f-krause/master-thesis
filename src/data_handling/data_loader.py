@@ -7,6 +7,8 @@ class Dataset(torch.utils.data.Dataset):
         self.data = torch.rand(100, 10)
         self.targets = torch.rand(100, 1)
     #      TODO do filtering and pre-processing (if necessary) here
+    #      TODO allow for data augmentation, by using different folding algorithms?
+    #      TODO remove blacklisted Ids
 
     def __len__(self):
         return len(self.data)
