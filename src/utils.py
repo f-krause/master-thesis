@@ -27,11 +27,10 @@ def set_project_path(config):
         project_path = r"C:\Users\Felix\code\uni\UniVie\master-thesis-data"
     elif platform.node() == "TGA-NB-060":
         project_path = r"C:\Users\felix.krause\code\uni\master-thesis-data"
-    # TODO set path for server (krausef99dm_thesis)
-    # elif platform.node() == "XY":
-    #     pass
+    elif platform.node() == "rey":
+        project_path = r"/mnt/data/krausef99dm_thesis"
     else:
-        project_path = "DEV_PROJECT"
+        raise ValueError("Unknown platform. Please specify project path in config file.")
 
     os.environ["PROJECT_PATH"] = project_path
     os.environ["SUBPROJECT"] = config["subproject"]
