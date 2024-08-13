@@ -11,7 +11,7 @@ used in DAP 2024 on university servers
 ## Set up environment
 Create virtual environment with mamba/conda
 ```shell
-mamba env create -f environment.yml
+mamba env create -f environment_linux.yml
 mamba activate master-env
 ```
 
@@ -48,12 +48,12 @@ ssh krausef99dm@rey.dm.univie.ac.at
 
 Export environment dependencies
 ```shell
-mamba env export -n master-env > environment.yml
+mamba env export -n master-env > environment_linux.yml
 ```
 
 Update environment dependencies
 ```shell
-mamba env update -n master-env -f environment.yml
+mamba env update -n master-env -f environment_linux.yml
 ```
 
 
