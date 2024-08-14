@@ -6,6 +6,7 @@ channels:
 dependencies:
   - _libgcc_mutex=0.1=conda_forge
   - _openmp_mutex=4.5=2_kmp_llvm
+  - _sysroot_linux-64_curr_repodata_hack=3=h69a702a_16
   - alembic=1.13.2=pyhd8ed1ab_0
   - anyio=4.4.0=pyhd8ed1ab_0
   - aom=3.9.1=hac33072_0
@@ -17,6 +18,7 @@ dependencies:
   - attrs=24.2.0=pyh71513ae_0
   - babel=2.14.0=pyhd8ed1ab_0
   - beautifulsoup4=4.12.3=pyha770c72_0
+  - binutils_impl_linux-64=2.40=ha1999f0_7
   - blas=1.0=mkl
   - bleach=6.1.0=pyhd8ed1ab_0
   - brotli-python=1.1.0=py39h3d6467e_1
@@ -58,6 +60,8 @@ dependencies:
   - fqdn=1.5.1=pyhd8ed1ab_0
   - freetype=2.12.1=h267a509_2
   - fribidi=1.0.10=h36c2ea0_0
+  - gcc=14.1.0=h6f9ffa1_0
+  - gcc_impl_linux-64=14.1.0=h3c94d91_0
   - gettext=0.22.5=h59595ed_2
   - gettext-tools=0.22.5=h59595ed_2
   - gmp=6.3.0=hac33072_2
@@ -65,6 +69,7 @@ dependencies:
   - gnutls=3.7.9=hb077bed_0
   - graphite2=1.3.13=h59595ed_1003
   - greenlet=3.0.3=py39h3d6467e_0
+  - gsl=2.7=he838d99_0
   - h11=0.14.0=pyhd8ed1ab_0
   - h2=4.1.0=pyhd8ed1ab_0
   - harfbuzz=9.0.0=hda332d3_1
@@ -101,6 +106,7 @@ dependencies:
   - jupyterlab_pygments=0.3.0=pyhd8ed1ab_1
   - jupyterlab_server=2.27.3=pyhd8ed1ab_0
   - jupyterlab_widgets=3.0.11=pyhd8ed1ab_0
+  - kernel-headers_linux-64=3.10.0=h4a8ded7_16
   - keyutils=1.6.1=h166bdaf_0
   - krb5=1.21.3=h659f571_0
   - lame=3.100=h166bdaf_1003
@@ -124,6 +130,8 @@ dependencies:
   - libedit=3.1.20191231=he28a2e2_2
   - libexpat=2.6.2=h59595ed_0
   - libffi=3.4.2=h7f98852_5
+  - libgcc=7.2.0=h69d50b8_2
+  - libgcc-devel_linux-64=14.1.0=h5d3d1c9_100
   - libgcc-ng=14.1.0=h77fa898_0
   - libgettextpo=0.22.5=h59595ed_2
   - libgettextpo-devel=0.22.5=h59595ed_2
@@ -158,6 +166,7 @@ dependencies:
   - libpciaccess=0.18=hd590300_0
   - libpng=1.6.43=h2797004_0
   - libprotobuf=4.25.3=h08a7969_0
+  - libsanitizer=14.1.0=hcba0ae0_0
   - libsodium=1.0.18=h36c2ea0_1
   - libsqlite=3.46.0=hde9e2c9_0
   - libstdcxx-ng=14.1.0=hc0a3c3a_0
@@ -206,6 +215,8 @@ dependencies:
   - pandocfilters=1.5.0=pyhd8ed1ab_0
   - parso=0.8.4=pyhd8ed1ab_0
   - pcre2=10.44=hba22ea6_2
+  - perl=5.32.1=7_hd590300_perl5
+  - perl-app-cpanminus=1.7047=pl5321hd8ed1ab_0
   - pexpect=4.9.0=pyhd8ed1ab_0
   - pickleshare=0.7.5=py_1003
   - pillow=10.4.0=py39h16a7006_0
@@ -257,6 +268,7 @@ dependencies:
   - stack_data=0.6.2=pyhd8ed1ab_0
   - svt-av1=2.1.2=hac33072_0
   - sympy=1.13.2=pypyh2585a3b_103
+  - sysroot_linux-64=2.17=h4a8ded7_16
   - tbb=2021.12.0=h434a139_3
   - terminado=0.18.1=pyh0d859eb_0
   - threadpoolctl=3.5.0=pyhc1e730c_0
@@ -314,4 +326,5 @@ dependencies:
       - gprofiler-official==1.0.0
       - mygene==3.2.2
       - pooch==1.8.2
+      - viennarna==2.6.4
 prefix: /mnt/data/krausef99dm_thesis/miniforge3/envs/master-env
