@@ -1,0 +1,93 @@
+import os
+import time
+import logging
+import pickle
+import json
+from tqdm import tqdm
+from ViennaRNA import fold
+
+
+FOLD_PACKAGE = 'viennarna'
+DATA_PATH = '/mnt/data/krausef99dm_thesis/data'
+OVERWRITE_FILES = False  # only for debugging!
+MAX_PRED_NR = 10  # FIXME only for debugging!
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    handlers=[
+                        # add time stamp to log file
+                        logging.FileHandler(f"logs/pred_sec_struc_{time.strftime('%Y%m%d-%H%M')}.log"),
+                        logging.StreamHandler()
+                    ])
+logger = logging.getLogger()
+
+
+def _load_data():
+    with open(os.path.join(DATA_PATH, 'ptr_data.pkl'), 'rb') as f:
+        # TODO make sure to drop super long sequences from data!
+        data = pickle.load(f)
+    return data
+
+
+def _check_file_exists(idx):
+    path = os.path.join(DATA_PATH, "sec_struc", f'{idx}-{FOLD_PACKAGE}.json')
+    if os.path.exists(path):
+        logging.warning(f"Skipping {idx}. File {path} already exists.")
+        return True
+    return False
+
+
+def _store_preds(idx, preds):
+    path = os.path.join(DATA_PATH, "sec_struc", f'{idx}-{FOLD_PACKAGE}.json')
+    # store as json
+    with open(path, 'w') as f:
+        json.dump(preds, f)
+
+
+def _pred_loop_type(seq, structure, debug=False):
+    # os.system("cd folding_algorithms/bpRNA")
+    os.chdir("folding_algorithms/bpRNA")
+    os.system(f'echo {seq} > a.dbn')
+    os.system('echo \"{}\" >> a.dbn'.format(structure))
+    os.system('perl bpRNA.pl a.dbn')
+    loop_type = [l.strip('\n') for l in open('a.st')]
+    if debug:
+        print(seq)
+        print(structure)
+        print(loop_type[5])
+    os.chdir("/export/home/krausef99dm/master-thesis/src/data_handling")
+    return loop_type
+
+
+def main():
+    logging.info("Predicting secondary structure and loop type.")
+
+    data = _load_data()
+    ids = data.keys()
+    preds = {}
+    counter = 0
+
+    # for idx in ["ENST00000304312"]:  # dev
+    for idx in tqdm(ids):
+        if counter >= MAX_PRED_NR:
+            break
+        if not OVERWRITE_FILES and _check_file_exists(idx):
+            continue
+
+        logging.info(f"Computing predictions for: {idx}-{FOLD_PACKAGE}")
+        seq = data[idx]['fasta']
+
+        pred_struc, mfe = fold(seq)
+        pred_loop_type = _pred_loop_type(seq, pred_struc)
+
+        preds["structure"] = pred_struc
+        preds["loop_type"] = pred_loop_type[5]
+        preds["MFE"] = mfe
+        preds["other_bpRNA_output"] = pred_loop_type[7:]
+
+        _store_preds(idx, preds)
+        counter += 1
+
+
+if __name__ == "__main__":
+    main()
