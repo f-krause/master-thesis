@@ -9,9 +9,10 @@ from ViennaRNA import fold
 
 FOLD_PACKAGE = 'viennarna'
 DATA_PATH = '/mnt/data/krausef99dm_thesis/data'
+
 OVERWRITE_FILES = False  # only for debugging!
-MAX_SEQ_LENGTH = 5000
-MAX_PRED_NR = 10  # FIXME only for debugging!
+MAX_SEQ_LENGTH = 2000  # 3241 seq with len below 2000
+MAX_PRED_NR = 600
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -65,25 +66,27 @@ def main():
 
     data = _load_data()
     ids = data.keys()
-    preds = {}
+
     too_long_seq = []
     counter = 0
     start_time = time.time()
 
     # for idx in ["ENST00000304312"]:  # dev
     for idx in tqdm(ids):
+        preds = {}
         if counter >= MAX_PRED_NR:
             break
         if not OVERWRITE_FILES and _check_file_exists(idx):
             continue
 
-        logging.info(f"Computing predictions for: {idx}-{FOLD_PACKAGE}")
         seq = data[idx]['fasta']
 
         if len(seq) > MAX_SEQ_LENGTH:
             logging.warning(f"Skipping {idx}. Sequence longer than {MAX_SEQ_LENGTH}.")
             too_long_seq.append(idx)
             continue
+
+        logging.info(f"Computing predictions for: {idx}-{FOLD_PACKAGE}")
 
         pred_struc, mfe = fold(seq)
         pred_loop_type = _pred_loop_type(seq, pred_struc)
@@ -100,7 +103,7 @@ def main():
     logging.info("Sequences that were skipped: ")
     logging.info(too_long_seq)
 
-    logging.info(f"Predicted {counter} secondary structures in {time.time() - start_time} seconds.")
+    logging.info(f"Predicted {counter} secondary structures in {(time.time() - start_time)/60} minutes.")
     logging.info(f"Average time per prediction: {(time.time() - start_time) / counter} seconds.")
     logging.info("Done.")
 
