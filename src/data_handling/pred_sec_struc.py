@@ -10,6 +10,7 @@ from ViennaRNA import fold
 FOLD_PACKAGE = 'viennarna'
 DATA_PATH = '/mnt/data/krausef99dm_thesis/data'
 OVERWRITE_FILES = False  # only for debugging!
+MAX_SEQ_LENGTH = 5000
 MAX_PRED_NR = 10  # FIXME only for debugging!
 
 logging.basicConfig(level=logging.INFO,
@@ -65,6 +66,7 @@ def main():
     data = _load_data()
     ids = data.keys()
     preds = {}
+    too_long_seq = []
     counter = 0
 
     # for idx in ["ENST00000304312"]:  # dev
@@ -77,6 +79,11 @@ def main():
         logging.info(f"Computing predictions for: {idx}-{FOLD_PACKAGE}")
         seq = data[idx]['fasta']
 
+        if len(seq) > MAX_SEQ_LENGTH:
+            logging.warning(f"Skipping {idx}. Sequence longer than {MAX_SEQ_LENGTH}.")
+            too_long_seq.append(idx)
+            continue
+
         pred_struc, mfe = fold(seq)
         pred_loop_type = _pred_loop_type(seq, pred_struc)
 
@@ -87,6 +94,11 @@ def main():
 
         _store_preds(idx, preds)
         counter += 1
+
+    logging.info(f"Skipped {len(too_long_seq)} sequences because they were too long.")
+    logging.info("Sequences that were skipped: ")
+    logging.info(too_long_seq)
+    logging.info("Done.")
 
 
 if __name__ == "__main__":
