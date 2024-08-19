@@ -68,6 +68,7 @@ def main():
     preds = {}
     too_long_seq = []
     counter = 0
+    start_time = time.time()
 
     # for idx in ["ENST00000304312"]:  # dev
     for idx in tqdm(ids):
@@ -98,6 +99,9 @@ def main():
     logging.info(f"Skipped {len(too_long_seq)} sequences because they were too long.")
     logging.info("Sequences that were skipped: ")
     logging.info(too_long_seq)
+
+    logging.info(f"Predicted {counter} secondary structures in {time.time() - start_time} seconds.")
+    logging.info(f"Average time per prediction: {(time.time() - start_time) / counter} seconds.")
     logging.info("Done.")
 
 
