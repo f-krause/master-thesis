@@ -1,0 +1,16 @@
+2024-08-19 16:26:24,196 - root - INFO - Predicting secondary structure and loop type.
+2024-08-19 16:26:24,833 - root - WARNING - Skipping ENST00000263100. Sequence longer than 1000.
+2024-08-19 16:26:24,834 - root - WARNING - Skipping ENST00000373993. Sequence longer than 1000.
+2024-08-19 16:26:24,834 - root - WARNING - Skipping ENST00000318602. Sequence longer than 1000.
+2024-08-19 16:26:24,834 - root - WARNING - Skipping ENST00000299698. Sequence longer than 1000.
+2024-08-19 16:26:24,834 - root - WARNING - Skipping ENST00000401850. Sequence longer than 1000.
+2024-08-19 16:26:24,834 - root - WARNING - Skipping ENST00000236709. Sequence longer than 1000.
+2024-08-19 16:26:24,835 - root - WARNING - Skipping ENST00000209873. Sequence longer than 1000.
+2024-08-19 16:26:24,835 - root - WARNING - Skipping ENST00000316519. Sequence longer than 1000.
+2024-08-19 16:26:24,835 - root - WARNING - Skipping ENST00000232892. Sequence longer than 1000.
+2024-08-19 16:26:24,835 - root - WARNING - Skipping ENST00000515480. Sequence longer than 1000.
+2024-08-19 16:26:24,835 - root - WARNING - Skipping ENST00000261880. Sequence longer than 1000.
+2024-08-19 16:26:24,835 - root - WARNING - Skipping ENST00000409085. Sequence longer than 1000.
+2024-08-19 16:26:24,836 - root - INFO - Computing predictions for: ENST00000526415-vienna_2
+2024-08-19 16:26:24,836 - root - INFO -    Sequence length: 579
+2024-08-19 16:26:58,785 - root - INFO -    Pred time: 33.94834017753601 seconds.

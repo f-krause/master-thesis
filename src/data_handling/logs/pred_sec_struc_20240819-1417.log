@@ -1,0 +1,51 @@
+2024-08-19 14:17:21,458 - root - INFO - Predicting secondary structure and loop type.
+2024-08-19 14:17:22,054 - root - WARNING - Skipping ENST00000263100. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000263100-viennarna.json already exists.
+2024-08-19 14:17:22,055 - root - WARNING - Skipping ENST00000373993. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000373993-viennarna.json already exists.
+2024-08-19 14:17:22,055 - root - WARNING - Skipping ENST00000318602. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000318602-viennarna.json already exists.
+2024-08-19 14:17:22,055 - root - WARNING - Skipping ENST00000299698. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000299698-viennarna.json already exists.
+2024-08-19 14:17:22,055 - root - WARNING - Skipping ENST00000401850. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000401850-viennarna.json already exists.
+2024-08-19 14:17:22,055 - root - WARNING - Skipping ENST00000236709. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000236709-viennarna.json already exists.
+2024-08-19 14:17:22,055 - root - WARNING - Skipping ENST00000209873. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000209873-viennarna.json already exists.
+2024-08-19 14:17:22,055 - root - WARNING - Skipping ENST00000316519. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000316519-viennarna.json already exists.
+2024-08-19 14:17:22,055 - root - WARNING - Skipping ENST00000232892. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000232892-viennarna.json already exists.
+2024-08-19 14:17:22,055 - root - WARNING - Skipping ENST00000515480. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000515480-viennarna.json already exists.
+2024-08-19 14:17:22,055 - root - INFO - Computing predictions for: ENST00000261880-viennarna
+2024-08-19 14:17:37,516 - root - INFO - Computing predictions for: ENST00000409085-viennarna
+2024-08-19 14:17:37,517 - root - WARNING - Skipping ENST00000409085. Sequence longer than 5000.
+2024-08-19 14:17:37,517 - root - INFO - Computing predictions for: ENST00000526415-viennarna
+2024-08-19 14:17:37,961 - root - INFO - Computing predictions for: ENST00000420660-viennarna
+2024-08-19 14:17:41,867 - root - INFO - Computing predictions for: ENST00000373932-viennarna
+2024-08-19 14:17:51,890 - root - INFO - Computing predictions for: ENST00000378279-viennarna
+2024-08-19 14:17:58,653 - root - INFO - Computing predictions for: ENST00000261772-viennarna
+2024-08-19 14:18:17,353 - root - INFO - Computing predictions for: ENST00000602986-viennarna
+2024-08-19 14:18:38,666 - root - INFO - Computing predictions for: ENST00000278618-viennarna
+2024-08-19 14:18:52,388 - root - INFO - Computing predictions for: ENST00000417368-viennarna
+2024-08-19 14:18:52,388 - root - WARNING - Skipping ENST00000417368. Sequence longer than 5000.
+2024-08-19 14:18:52,388 - root - INFO - Computing predictions for: ENST00000417379-viennarna
+2024-08-19 14:18:52,388 - root - WARNING - Skipping ENST00000417379. Sequence longer than 5000.
+2024-08-19 14:18:52,389 - root - INFO - Computing predictions for: ENST00000425191-viennarna
+2024-08-19 14:18:56,745 - root - INFO - Computing predictions for: ENST00000374736-viennarna
+2024-08-19 14:18:56,745 - root - WARNING - Skipping ENST00000374736. Sequence longer than 5000.
+2024-08-19 14:18:56,745 - root - INFO - Computing predictions for: ENST00000389661-viennarna
+2024-08-19 14:18:56,745 - root - WARNING - Skipping ENST00000389661. Sequence longer than 5000.
+2024-08-19 14:18:56,746 - root - INFO - Computing predictions for: ENST00000371605-viennarna
+2024-08-19 14:18:56,746 - root - WARNING - Skipping ENST00000371605. Sequence longer than 5000.
+2024-08-19 14:18:56,746 - root - INFO - Computing predictions for: ENST00000382381-viennarna
+2024-08-19 14:18:56,746 - root - WARNING - Skipping ENST00000382381. Sequence longer than 5000.
+2024-08-19 14:18:56,746 - root - INFO - Computing predictions for: ENST00000588877-viennarna
+2024-08-19 14:18:56,746 - root - WARNING - Skipping ENST00000588877. Sequence longer than 5000.
+2024-08-19 14:18:56,746 - root - INFO - Computing predictions for: ENST00000284425-viennarna
+2024-08-19 14:18:56,746 - root - WARNING - Skipping ENST00000284425. Sequence longer than 5000.
+2024-08-19 14:18:56,746 - root - INFO - Computing predictions for: ENST00000586539-viennarna
+2024-08-19 14:18:56,747 - root - WARNING - Skipping ENST00000586539. Sequence longer than 5000.
+2024-08-19 14:18:56,747 - root - INFO - Computing predictions for: ENST00000453985-viennarna
+2024-08-19 14:18:56,747 - root - WARNING - Skipping ENST00000453985. Sequence longer than 5000.
+2024-08-19 14:18:56,747 - root - INFO - Computing predictions for: ENST00000622132-viennarna
+2024-08-19 14:18:56,747 - root - WARNING - Skipping ENST00000622132. Sequence longer than 5000.
+2024-08-19 14:18:56,747 - root - INFO - Computing predictions for: ENST00000344517-viennarna
+2024-08-19 14:19:23,331 - root - INFO - Skipped 12 sequences because they were too long.
+2024-08-19 14:19:23,331 - root - INFO - Sequences that were skipped: 
+2024-08-19 14:19:23,332 - root - INFO - ['ENST00000409085', 'ENST00000417368', 'ENST00000417379', 'ENST00000374736', 'ENST00000389661', 'ENST00000371605', 'ENST00000382381', 'ENST00000588877', 'ENST00000284425', 'ENST00000586539', 'ENST00000453985', 'ENST00000622132']
+2024-08-19 14:19:23,332 - root - INFO - Predicted 10 secondary structures in 121.28860759735107 seconds.
+2024-08-19 14:19:23,332 - root - INFO - Average time per prediction: 12.128866124153138 seconds.
+2024-08-19 14:19:23,332 - root - INFO - Done.

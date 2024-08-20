@@ -1,0 +1,4 @@
+2024-08-19 16:29:14,769 - root - INFO - Predicting secondary structure and loop type.
+2024-08-19 16:29:15,422 - root - INFO - Computing predictions for: ENST00000304312-vienna_2
+2024-08-19 16:29:15,423 - root - INFO -    Sequence length: 303
+2024-08-19 16:29:21,955 - root - INFO -    Pred time: 6.531628847122192 seconds.
