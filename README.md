@@ -58,6 +58,15 @@ Update environment dependencies
 mamba env update -n master-env -f environment_linux.yml
 ```
 
+Count files in a directory
+```shell
+ls -1 | wc -l
+```
+
+Connect to shh server
+```shell
+ssh krausef99dm@rey.dm.univie.ac.at
+```
 
 ## More
 TBW
