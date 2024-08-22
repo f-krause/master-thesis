@@ -3,7 +3,9 @@ project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 
 nr_folds: 5
+seed: 2024
 
+model: "dummy" # dummy, baseline, lstm, xlstm, mamba, transformer, best
 epochs: 4
 save_freq: 2
 val_freq: 2

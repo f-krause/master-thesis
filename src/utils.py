@@ -21,6 +21,8 @@ class TrainConfig:
     project_path: Optional[str]
     log_file_path: Optional[str]
     nr_folds: int
+    seed: int
+    model: str
     epochs: int
     save_freq: int
     val_freq: int
@@ -30,15 +32,15 @@ class TrainConfig:
     optimizer: OptimizerConfig
 
     def __init__(self, config_file: str):
-        # Load the YAML file
         with open(config_file, 'r') as file:
             config = yaml.safe_load(file)
 
-        # Set the fields from the YAML file
         self.subproject = config.get('subproject', "dev")
         self.project_path = config.get('project_path', None)
         self.log_file_path = config.get('log_file_path', None)
         self.nr_folds = config['nr_folds']
+        self.seed = config['seed']
+        self.model = config['model']
         self.epochs = config['epochs']
         self.save_freq = config['save_freq']
         self.val_freq = config['val_freq']
@@ -46,7 +48,6 @@ class TrainConfig:
         self.batch_size = config['batch_size']
         self.num_workers = config['num_workers']
 
-        # Initialize the nested OptimizerConfig dataclass
         optimizer_config = config['optimizer']
         self.optimizer = OptimizerConfig(
             name=optimizer_config['name'],

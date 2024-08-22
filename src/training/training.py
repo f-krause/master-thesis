@@ -2,15 +2,52 @@ import os
 import torch
 import pandas as pd
 from tqdm import tqdm
+from log.logger import setup_logger
+from utils import save_checkpoint, mkdir, check_path_exists, TrainConfig
 from data_handling.data_loader import get_data_loaders
 from training.optimizer import get_optimizer
-from models.model_template import ModelBaseline
-from utils import save_checkpoint, mkdir, check_path_exists, TrainConfig
-from log.logger import setup_logger
+
+from models.dummy.model_dummy import ModelDummy
+from models.baseline.model_baseline import ModelBaseline
+
+
+
+
+def get_model(config: TrainConfig, device: torch.device, logger):
+    if config.model == "dummy":
+        logger.warning("Using dummy model")
+        return ModelDummy().to(device)
+    if config.model == "baseline":
+        logger.info("Using baseline model")
+        return ModelBaseline().to(device)
+    if config.model == "lstm":
+        logger.info("Using LSTM model")
+        # TODO
+        raise NotImplementedError("LSTM model not implemented yet")
+    if config.model == "xlstm":
+        logger.info("Using xLSTM model")
+        # TODO
+        raise NotImplementedError("XLSTM model not implemented yet")
+    if config.model == "mamba":
+        logger.info("Using Mamba model")
+        # TODO
+        raise NotImplementedError("Mamba model not implemented yet")
+    if config.model == "transformer":
+        logger.info("Using Transformer model")
+        # TODO
+        raise NotImplementedError("Transformer model not implemented yet")
+    if config.model == "best":
+        logger.info("Using best model")
+        # TODO
+        raise NotImplementedError("Best model not implemented yet")
+    else:
+        raise ValueError(f"Model {config.model} not implemented! Choose from: "
+                         f"dummy, baseline, lstm, xlstm, mamba, transformer, best")
 
 
 def train(config: TrainConfig):
     logger = setup_logger()
+
     logger.info("Starting training")
 
     checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], os.environ["SUBPROJECT"], "weights")
@@ -21,8 +58,9 @@ def train(config: TrainConfig):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Using device: {device}")
 
-    model = ModelBaseline().to(device)  # Initialize your model
-    optimizer = get_optimizer(model, config.optimizer)  # Initialize your optimizer
+    model = get_model(config, device, logger)
+
+    optimizer = get_optimizer(model, config.optimizer)
 
     criterion = torch.nn.MSELoss()  # Define your loss function
     train_loader, val_loader = get_data_loaders(config)

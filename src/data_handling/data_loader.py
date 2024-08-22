@@ -4,9 +4,13 @@ from utils import TrainConfig
 
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, config: TrainConfig, train=True):
-        self.data = torch.rand(100, 10)
-        self.targets = torch.rand(100, 1)
+    def __init__(self, config: TrainConfig, train=True, dummy=False):
+        if config.model == "dummy":
+            self.data = torch.rand(100, 10)
+            self.targets = torch.rand(100, 1)
+        else:
+            # TODO
+            raise NotImplementedError()
 
     #      TODO do filtering and pre-processing (if necessary) here
     #      TODO allow for data augmentation, by using different folding algorithms?
