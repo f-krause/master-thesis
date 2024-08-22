@@ -1,13 +1,13 @@
 import torch.optim as optim
+from utils import OptimizerConfig
 
 
-def get_optimizer(model, config):
-    optimizer_name = config['optimizer']['name']
-    lr = config['optimizer']['lr']
+def get_optimizer(model, optimizer_config: OptimizerConfig):
+    optimizer_name = optimizer_config.name
 
     if optimizer_name == 'adam':
-        return optim.Adam(model.parameters(), lr=lr)
+        return optim.Adam(model.parameters(), lr=optimizer_config.lr)
     elif optimizer_name == 'sgd':
-        return optim.SGD(model.parameters(), lr=lr, momentum=config['optimizer']['momentum'])
+        return optim.SGD(model.parameters(), lr=optimizer_config.lr, momentum=optimizer_config.momentum)
     else:
         raise ValueError(f"Optimizer {optimizer_name} not recognized.")

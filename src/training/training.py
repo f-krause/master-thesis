@@ -5,11 +5,11 @@ from tqdm import tqdm
 from data_handling.data_loader import get_data_loaders
 from training.optimizer import get_optimizer
 from models.model_template import ModelBaseline
-from utils import save_checkpoint, mkdir, check_path_exists
+from utils import save_checkpoint, mkdir, check_path_exists, TrainConfig
 from log.logger import setup_logger
 
 
-def train(config):
+def train(config: TrainConfig):
     logger = setup_logger()
     logger.info("Starting training")
 
@@ -22,14 +22,14 @@ def train(config):
     logger.info(f"Using device: {device}")
 
     model = ModelBaseline().to(device)  # Initialize your model
-    optimizer = get_optimizer(model, config)
+    optimizer = get_optimizer(model, config.optimizer)  # Initialize your optimizer
 
     criterion = torch.nn.MSELoss()  # Define your loss function
-    train_loader, val_loader = get_data_loaders(config['batch_size'], config['num_workers'])
+    train_loader, val_loader = get_data_loaders(config)
 
     losses = {}
 
-    for epoch in range(1, config['epochs'] + 1):
+    for epoch in range(1, config.epochs + 1):
         # Training
         model.train()
         running_loss = 0.0
@@ -45,7 +45,7 @@ def train(config):
         logger.info(f'Epoch {epoch}, Loss: {running_loss / len(train_loader)}')
 
         # Validation
-        if (epoch % config['val_freq'] == 0 and epoch > config["warmup"]) or epoch == config['epochs'] - 1:
+        if (epoch % config.val_freq == 0 and epoch > config.warmup) or epoch == config.epochs - 1:
             model.eval()
             val_loss = 0.0
             with torch.no_grad():
@@ -58,7 +58,7 @@ def train(config):
             logger.info(f'Validation loss: {val_loss / len(val_loader)}')
 
         # Save checkpoint
-        if (epoch % config['save_freq'] == 0 and epoch > config["warmup"]) or epoch == config['epochs'] - 1:
+        if (epoch % config.save_freq == 0 and epoch > config.warmup) or epoch == config.epochs - 1:
             save_checkpoint({
                 'epoch': epoch,
                 'state_dict': model.state_dict(),
