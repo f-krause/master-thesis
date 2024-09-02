@@ -5,9 +5,10 @@ import pickle
 import json
 from tqdm import tqdm
 from ViennaRNA import fold
+import linearfold
 
-
-FOLD_PACKAGE = 'viennarna'
+# FOLD_PACKAGE = 'viennarna'
+FOLD_PACKAGE = 'linearfold'
 DATA_PATH = '/mnt/data/krausef99dm_thesis/data'
 
 OVERWRITE_FILES = False  # only for debugging!
@@ -18,7 +19,7 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     handlers=[
                         # add time stamp to log file
-                        logging.FileHandler(f"logs/pred_sec_struc_{time.strftime('%Y%m%d-%H%M')}.log"),
+                        logging.FileHandler(f"logs/{FOLD_PACKAGE}_pred_sec_struc_{time.strftime('%Y%m%d-%H%M')}.log"),
                         logging.StreamHandler()
                     ])
 logger = logging.getLogger()
@@ -63,6 +64,9 @@ def _pred_loop_type(seq, structure, debug=False):
 
 def main():
     logging.info("Predicting secondary structure and loop type.")
+    logging.info(f"MAX_SEQ_LENGTH: {MAX_SEQ_LENGTH}")
+    logging.info(f"MAX_PRED_NR: {MAX_PRED_NR}")
+    logging.info(f"FOLD_PACKAGE: {FOLD_PACKAGE}")
 
     data = _load_data()
     ids = data.keys()
@@ -88,7 +92,14 @@ def main():
 
         logging.info(f"Computing predictions for: {idx}-{FOLD_PACKAGE}")
 
-        pred_struc, mfe = fold(seq)
+        # Predicting structure
+        if FOLD_PACKAGE == 'viennarna':
+            pred_struc, mfe = fold(seq)
+        elif FOLD_PACKAGE == 'linearfold':
+            pred_struc, mfe = linearfold.fold(seq)
+        else:
+            raise ValueError(f"Unknown FOLD_PACKAGE: {FOLD_PACKAGE}")
+
         pred_loop_type = _pred_loop_type(seq, pred_struc)
 
         preds["structure"] = pred_struc
