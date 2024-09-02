@@ -1,0 +1,1310 @@
+2024-09-02 18:01:03,279 - root - INFO - Predicting secondary structure and loop type.
+2024-09-02 18:01:03,280 - root - INFO - MAX_SEQ_LENGTH: 5000
+2024-09-02 18:01:03,280 - root - INFO - MAX_PRED_NR: 1000
+2024-09-02 18:01:03,280 - root - INFO - FOLD_PACKAGE: linearfold
+2024-09-02 18:01:03,869 - root - WARNING - Skipping ENST00000263100. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000263100-linearfold.json already exists.
+2024-09-02 18:01:03,869 - root - WARNING - Skipping ENST00000373993. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000373993-linearfold.json already exists.
+2024-09-02 18:01:03,869 - root - WARNING - Skipping ENST00000318602. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000318602-linearfold.json already exists.
+2024-09-02 18:01:03,869 - root - WARNING - Skipping ENST00000299698. Sequence longer than 5000.
+2024-09-02 18:01:03,869 - root - WARNING - Skipping ENST00000401850. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000401850-linearfold.json already exists.
+2024-09-02 18:01:03,869 - root - WARNING - Skipping ENST00000236709. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000236709-linearfold.json already exists.
+2024-09-02 18:01:03,869 - root - WARNING - Skipping ENST00000209873. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000209873-linearfold.json already exists.
+2024-09-02 18:01:03,869 - root - WARNING - Skipping ENST00000316519. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000316519-linearfold.json already exists.
+2024-09-02 18:01:03,869 - root - WARNING - Skipping ENST00000232892. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000232892-linearfold.json already exists.
+2024-09-02 18:01:03,869 - root - WARNING - Skipping ENST00000515480. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000515480-linearfold.json already exists.
+2024-09-02 18:01:03,869 - root - WARNING - Skipping ENST00000261880. File /mnt/data/krausef99dm_thesis/data/sec_struc/ENST00000261880-linearfold.json already exists.
+2024-09-02 18:01:03,869 - root - WARNING - Skipping ENST00000409085. Sequence longer than 5000.
+2024-09-02 18:01:03,869 - root - INFO - Computing predictions for: ENST00000526415-linearfold
+2024-09-02 18:01:04,078 - root - INFO - Computing predictions for: ENST00000420660-linearfold
+2024-09-02 18:01:04,854 - root - INFO - Computing predictions for: ENST00000373932-linearfold
+2024-09-02 18:01:05,970 - root - INFO - Computing predictions for: ENST00000378279-linearfold
+2024-09-02 18:01:07,157 - root - INFO - Computing predictions for: ENST00000261772-linearfold
+2024-09-02 18:01:08,459 - root - INFO - Computing predictions for: ENST00000602986-linearfold
+2024-09-02 18:01:09,382 - root - INFO - Computing predictions for: ENST00000278618-linearfold
+2024-09-02 18:01:10,060 - root - WARNING - Skipping ENST00000417368. Sequence longer than 5000.
+2024-09-02 18:01:10,061 - root - WARNING - Skipping ENST00000417379. Sequence longer than 5000.
+2024-09-02 18:01:10,062 - root - INFO - Computing predictions for: ENST00000425191-linearfold
+2024-09-02 18:01:10,805 - root - WARNING - Skipping ENST00000374736. Sequence longer than 5000.
+2024-09-02 18:01:10,806 - root - WARNING - Skipping ENST00000389661. Sequence longer than 5000.
+2024-09-02 18:01:10,806 - root - WARNING - Skipping ENST00000371605. Sequence longer than 5000.
+2024-09-02 18:01:10,807 - root - WARNING - Skipping ENST00000382381. Sequence longer than 5000.
+2024-09-02 18:01:10,807 - root - WARNING - Skipping ENST00000588877. Sequence longer than 5000.
+2024-09-02 18:01:10,807 - root - WARNING - Skipping ENST00000284425. Sequence longer than 5000.
+2024-09-02 18:01:10,807 - root - WARNING - Skipping ENST00000586539. Sequence longer than 5000.
+2024-09-02 18:01:10,807 - root - WARNING - Skipping ENST00000453985. Sequence longer than 5000.
+2024-09-02 18:01:10,807 - root - WARNING - Skipping ENST00000622132. Sequence longer than 5000.
+2024-09-02 18:01:10,807 - root - INFO - Computing predictions for: ENST00000344517-linearfold
+2024-09-02 18:01:12,119 - root - INFO - Computing predictions for: ENST00000265316-linearfold
+2024-09-02 18:01:13,565 - root - INFO - Computing predictions for: ENST00000373394-linearfold
+2024-09-02 18:01:14,825 - root - INFO - Computing predictions for: ENST00000542328-linearfold
+2024-09-02 18:01:16,956 - root - INFO - Computing predictions for: ENST00000344275-linearfold
+2024-09-02 18:01:18,118 - root - WARNING - Skipping ENST00000244533. Sequence longer than 5000.
+2024-09-02 18:01:18,118 - root - WARNING - Skipping ENST00000285238. Sequence longer than 5000.
+2024-09-02 18:01:18,118 - root - WARNING - Skipping ENST00000265586. Sequence longer than 5000.
+2024-09-02 18:01:18,118 - root - WARNING - Skipping ENST00000205557. Sequence longer than 5000.
+2024-09-02 18:01:18,119 - root - INFO - Computing predictions for: ENST00000389817-linearfold
+2024-09-02 18:01:20,407 - root - INFO - Computing predictions for: ENST00000218104-linearfold
+2024-09-02 18:01:22,429 - root - WARNING - Skipping ENST00000308666. Sequence longer than 5000.
+2024-09-02 18:01:22,429 - root - INFO - Computing predictions for: ENST00000370214-linearfold
+2024-09-02 18:01:23,327 - root - INFO - Computing predictions for: ENST00000356924-linearfold
+2024-09-02 18:01:24,482 - root - INFO - Computing predictions for: ENST00000296577-linearfold
+2024-09-02 18:01:25,390 - root - INFO - Computing predictions for: ENST00000287844-linearfold
+2024-09-02 18:01:27,028 - root - INFO - Computing predictions for: ENST00000429586-linearfold
+2024-09-02 18:01:28,022 - root - INFO - Computing predictions for: ENST00000347800-linearfold
+2024-09-02 18:01:29,180 - root - INFO - Computing predictions for: ENST00000515655-linearfold
+2024-09-02 18:01:30,299 - root - WARNING - Skipping ENST00000272286. Sequence longer than 5000.
+2024-09-02 18:01:30,299 - root - INFO - Computing predictions for: ENST00000273359-linearfold
+2024-09-02 18:01:30,955 - root - INFO - Computing predictions for: ENST00000222800-linearfold
+2024-09-02 18:01:31,622 - root - INFO - Computing predictions for: ENST00000339157-linearfold
+2024-09-02 18:01:32,457 - root - WARNING - Skipping ENST00000375898. Sequence longer than 5000.
+2024-09-02 18:01:32,457 - root - INFO - Computing predictions for: ENST00000273596-linearfold
+2024-09-02 18:01:32,964 - root - INFO - Computing predictions for: ENST00000525795-linearfold
+2024-09-02 18:01:33,544 - root - INFO - Computing predictions for: ENST00000307201-linearfold
+2024-09-02 18:01:35,064 - root - INFO - Computing predictions for: ENST00000292577-linearfold
+2024-09-02 18:01:36,010 - root - INFO - Computing predictions for: ENST00000333421-linearfold
+2024-09-02 18:01:36,946 - root - INFO - Computing predictions for: ENST00000258884-linearfold
+2024-09-02 18:01:37,799 - root - INFO - Computing predictions for: ENST00000444616-linearfold
+2024-09-02 18:01:38,430 - root - INFO - Computing predictions for: ENST00000565973-linearfold
+2024-09-02 18:01:39,277 - root - INFO - Computing predictions for: ENST00000289119-linearfold
+2024-09-02 18:01:39,867 - root - INFO - Computing predictions for: ENST00000428304-linearfold
+2024-09-02 18:01:41,062 - root - INFO - Computing predictions for: ENST00000458276-linearfold
+2024-09-02 18:01:41,464 - root - INFO - Computing predictions for: ENST00000478253-linearfold
+2024-09-02 18:01:42,231 - root - INFO - Computing predictions for: ENST00000376138-linearfold
+2024-09-02 18:01:43,089 - root - WARNING - Skipping ENST00000261017. Sequence longer than 5000.
+2024-09-02 18:01:43,089 - root - INFO - Computing predictions for: ENST00000225941-linearfold
+2024-09-02 18:01:43,852 - root - WARNING - Skipping ENST00000471714. Sequence longer than 5000.
+2024-09-02 18:01:43,853 - root - INFO - Computing predictions for: ENST00000369256-linearfold
+2024-09-02 18:01:44,910 - root - INFO - Computing predictions for: ENST00000447017-linearfold
+2024-09-02 18:01:46,679 - root - INFO - Computing predictions for: ENST00000508983-linearfold
+2024-09-02 18:01:47,488 - root - INFO - Computing predictions for: ENST00000611156-linearfold
+2024-09-02 18:01:48,188 - root - INFO - Computing predictions for: ENST00000311955-linearfold
+2024-09-02 18:01:49,002 - root - INFO - Computing predictions for: ENST00000367660-linearfold
+2024-09-02 18:01:49,227 - root - INFO - Computing predictions for: ENST00000274849-linearfold
+2024-09-02 18:01:50,197 - root - INFO - Computing predictions for: ENST00000232744-linearfold
+2024-09-02 18:01:51,154 - root - INFO - Computing predictions for: ENST00000435224-linearfold
+2024-09-02 18:01:53,525 - root - INFO - Computing predictions for: ENST00000348433-linearfold
+2024-09-02 18:01:54,352 - root - INFO - Computing predictions for: ENST00000409176-linearfold
+2024-09-02 18:01:55,165 - root - INFO - Computing predictions for: ENST00000333167-linearfold
+2024-09-02 18:01:55,908 - root - INFO - Computing predictions for: ENST00000285093-linearfold
+2024-09-02 18:01:56,751 - root - WARNING - Skipping ENST00000377848. Sequence longer than 5000.
+2024-09-02 18:01:56,752 - root - INFO - Computing predictions for: ENST00000455480-linearfold
+2024-09-02 18:01:58,422 - root - INFO - Computing predictions for: ENST00000264990-linearfold
+2024-09-02 18:01:59,417 - root - INFO - Computing predictions for: ENST00000281182-linearfold
+2024-09-02 18:02:00,214 - root - INFO - Computing predictions for: ENST00000308982-linearfold
+2024-09-02 18:02:01,139 - root - INFO - Computing predictions for: ENST00000233710-linearfold
+2024-09-02 18:02:01,835 - root - INFO - Computing predictions for: ENST00000370841-linearfold
+2024-09-02 18:02:02,375 - root - INFO - Computing predictions for: ENST00000242592-linearfold
+2024-09-02 18:02:03,332 - root - WARNING - Skipping ENST00000358776. Sequence longer than 5000.
+2024-09-02 18:02:03,332 - root - INFO - Computing predictions for: ENST00000356839-linearfold
+2024-09-02 18:02:04,240 - root - INFO - Computing predictions for: ENST00000158762-linearfold
+2024-09-02 18:02:05,475 - root - WARNING - Skipping ENST00000326793. Sequence longer than 5000.
+2024-09-02 18:02:05,475 - root - INFO - Computing predictions for: ENST00000354700-linearfold
+2024-09-02 18:02:07,597 - root - INFO - Computing predictions for: ENST00000265838-linearfold
+2024-09-02 18:02:08,037 - root - INFO - Computing predictions for: ENST00000367048-linearfold
+2024-09-02 18:02:08,519 - root - INFO - Computing predictions for: ENST00000366812-linearfold
+2024-09-02 18:02:09,558 - root - INFO - Computing predictions for: ENST00000398322-linearfold
+2024-09-02 18:02:10,473 - root - INFO - Computing predictions for: ENST00000375888-linearfold
+2024-09-02 18:02:11,021 - root - INFO - Computing predictions for: ENST00000367595-linearfold
+2024-09-02 18:02:11,498 - root - INFO - Computing predictions for: ENST00000356189-linearfold
+2024-09-02 18:02:12,424 - root - INFO - Computing predictions for: ENST00000263776-linearfold
+2024-09-02 18:02:13,402 - root - INFO - Computing predictions for: ENST00000219251-linearfold
+2024-09-02 18:02:14,419 - root - INFO - Computing predictions for: ENST00000290866-linearfold
+2024-09-02 18:02:18,063 - root - WARNING - Skipping ENST00000427411. Sequence longer than 5000.
+2024-09-02 18:02:18,063 - root - INFO - Computing predictions for: ENST00000428317-linearfold
+2024-09-02 18:02:19,204 - root - INFO - Computing predictions for: ENST00000605057-linearfold
+2024-09-02 18:02:20,959 - root - INFO - Computing predictions for: ENST00000537147-linearfold
+2024-09-02 18:02:21,719 - root - INFO - Computing predictions for: ENST00000272928-linearfold
+2024-09-02 18:02:22,443 - root - INFO - Computing predictions for: ENST00000590151-linearfold
+2024-09-02 18:02:24,179 - root - INFO - Computing predictions for: ENST00000356140-linearfold
+2024-09-02 18:02:24,565 - root - INFO - Computing predictions for: ENST00000541043-linearfold
+2024-09-02 18:02:25,842 - root - INFO - Computing predictions for: ENST00000216254-linearfold
+2024-09-02 18:02:27,008 - root - INFO - Computing predictions for: ENST00000311148-linearfold
+2024-09-02 18:02:27,744 - root - INFO - Computing predictions for: ENST00000343744-linearfold
+2024-09-02 18:02:29,231 - root - INFO - Computing predictions for: ENST00000307624-linearfold
+2024-09-02 18:02:29,887 - root - INFO - Computing predictions for: ENST00000537591-linearfold
+2024-09-02 18:02:31,202 - root - INFO - Computing predictions for: ENST00000326303-linearfold
+2024-09-02 18:02:31,818 - root - INFO - Computing predictions for: ENST00000608083-linearfold
+2024-09-02 18:02:32,444 - root - INFO - Computing predictions for: ENST00000217455-linearfold
+2024-09-02 18:02:32,948 - root - INFO - Computing predictions for: ENST00000379303-linearfold
+2024-09-02 18:02:34,309 - root - WARNING - Skipping ENST00000301608. Sequence longer than 5000.
+2024-09-02 18:02:34,309 - root - INFO - Computing predictions for: ENST00000302819-linearfold
+2024-09-02 18:02:35,215 - root - INFO - Computing predictions for: ENST00000272065-linearfold
+2024-09-02 18:02:35,639 - root - INFO - Computing predictions for: ENST00000256997-linearfold
+2024-09-02 18:02:36,628 - root - INFO - Computing predictions for: ENST00000592828-linearfold
+2024-09-02 18:02:37,606 - root - WARNING - Skipping ENST00000583509. Sequence longer than 5000.
+2024-09-02 18:02:37,606 - root - INFO - Computing predictions for: ENST00000336375-linearfold
+2024-09-02 18:02:38,774 - root - INFO - Computing predictions for: ENST00000216139-linearfold
+2024-09-02 18:02:39,517 - root - INFO - Computing predictions for: ENST00000229243-linearfold
+2024-09-02 18:02:40,540 - root - INFO - Computing predictions for: ENST00000527795-linearfold
+2024-09-02 18:02:40,853 - root - WARNING - Skipping ENST00000258873. Sequence longer than 5000.
+2024-09-02 18:02:40,853 - root - INFO - Computing predictions for: ENST00000427954-linearfold
+2024-09-02 18:02:42,091 - root - INFO - Computing predictions for: ENST00000614302-linearfold
+2024-09-02 18:02:44,782 - root - INFO - Computing predictions for: ENST00000504342-linearfold
+2024-09-02 18:02:45,760 - root - INFO - Computing predictions for: ENST00000392066-linearfold
+2024-09-02 18:02:46,954 - root - WARNING - Skipping ENST00000348502. Sequence longer than 5000.
+2024-09-02 18:02:46,954 - root - INFO - Computing predictions for: ENST00000393081-linearfold
+2024-09-02 18:02:48,185 - root - INFO - Computing predictions for: ENST00000379240-linearfold
+2024-09-02 18:02:49,088 - root - INFO - Computing predictions for: ENST00000575690-linearfold
+2024-09-02 18:02:49,955 - root - INFO - Computing predictions for: ENST00000567001-linearfold
+2024-09-02 18:02:50,659 - root - INFO - Computing predictions for: ENST00000289416-linearfold
+2024-09-02 18:02:51,334 - root - INFO - Computing predictions for: ENST00000331849-linearfold
+2024-09-02 18:02:52,317 - root - INFO - Computing predictions for: ENST00000323482-linearfold
+2024-09-02 18:02:53,834 - root - INFO - Computing predictions for: ENST00000360596-linearfold
+2024-09-02 18:02:54,944 - root - INFO - Computing predictions for: ENST00000261206-linearfold
+2024-09-02 18:02:55,769 - root - INFO - Computing predictions for: ENST00000366684-linearfold
+2024-09-02 18:02:56,413 - root - INFO - Computing predictions for: ENST00000290378-linearfold
+2024-09-02 18:02:56,938 - root - INFO - Computing predictions for: ENST00000615544-linearfold
+2024-09-02 18:02:57,693 - root - INFO - Computing predictions for: ENST00000409624-linearfold
+2024-09-02 18:02:58,442 - root - INFO - Computing predictions for: ENST00000429709-linearfold
+2024-09-02 18:02:58,964 - root - INFO - Computing predictions for: ENST00000160382-linearfold
+2024-09-02 18:02:59,658 - root - INFO - Computing predictions for: ENST00000333999-linearfold
+2024-09-02 18:03:00,281 - root - INFO - Computing predictions for: ENST00000374667-linearfold
+2024-09-02 18:03:00,993 - root - INFO - Computing predictions for: ENST00000617065-linearfold
+2024-09-02 18:03:01,670 - root - INFO - Computing predictions for: ENST00000394419-linearfold
+2024-09-02 18:03:03,272 - root - INFO - Computing predictions for: ENST00000366578-linearfold
+2024-09-02 18:03:04,868 - root - INFO - Computing predictions for: ENST00000513398-linearfold
+2024-09-02 18:03:06,172 - root - INFO - Computing predictions for: ENST00000254286-linearfold
+2024-09-02 18:03:06,815 - root - INFO - Computing predictions for: ENST00000369905-linearfold
+2024-09-02 18:03:07,960 - root - INFO - Computing predictions for: ENST00000289228-linearfold
+2024-09-02 18:03:08,966 - root - INFO - Computing predictions for: ENST00000260641-linearfold
+2024-09-02 18:03:09,899 - root - WARNING - Skipping ENST00000263238. Sequence longer than 5000.
+2024-09-02 18:03:09,899 - root - INFO - Computing predictions for: ENST00000256001-linearfold
+2024-09-02 18:03:10,689 - root - INFO - Computing predictions for: ENST00000243903-linearfold
+2024-09-02 18:03:11,704 - root - INFO - Computing predictions for: ENST00000188312-linearfold
+2024-09-02 18:03:12,108 - root - INFO - Computing predictions for: ENST00000335754-linearfold
+2024-09-02 18:03:13,164 - root - INFO - Computing predictions for: ENST00000378404-linearfold
+2024-09-02 18:03:13,849 - root - INFO - Computing predictions for: ENST00000330368-linearfold
+2024-09-02 18:03:14,408 - root - INFO - Computing predictions for: ENST00000434821-linearfold
+2024-09-02 18:03:15,584 - root - INFO - Computing predictions for: ENST00000542485-linearfold
+2024-09-02 18:03:16,517 - root - INFO - Computing predictions for: ENST00000409680-linearfold
+2024-09-02 18:03:17,092 - root - WARNING - Skipping ENST00000535787. Sequence longer than 5000.
+2024-09-02 18:03:17,092 - root - INFO - Computing predictions for: ENST00000388922-linearfold
+2024-09-02 18:03:19,102 - root - INFO - Computing predictions for: ENST00000404366-linearfold
+2024-09-02 18:03:19,772 - root - INFO - Computing predictions for: ENST00000255082-linearfold
+2024-09-02 18:03:20,410 - root - INFO - Computing predictions for: ENST00000555694-linearfold
+2024-09-02 18:03:20,591 - root - INFO - Computing predictions for: ENST00000394666-linearfold
+2024-09-02 18:03:20,918 - root - INFO - Computing predictions for: ENST00000372874-linearfold
+2024-09-02 18:03:21,561 - root - INFO - Computing predictions for: ENST00000315906-linearfold
+2024-09-02 18:03:22,673 - root - INFO - Computing predictions for: ENST00000562188-linearfold
+2024-09-02 18:03:23,882 - root - WARNING - Skipping ENST00000260408. Sequence longer than 5000.
+2024-09-02 18:03:23,882 - root - INFO - Computing predictions for: ENST00000535346-linearfold
+2024-09-02 18:03:25,163 - root - WARNING - Skipping ENST00000368679. Sequence longer than 5000.
+2024-09-02 18:03:25,163 - root - INFO - Computing predictions for: ENST00000310823-linearfold
+2024-09-02 18:03:26,432 - root - INFO - Computing predictions for: ENST00000265727-linearfold
+2024-09-02 18:03:27,315 - root - WARNING - Skipping ENST00000265769. Sequence longer than 5000.
+2024-09-02 18:03:27,316 - root - INFO - Computing predictions for: ENST00000369400-linearfold
+2024-09-02 18:03:28,196 - root - INFO - Computing predictions for: ENST00000445355-linearfold
+2024-09-02 18:03:29,956 - root - INFO - Computing predictions for: ENST00000487273-linearfold
+2024-09-02 18:03:31,014 - root - INFO - Computing predictions for: ENST00000522298-linearfold
+2024-09-02 18:03:31,614 - root - WARNING - Skipping ENST00000284984. Sequence longer than 5000.
+2024-09-02 18:03:31,614 - root - WARNING - Skipping ENST00000504830. Sequence longer than 5000.
+2024-09-02 18:03:31,614 - root - INFO - Computing predictions for: ENST00000274181-linearfold
+2024-09-02 18:03:33,662 - root - WARNING - Skipping ENST00000251582. Sequence longer than 5000.
+2024-09-02 18:03:33,662 - root - WARNING - Skipping ENST00000367996. Sequence longer than 5000.
+2024-09-02 18:03:33,663 - root - WARNING - Skipping ENST00000284987. Sequence longer than 5000.
+2024-09-02 18:03:33,663 - root - WARNING - Skipping ENST00000388820. Sequence longer than 5000.
+2024-09-02 18:03:33,663 - root - WARNING - Skipping ENST00000380548. Sequence longer than 5000.
+2024-09-02 18:03:33,663 - root - INFO - Computing predictions for: ENST00000393061-linearfold
+2024-09-02 18:03:36,041 - root - WARNING - Skipping ENST00000567476. Sequence longer than 5000.
+2024-09-02 18:03:36,042 - root - INFO - Computing predictions for: ENST00000369038-linearfold
+2024-09-02 18:03:38,030 - root - INFO - Computing predictions for: ENST00000330475-linearfold
+2024-09-02 18:03:39,303 - root - INFO - Computing predictions for: ENST00000265846-linearfold
+2024-09-02 18:03:40,633 - root - INFO - Computing predictions for: ENST00000330889-linearfold
+2024-09-02 18:03:41,590 - root - WARNING - Skipping ENST00000368474. Sequence longer than 5000.
+2024-09-02 18:03:41,590 - root - INFO - Computing predictions for: ENST00000307921-linearfold
+2024-09-02 18:03:42,276 - root - WARNING - Skipping ENST00000237283. Sequence longer than 5000.
+2024-09-02 18:03:42,276 - root - INFO - Computing predictions for: ENST00000329478-linearfold
+2024-09-02 18:03:43,243 - root - INFO - Computing predictions for: ENST00000238561-linearfold
+2024-09-02 18:03:44,516 - root - INFO - Computing predictions for: ENST00000324464-linearfold
+2024-09-02 18:03:45,695 - root - INFO - Computing predictions for: ENST00000308860-linearfold
+2024-09-02 18:03:46,722 - root - WARNING - Skipping ENST00000297323. Sequence longer than 5000.
+2024-09-02 18:03:46,722 - root - WARNING - Skipping ENST00000260600. Sequence longer than 5000.
+2024-09-02 18:03:46,722 - root - INFO - Computing predictions for: ENST00000554068-linearfold
+2024-09-02 18:03:48,334 - root - WARNING - Skipping ENST00000462833. Sequence longer than 5000.
+2024-09-02 18:03:48,334 - root - WARNING - Skipping ENST00000550422. Sequence longer than 5000.
+2024-09-02 18:03:48,334 - root - WARNING - Skipping ENST00000394697. Sequence longer than 5000.
+2024-09-02 18:03:48,334 - root - WARNING - Skipping ENST00000294016. Sequence longer than 5000.
+2024-09-02 18:03:48,335 - root - INFO - Computing predictions for: ENST00000579794-linearfold
+2024-09-02 18:03:49,340 - root - INFO - Computing predictions for: ENST00000409363-linearfold
+2024-09-02 18:03:50,147 - root - INFO - Computing predictions for: ENST00000398125-linearfold
+2024-09-02 18:03:51,774 - root - INFO - Computing predictions for: ENST00000407644-linearfold
+2024-09-02 18:03:53,278 - root - INFO - Computing predictions for: ENST00000360162-linearfold
+2024-09-02 18:03:54,089 - root - WARNING - Skipping ENST00000397944. Sequence longer than 5000.
+2024-09-02 18:03:54,090 - root - WARNING - Skipping ENST00000412232. Sequence longer than 5000.
+2024-09-02 18:03:54,090 - root - INFO - Computing predictions for: ENST00000334304-linearfold
+2024-09-02 18:03:55,733 - root - WARNING - Skipping ENST00000517894. Sequence longer than 5000.
+2024-09-02 18:03:55,733 - root - INFO - Computing predictions for: ENST00000398556-linearfold
+2024-09-02 18:03:58,330 - root - INFO - Computing predictions for: ENST00000392965-linearfold
+2024-09-02 18:03:59,365 - root - INFO - Computing predictions for: ENST00000253673-linearfold
+2024-09-02 18:04:00,128 - root - INFO - Computing predictions for: ENST00000242786-linearfold
+2024-09-02 18:04:01,541 - root - INFO - Computing predictions for: ENST00000327753-linearfold
+2024-09-02 18:04:02,436 - root - WARNING - Skipping ENST00000283296. Sequence longer than 5000.
+2024-09-02 18:04:02,436 - root - INFO - Computing predictions for: ENST00000568908-linearfold
+2024-09-02 18:04:04,209 - root - INFO - Computing predictions for: ENST00000379873-linearfold
+2024-09-02 18:04:05,619 - root - INFO - Computing predictions for: ENST00000340339-linearfold
+2024-09-02 18:04:07,214 - root - WARNING - Skipping ENST00000296932. Sequence longer than 5000.
+2024-09-02 18:04:07,214 - root - INFO - Computing predictions for: ENST00000273352-linearfold
+2024-09-02 18:04:08,037 - root - WARNING - Skipping ENST00000340736. Sequence longer than 5000.
+2024-09-02 18:04:08,038 - root - INFO - Computing predictions for: ENST00000359929-linearfold
+2024-09-02 18:04:10,425 - root - INFO - Computing predictions for: ENST00000370742-linearfold
+2024-09-02 18:04:11,237 - root - INFO - Computing predictions for: ENST00000209668-linearfold
+2024-09-02 18:04:11,699 - root - INFO - Computing predictions for: ENST00000305046-linearfold
+2024-09-02 18:04:12,808 - root - INFO - Computing predictions for: ENST00000515683-linearfold
+2024-09-02 18:04:13,271 - root - INFO - Computing predictions for: ENST00000505590-linearfold
+2024-09-02 18:04:13,681 - root - INFO - Computing predictions for: ENST00000296412-linearfold
+2024-09-02 18:04:14,426 - root - INFO - Computing predictions for: ENST00000237653-linearfold
+2024-09-02 18:04:14,910 - root - INFO - Computing predictions for: ENST00000209665-linearfold
+2024-09-02 18:04:15,505 - root - INFO - Computing predictions for: ENST00000396623-linearfold
+2024-09-02 18:04:16,152 - root - INFO - Computing predictions for: ENST00000327435-linearfold
+2024-09-02 18:04:16,828 - root - INFO - Computing predictions for: ENST00000444204-linearfold
+2024-09-02 18:04:18,236 - root - INFO - Computing predictions for: ENST00000367254-linearfold
+2024-09-02 18:04:18,767 - root - INFO - Computing predictions for: ENST00000357103-linearfold
+2024-09-02 18:04:20,055 - root - INFO - Computing predictions for: ENST00000286621-linearfold
+2024-09-02 18:04:20,480 - root - INFO - Computing predictions for: ENST00000534464-linearfold
+2024-09-02 18:04:21,208 - root - INFO - Computing predictions for: ENST00000395738-linearfold
+2024-09-02 18:04:23,509 - root - WARNING - Skipping ENST00000621696. Sequence longer than 5000.
+2024-09-02 18:04:23,509 - root - INFO - Computing predictions for: ENST00000373783-linearfold
+2024-09-02 18:04:24,948 - root - INFO - Computing predictions for: ENST00000618295-linearfold
+2024-09-02 18:04:25,326 - root - INFO - Computing predictions for: ENST00000311669-linearfold
+2024-09-02 18:04:26,503 - root - INFO - Computing predictions for: ENST00000478399-linearfold
+2024-09-02 18:04:28,202 - root - INFO - Computing predictions for: ENST00000373178-linearfold
+2024-09-02 18:04:28,955 - root - INFO - Computing predictions for: ENST00000609540-linearfold
+2024-09-02 18:04:29,295 - root - INFO - Computing predictions for: ENST00000306675-linearfold
+2024-09-02 18:04:30,615 - root - INFO - Computing predictions for: ENST00000280155-linearfold
+2024-09-02 18:04:32,632 - root - INFO - Computing predictions for: ENST00000620793-linearfold
+2024-09-02 18:04:34,470 - root - INFO - Computing predictions for: ENST00000305988-linearfold
+2024-09-02 18:04:35,235 - root - INFO - Computing predictions for: ENST00000308595-linearfold
+2024-09-02 18:04:36,976 - root - WARNING - Skipping ENST00000324198. Sequence longer than 5000.
+2024-09-02 18:04:36,976 - root - INFO - Computing predictions for: ENST00000491935-linearfold
+2024-09-02 18:04:37,738 - root - INFO - Computing predictions for: ENST00000623063-linearfold
+2024-09-02 18:04:39,113 - root - INFO - Computing predictions for: ENST00000366535-linearfold
+2024-09-02 18:04:39,784 - root - INFO - Computing predictions for: ENST00000330877-linearfold
+2024-09-02 18:04:40,500 - root - INFO - Computing predictions for: ENST00000223357-linearfold
+2024-09-02 18:04:42,521 - root - INFO - Computing predictions for: ENST00000327141-linearfold
+2024-09-02 18:04:43,345 - root - WARNING - Skipping ENST00000360265. Sequence longer than 5000.
+2024-09-02 18:04:43,345 - root - WARNING - Skipping ENST00000296721. Sequence longer than 5000.
+2024-09-02 18:04:43,346 - root - INFO - Computing predictions for: ENST00000369271-linearfold
+2024-09-02 18:04:45,236 - root - WARNING - Skipping ENST00000395146. Sequence longer than 5000.
+2024-09-02 18:04:45,236 - root - INFO - Computing predictions for: ENST00000370457-linearfold
+2024-09-02 18:04:46,939 - root - WARNING - Skipping ENST00000265343. Sequence longer than 5000.
+2024-09-02 18:04:46,939 - root - INFO - Computing predictions for: ENST00000269143-linearfold
+2024-09-02 18:04:48,511 - root - INFO - Computing predictions for: ENST00000226355-linearfold
+2024-09-02 18:04:49,139 - root - INFO - Computing predictions for: ENST00000409257-linearfold
+2024-09-02 18:04:49,996 - root - INFO - Computing predictions for: ENST00000238856-linearfold
+2024-09-02 18:04:51,378 - root - INFO - Computing predictions for: ENST00000264595-linearfold
+2024-09-02 18:04:52,049 - root - WARNING - Skipping ENST00000304032. Sequence longer than 5000.
+2024-09-02 18:04:52,049 - root - INFO - Computing predictions for: ENST00000373671-linearfold
+2024-09-02 18:04:52,719 - root - INFO - Computing predictions for: ENST00000300176-linearfold
+2024-09-02 18:04:55,014 - root - INFO - Computing predictions for: ENST00000312916-linearfold
+2024-09-02 18:04:56,266 - root - WARNING - Skipping ENST00000370165. Sequence longer than 5000.
+2024-09-02 18:04:56,266 - root - INFO - Computing predictions for: ENST00000375826-linearfold
+2024-09-02 18:04:57,448 - root - INFO - Computing predictions for: ENST00000342526-linearfold
+2024-09-02 18:04:58,092 - root - WARNING - Skipping ENST00000373204. Sequence longer than 5000.
+2024-09-02 18:04:58,092 - root - WARNING - Skipping ENST00000220592. Sequence longer than 5000.
+2024-09-02 18:04:58,092 - root - WARNING - Skipping ENST00000373191. Sequence longer than 5000.
+2024-09-02 18:04:58,092 - root - WARNING - Skipping ENST00000373210. Sequence longer than 5000.
+2024-09-02 18:04:58,093 - root - INFO - Computing predictions for: ENST00000538402-linearfold
+2024-09-02 18:04:58,816 - root - INFO - Computing predictions for: ENST00000546158-linearfold
+2024-09-02 18:04:59,811 - root - WARNING - Skipping ENST00000320285. Sequence longer than 5000.
+2024-09-02 18:04:59,811 - root - WARNING - Skipping ENST00000285518. Sequence longer than 5000.
+2024-09-02 18:04:59,811 - root - WARNING - Skipping ENST00000264167. Sequence longer than 5000.
+2024-09-02 18:04:59,811 - root - INFO - Computing predictions for: ENST00000419304-linearfold
+2024-09-02 18:05:00,285 - root - INFO - Computing predictions for: ENST00000310398-linearfold
+2024-09-02 18:05:00,496 - root - WARNING - Skipping ENST00000379370. Sequence longer than 5000.
+2024-09-02 18:05:00,496 - root - INFO - Computing predictions for: ENST00000366667-linearfold
+2024-09-02 18:05:01,376 - root - INFO - Computing predictions for: ENST00000357081-linearfold
+2024-09-02 18:05:02,499 - root - INFO - Computing predictions for: ENST00000314340-linearfold
+2024-09-02 18:05:03,045 - root - INFO - Computing predictions for: ENST00000307503-linearfold
+2024-09-02 18:05:04,337 - root - INFO - Computing predictions for: ENST00000231420-linearfold
+2024-09-02 18:05:05,040 - root - WARNING - Skipping ENST00000326225. Sequence longer than 5000.
+2024-09-02 18:05:05,040 - root - INFO - Computing predictions for: ENST00000217426-linearfold
+2024-09-02 18:05:05,910 - root - INFO - Computing predictions for: ENST00000369799-linearfold
+2024-09-02 18:05:07,232 - root - WARNING - Skipping ENST00000446544. Sequence longer than 5000.
+2024-09-02 18:05:07,233 - root - WARNING - Skipping ENST00000374011. Sequence longer than 5000.
+2024-09-02 18:05:07,233 - root - WARNING - Skipping ENST00000457866. Sequence longer than 5000.
+2024-09-02 18:05:07,233 - root - WARNING - Skipping ENST00000378024. Sequence longer than 5000.
+2024-09-02 18:05:07,233 - root - WARNING - Skipping ENST00000333244. Sequence longer than 5000.
+2024-09-02 18:05:07,233 - root - INFO - Computing predictions for: ENST00000216479-linearfold
+2024-09-02 18:05:07,723 - root - INFO - Computing predictions for: ENST00000411641-linearfold
+2024-09-02 18:05:08,395 - root - INFO - Computing predictions for: ENST00000302312-linearfold
+2024-09-02 18:05:08,596 - root - INFO - Computing predictions for: ENST00000340020-linearfold
+2024-09-02 18:05:09,382 - root - INFO - Computing predictions for: ENST00000247291-linearfold
+2024-09-02 18:05:10,742 - root - INFO - Computing predictions for: ENST00000287295-linearfold
+2024-09-02 18:05:11,521 - root - INFO - Computing predictions for: ENST00000613322-linearfold
+2024-09-02 18:05:12,877 - root - INFO - Computing predictions for: ENST00000440238-linearfold
+2024-09-02 18:05:13,971 - root - WARNING - Skipping ENST00000633556. Sequence longer than 5000.
+2024-09-02 18:05:13,972 - root - WARNING - Skipping ENST00000308182. Sequence longer than 5000.
+2024-09-02 18:05:13,972 - root - INFO - Computing predictions for: ENST00000368130-linearfold
+2024-09-02 18:05:14,363 - root - INFO - Computing predictions for: ENST00000442366-linearfold
+2024-09-02 18:05:14,902 - root - INFO - Computing predictions for: ENST00000223029-linearfold
+2024-09-02 18:05:15,344 - root - INFO - Computing predictions for: ENST00000279146-linearfold
+2024-09-02 18:05:15,926 - root - INFO - Computing predictions for: ENST00000361265-linearfold
+2024-09-02 18:05:17,106 - root - INFO - Computing predictions for: ENST00000467905-linearfold
+2024-09-02 18:05:17,446 - root - INFO - Computing predictions for: ENST00000381809-linearfold
+2024-09-02 18:05:18,627 - root - WARNING - Skipping ENST00000545314. Sequence longer than 5000.
+2024-09-02 18:05:18,627 - root - INFO - Computing predictions for: ENST00000354567-linearfold
+2024-09-02 18:05:19,646 - root - INFO - Computing predictions for: ENST00000267584-linearfold
+2024-09-02 18:05:20,581 - root - INFO - Computing predictions for: ENST00000298545-linearfold
+2024-09-02 18:05:21,221 - root - WARNING - Skipping ENST00000424296. Sequence longer than 5000.
+2024-09-02 18:05:21,222 - root - INFO - Computing predictions for: ENST00000621116-linearfold
+2024-09-02 18:05:22,972 - root - INFO - Computing predictions for: ENST00000225737-linearfold
+2024-09-02 18:05:24,144 - root - WARNING - Skipping ENST00000025301. Sequence longer than 5000.
+2024-09-02 18:05:24,145 - root - WARNING - Skipping ENST00000354675. Sequence longer than 5000.
+2024-09-02 18:05:24,145 - root - WARNING - Skipping ENST00000394518. Sequence longer than 5000.
+2024-09-02 18:05:24,145 - root - INFO - Computing predictions for: ENST00000371431-linearfold
+2024-09-02 18:05:24,424 - root - INFO - Computing predictions for: ENST00000313871-linearfold
+2024-09-02 18:05:25,974 - root - INFO - Computing predictions for: ENST00000545990-linearfold
+2024-09-02 18:05:27,047 - root - INFO - Computing predictions for: ENST00000376064-linearfold
+2024-09-02 18:05:27,929 - root - WARNING - Skipping ENST00000394718. Sequence longer than 5000.
+2024-09-02 18:05:27,929 - root - WARNING - Skipping ENST00000280979. Sequence longer than 5000.
+2024-09-02 18:05:27,929 - root - INFO - Computing predictions for: ENST00000431975-linearfold
+2024-09-02 18:05:28,816 - root - INFO - Computing predictions for: ENST00000269701-linearfold
+2024-09-02 18:05:30,276 - root - INFO - Computing predictions for: ENST00000397410-linearfold
+2024-09-02 18:05:31,226 - root - WARNING - Skipping ENST00000356239. Sequence longer than 5000.
+2024-09-02 18:05:31,226 - root - INFO - Computing predictions for: ENST00000534147-linearfold
+2024-09-02 18:05:31,631 - root - WARNING - Skipping ENST00000374088. Sequence longer than 5000.
+2024-09-02 18:05:31,632 - root - INFO - Computing predictions for: ENST00000621846-linearfold
+2024-09-02 18:05:32,189 - root - INFO - Computing predictions for: ENST00000285930-linearfold
+2024-09-02 18:05:32,699 - root - INFO - Computing predictions for: ENST00000359579-linearfold
+2024-09-02 18:05:33,247 - root - WARNING - Skipping ENST00000380872. Sequence longer than 5000.
+2024-09-02 18:05:33,247 - root - INFO - Computing predictions for: ENST00000380753-linearfold
+2024-09-02 18:05:34,125 - root - INFO - Computing predictions for: ENST00000380448-linearfold
+2024-09-02 18:05:34,548 - root - INFO - Computing predictions for: ENST00000242375-linearfold
+2024-09-02 18:05:35,280 - root - INFO - Computing predictions for: ENST00000235835-linearfold
+2024-09-02 18:05:35,918 - root - INFO - Computing predictions for: ENST00000361640-linearfold
+2024-09-02 18:05:36,482 - root - INFO - Computing predictions for: ENST00000554581-linearfold
+2024-09-02 18:05:38,219 - root - INFO - Computing predictions for: ENST00000391834-linearfold
+2024-09-02 18:05:39,178 - root - WARNING - Skipping ENST00000392038. Sequence longer than 5000.
+2024-09-02 18:05:39,178 - root - INFO - Computing predictions for: ENST00000570004-linearfold
+2024-09-02 18:05:39,561 - root - INFO - Computing predictions for: ENST00000409155-linearfold
+2024-09-02 18:05:40,731 - root - INFO - Computing predictions for: ENST00000484952-linearfold
+2024-09-02 18:05:41,585 - root - INFO - Computing predictions for: ENST00000295897-linearfold
+2024-09-02 18:05:42,204 - root - INFO - Computing predictions for: ENST00000472644-linearfold
+2024-09-02 18:05:43,216 - root - INFO - Computing predictions for: ENST00000293350-linearfold
+2024-09-02 18:05:44,906 - root - INFO - Computing predictions for: ENST00000371224-linearfold
+2024-09-02 18:05:46,101 - root - INFO - Computing predictions for: ENST00000297785-linearfold
+2024-09-02 18:05:46,694 - root - INFO - Computing predictions for: ENST00000249750-linearfold
+2024-09-02 18:05:47,779 - root - INFO - Computing predictions for: ENST00000329841-linearfold
+2024-09-02 18:05:48,957 - root - INFO - Computing predictions for: ENST00000377698-linearfold
+2024-09-02 18:05:50,109 - root - INFO - Computing predictions for: ENST00000472186-linearfold
+2024-09-02 18:05:51,512 - root - WARNING - Skipping ENST00000258494. Sequence longer than 5000.
+2024-09-02 18:05:51,512 - root - WARNING - Skipping ENST00000261733. Sequence longer than 5000.
+2024-09-02 18:05:51,513 - root - INFO - Computing predictions for: ENST00000457500-linearfold
+2024-09-02 18:05:52,413 - root - INFO - Computing predictions for: ENST00000579855-linearfold
+2024-09-02 18:05:53,484 - root - INFO - Computing predictions for: ENST00000614849-linearfold
+2024-09-02 18:05:54,607 - root - INFO - Computing predictions for: ENST00000375341-linearfold
+2024-09-02 18:05:56,089 - root - WARNING - Skipping ENST00000357578. Sequence longer than 5000.
+2024-09-02 18:05:56,089 - root - WARNING - Skipping ENST00000553458. Sequence longer than 5000.
+2024-09-02 18:05:56,089 - root - INFO - Computing predictions for: ENST00000409134-linearfold
+2024-09-02 18:05:57,560 - root - INFO - Computing predictions for: ENST00000265605-linearfold
+2024-09-02 18:05:58,391 - root - INFO - Computing predictions for: ENST00000354775-linearfold
+2024-09-02 18:05:59,117 - root - INFO - Computing predictions for: ENST00000395321-linearfold
+2024-09-02 18:05:59,826 - root - INFO - Computing predictions for: ENST00000262374-linearfold
+2024-09-02 18:06:01,330 - root - WARNING - Skipping ENST00000308742. Sequence longer than 5000.
+2024-09-02 18:06:01,330 - root - WARNING - Skipping ENST00000330817. Sequence longer than 5000.
+2024-09-02 18:06:01,331 - root - INFO - Computing predictions for: ENST00000394780-linearfold
+2024-09-02 18:06:02,546 - root - WARNING - Skipping ENST00000370205. Sequence longer than 5000.
+2024-09-02 18:06:02,547 - root - INFO - Computing predictions for: ENST00000476832-linearfold
+2024-09-02 18:06:03,414 - root - INFO - Computing predictions for: ENST00000239891-linearfold
+2024-09-02 18:06:03,769 - root - INFO - Computing predictions for: ENST00000614444-linearfold
+2024-09-02 18:06:04,421 - root - WARNING - Skipping ENST00000389048. Sequence longer than 5000.
+2024-09-02 18:06:04,422 - root - INFO - Computing predictions for: ENST00000216489-linearfold
+2024-09-02 18:06:05,229 - root - INFO - Computing predictions for: ENST00000429722-linearfold
+2024-09-02 18:06:05,683 - root - INFO - Computing predictions for: ENST00000302708-linearfold
+2024-09-02 18:06:06,244 - root - INFO - Computing predictions for: ENST00000292566-linearfold
+2024-09-02 18:06:07,198 - root - INFO - Computing predictions for: ENST00000252984-linearfold
+2024-09-02 18:06:07,673 - root - INFO - Computing predictions for: ENST00000245812-linearfold
+2024-09-02 18:06:08,167 - root - INFO - Computing predictions for: ENST00000428149-linearfold
+2024-09-02 18:06:09,198 - root - WARNING - Skipping ENST00000484298. Sequence longer than 5000.
+2024-09-02 18:06:09,199 - root - INFO - Computing predictions for: ENST00000251535-linearfold
+2024-09-02 18:06:10,220 - root - INFO - Computing predictions for: ENST00000570836-linearfold
+2024-09-02 18:06:11,151 - root - INFO - Computing predictions for: ENST00000380183-linearfold
+2024-09-02 18:06:12,388 - root - INFO - Computing predictions for: ENST00000380490-linearfold
+2024-09-02 18:06:12,683 - root - INFO - Computing predictions for: ENST00000295463-linearfold
+2024-09-02 18:06:14,150 - root - INFO - Computing predictions for: ENST00000458497-linearfold
+2024-09-02 18:06:15,560 - root - WARNING - Skipping ENST00000361673. Sequence longer than 5000.
+2024-09-02 18:06:15,560 - root - WARNING - Skipping ENST00000258888. Sequence longer than 5000.
+2024-09-02 18:06:15,560 - root - INFO - Computing predictions for: ENST00000374840-linearfold
+2024-09-02 18:06:16,702 - root - INFO - Computing predictions for: ENST00000392027-linearfold
+2024-09-02 18:06:18,019 - root - WARNING - Skipping ENST00000264276. Sequence longer than 5000.
+2024-09-02 18:06:18,019 - root - INFO - Computing predictions for: ENST00000415953-linearfold
+2024-09-02 18:06:19,739 - root - INFO - Computing predictions for: ENST00000335606-linearfold
+2024-09-02 18:06:20,914 - root - INFO - Computing predictions for: ENST00000265132-linearfold
+2024-09-02 18:06:21,442 - root - WARNING - Skipping ENST00000534300. Sequence longer than 5000.
+2024-09-02 18:06:21,442 - root - INFO - Computing predictions for: ENST00000368885-linearfold
+2024-09-02 18:06:22,308 - root - INFO - Computing predictions for: ENST00000266736-linearfold
+2024-09-02 18:06:22,994 - root - INFO - Computing predictions for: ENST00000293971-linearfold
+2024-09-02 18:06:24,596 - root - WARNING - Skipping ENST00000515384. Sequence longer than 5000.
+2024-09-02 18:06:24,597 - root - INFO - Computing predictions for: ENST00000290649-linearfold
+2024-09-02 18:06:25,956 - root - INFO - Computing predictions for: ENST00000221496-linearfold
+2024-09-02 18:06:27,124 - root - INFO - Computing predictions for: ENST00000526620-linearfold
+2024-09-02 18:06:27,591 - root - WARNING - Skipping ENST00000369864. Sequence longer than 5000.
+2024-09-02 18:06:27,591 - root - INFO - Computing predictions for: ENST00000550413-linearfold
+2024-09-02 18:06:28,673 - root - INFO - Computing predictions for: ENST00000372059-linearfold
+2024-09-02 18:06:29,542 - root - INFO - Computing predictions for: ENST00000393001-linearfold
+2024-09-02 18:06:31,053 - root - INFO - Computing predictions for: ENST00000299155-linearfold
+2024-09-02 18:06:31,999 - root - INFO - Computing predictions for: ENST00000537562-linearfold
+2024-09-02 18:06:32,423 - root - WARNING - Skipping ENST00000317829. Sequence longer than 5000.
+2024-09-02 18:06:32,424 - root - INFO - Computing predictions for: ENST00000249883-linearfold
+2024-09-02 18:06:34,550 - root - INFO - Computing predictions for: ENST00000369538-linearfold
+2024-09-02 18:06:35,264 - root - INFO - Computing predictions for: ENST00000529507-linearfold
+2024-09-02 18:06:36,411 - root - INFO - Computing predictions for: ENST00000356264-linearfold
+2024-09-02 18:06:37,472 - root - INFO - Computing predictions for: ENST00000273588-linearfold
+2024-09-02 18:06:38,287 - root - INFO - Computing predictions for: ENST00000370083-linearfold
+2024-09-02 18:06:38,790 - root - INFO - Computing predictions for: ENST00000622339-linearfold
+2024-09-02 18:06:39,293 - root - INFO - Computing predictions for: ENST00000610648-linearfold
+2024-09-02 18:06:39,778 - root - INFO - Computing predictions for: ENST00000612294-linearfold
+2024-09-02 18:06:40,234 - root - WARNING - Skipping ENST00000341068. Sequence longer than 5000.
+2024-09-02 18:06:40,234 - root - INFO - Computing predictions for: ENST00000613466-linearfold
+2024-09-02 18:06:40,669 - root - INFO - Computing predictions for: ENST00000514612-linearfold
+2024-09-02 18:06:41,086 - root - INFO - Computing predictions for: ENST00000621663-linearfold
+2024-09-02 18:06:42,220 - root - INFO - Computing predictions for: ENST00000315368-linearfold
+2024-09-02 18:06:42,907 - root - INFO - Computing predictions for: ENST00000261819-linearfold
+2024-09-02 18:06:43,848 - root - INFO - Computing predictions for: ENST00000397990-linearfold
+2024-09-02 18:06:44,135 - root - WARNING - Skipping ENST00000251089. Sequence longer than 5000.
+2024-09-02 18:06:44,135 - root - INFO - Computing predictions for: ENST00000366962-linearfold
+2024-09-02 18:06:45,370 - root - INFO - Computing predictions for: ENST00000297450-linearfold
+2024-09-02 18:06:46,367 - root - INFO - Computing predictions for: ENST00000338312-linearfold
+2024-09-02 18:06:46,806 - root - INFO - Computing predictions for: ENST00000367629-linearfold
+2024-09-02 18:06:47,377 - root - INFO - Computing predictions for: ENST00000373425-linearfold
+2024-09-02 18:06:48,736 - root - INFO - Computing predictions for: ENST00000371129-linearfold
+2024-09-02 18:06:49,316 - root - INFO - Computing predictions for: ENST00000592641-linearfold
+2024-09-02 18:06:50,208 - root - INFO - Computing predictions for: ENST00000376819-linearfold
+2024-09-02 18:06:50,964 - root - WARNING - Skipping ENST00000347528. Sequence longer than 5000.
+2024-09-02 18:06:50,965 - root - WARNING - Skipping ENST00000357077. Sequence longer than 5000.
+2024-09-02 18:06:50,965 - root - WARNING - Skipping ENST00000280772. Sequence longer than 5000.
+2024-09-02 18:06:50,965 - root - WARNING - Skipping ENST00000378392. Sequence longer than 5000.
+2024-09-02 18:06:50,965 - root - WARNING - Skipping ENST00000341657. Sequence longer than 5000.
+2024-09-02 18:06:50,965 - root - WARNING - Skipping ENST00000284268. Sequence longer than 5000.
+2024-09-02 18:06:50,965 - root - WARNING - Skipping ENST00000532219. Sequence longer than 5000.
+2024-09-02 18:06:50,965 - root - WARNING - Skipping ENST00000265742. Sequence longer than 5000.
+2024-09-02 18:06:50,966 - root - INFO - Computing predictions for: ENST00000357997-linearfold
+2024-09-02 18:06:52,581 - root - INFO - Computing predictions for: ENST00000306999-linearfold
+2024-09-02 18:06:53,271 - root - INFO - Computing predictions for: ENST00000296785-linearfold
+2024-09-02 18:06:53,875 - root - INFO - Computing predictions for: ENST00000371697-linearfold
+2024-09-02 18:06:54,380 - root - INFO - Computing predictions for: ENST00000267339-linearfold
+2024-09-02 18:06:55,239 - root - WARNING - Skipping ENST00000378330. Sequence longer than 5000.
+2024-09-02 18:06:55,240 - root - WARNING - Skipping ENST00000400020. Sequence longer than 5000.
+2024-09-02 18:06:55,240 - root - INFO - Computing predictions for: ENST00000261739-linearfold
+2024-09-02 18:06:56,728 - root - INFO - Computing predictions for: ENST00000511455-linearfold
+2024-09-02 18:06:57,866 - root - INFO - Computing predictions for: ENST00000380094-linearfold
+2024-09-02 18:06:59,068 - root - INFO - Computing predictions for: ENST00000307518-linearfold
+2024-09-02 18:06:59,791 - root - INFO - Computing predictions for: ENST00000371930-linearfold
+2024-09-02 18:07:00,737 - root - INFO - Computing predictions for: ENST00000600132-linearfold
+2024-09-02 18:07:02,822 - root - INFO - Computing predictions for: ENST00000306065-linearfold
+2024-09-02 18:07:04,339 - root - INFO - Computing predictions for: ENST00000592179-linearfold
+2024-09-02 18:07:05,332 - root - INFO - Computing predictions for: ENST00000606888-linearfold
+2024-09-02 18:07:06,933 - root - INFO - Computing predictions for: ENST00000355594-linearfold
+2024-09-02 18:07:08,451 - root - INFO - Computing predictions for: ENST00000285243-linearfold
+2024-09-02 18:07:09,854 - root - INFO - Computing predictions for: ENST00000531895-linearfold
+2024-09-02 18:07:10,453 - root - WARNING - Skipping ENST00000282272. Sequence longer than 5000.
+2024-09-02 18:07:10,453 - root - INFO - Computing predictions for: ENST00000333279-linearfold
+2024-09-02 18:07:11,217 - root - INFO - Computing predictions for: ENST00000544612-linearfold
+2024-09-02 18:07:11,681 - root - WARNING - Skipping ENST00000504087. Sequence longer than 5000.
+2024-09-02 18:07:11,681 - root - WARNING - Skipping ENST00000267116. Sequence longer than 5000.
+2024-09-02 18:07:11,681 - root - INFO - Computing predictions for: ENST00000215941-linearfold
+2024-09-02 18:07:12,646 - root - WARNING - Skipping ENST00000369408. Sequence longer than 5000.
+2024-09-02 18:07:12,647 - root - INFO - Computing predictions for: ENST00000454272-linearfold
+2024-09-02 18:07:13,579 - root - WARNING - Skipping ENST00000360359. Sequence longer than 5000.
+2024-09-02 18:07:13,579 - root - INFO - Computing predictions for: ENST00000311620-linearfold
+2024-09-02 18:07:14,951 - root - WARNING - Skipping ENST00000353234. Sequence longer than 5000.
+2024-09-02 18:07:14,951 - root - INFO - Computing predictions for: ENST00000410034-linearfold
+2024-09-02 18:07:15,984 - root - INFO - Computing predictions for: ENST00000265748-linearfold
+2024-09-02 18:07:17,259 - root - INFO - Computing predictions for: ENST00000355303-linearfold
+2024-09-02 18:07:19,211 - root - INFO - Computing predictions for: ENST00000292246-linearfold
+2024-09-02 18:07:20,312 - root - WARNING - Skipping ENST00000423947. Sequence longer than 5000.
+2024-09-02 18:07:20,312 - root - INFO - Computing predictions for: ENST00000159087-linearfold
+2024-09-02 18:07:22,678 - root - INFO - Computing predictions for: ENST00000332826-linearfold
+2024-09-02 18:07:24,038 - root - INFO - Computing predictions for: ENST00000465139-linearfold
+2024-09-02 18:07:24,771 - root - INFO - Computing predictions for: ENST00000339399-linearfold
+2024-09-02 18:07:25,227 - root - INFO - Computing predictions for: ENST00000583931-linearfold
+2024-09-02 18:07:25,993 - root - INFO - Computing predictions for: ENST00000300060-linearfold
+2024-09-02 18:07:27,634 - root - WARNING - Skipping ENST00000303714. Sequence longer than 5000.
+2024-09-02 18:07:27,635 - root - WARNING - Skipping ENST00000403729. Sequence longer than 5000.
+2024-09-02 18:07:27,635 - root - INFO - Computing predictions for: ENST00000376911-linearfold
+2024-09-02 18:07:28,196 - root - INFO - Computing predictions for: ENST00000359299-linearfold
+2024-09-02 18:07:28,589 - root - INFO - Computing predictions for: ENST00000265447-linearfold
+2024-09-02 18:07:29,619 - root - INFO - Computing predictions for: ENST00000262219-linearfold
+2024-09-02 18:07:30,157 - root - INFO - Computing predictions for: ENST00000421017-linearfold
+2024-09-02 18:07:30,642 - root - INFO - Computing predictions for: ENST00000264908-linearfold
+2024-09-02 18:07:31,051 - root - INFO - Computing predictions for: ENST00000394295-linearfold
+2024-09-02 18:07:31,778 - root - INFO - Computing predictions for: ENST00000296511-linearfold
+2024-09-02 18:07:32,278 - root - INFO - Computing predictions for: ENST00000354546-linearfold
+2024-09-02 18:07:33,425 - root - INFO - Computing predictions for: ENST00000372921-linearfold
+2024-09-02 18:07:34,126 - root - INFO - Computing predictions for: ENST00000585281-linearfold
+2024-09-02 18:07:34,944 - root - INFO - Computing predictions for: ENST00000368947-linearfold
+2024-09-02 18:07:35,554 - root - INFO - Computing predictions for: ENST00000617537-linearfold
+2024-09-02 18:07:36,361 - root - INFO - Computing predictions for: ENST00000493429-linearfold
+2024-09-02 18:07:37,787 - root - INFO - Computing predictions for: ENST00000308423-linearfold
+2024-09-02 18:07:39,509 - root - INFO - Computing predictions for: ENST00000374700-linearfold
+2024-09-02 18:07:41,043 - root - WARNING - Skipping ENST00000274000. Sequence longer than 5000.
+2024-09-02 18:07:41,043 - root - INFO - Computing predictions for: ENST00000405198-linearfold
+2024-09-02 18:07:43,029 - root - INFO - Computing predictions for: ENST00000569748-linearfold
+2024-09-02 18:07:44,454 - root - INFO - Computing predictions for: ENST00000397120-linearfold
+2024-09-02 18:07:45,604 - root - INFO - Computing predictions for: ENST00000444449-linearfold
+2024-09-02 18:07:46,651 - root - INFO - Computing predictions for: ENST00000590923-linearfold
+2024-09-02 18:07:47,363 - root - INFO - Computing predictions for: ENST00000354293-linearfold
+2024-09-02 18:07:48,984 - root - INFO - Computing predictions for: ENST00000332231-linearfold
+2024-09-02 18:07:51,182 - root - WARNING - Skipping ENST00000621914. Sequence longer than 5000.
+2024-09-02 18:07:51,182 - root - INFO - Computing predictions for: ENST00000439647-linearfold
+2024-09-02 18:07:51,963 - root - INFO - Computing predictions for: ENST00000263270-linearfold
+2024-09-02 18:07:52,329 - root - WARNING - Skipping ENST00000519295. Sequence longer than 5000.
+2024-09-02 18:07:52,329 - root - INFO - Computing predictions for: ENST00000372745-linearfold
+2024-09-02 18:07:52,988 - root - INFO - Computing predictions for: ENST00000518421-linearfold
+2024-09-02 18:07:54,105 - root - INFO - Computing predictions for: ENST00000316788-linearfold
+2024-09-02 18:07:54,462 - root - WARNING - Skipping ENST00000336418. Sequence longer than 5000.
+2024-09-02 18:07:54,462 - root - INFO - Computing predictions for: ENST00000369569-linearfold
+2024-09-02 18:07:55,427 - root - WARNING - Skipping ENST00000261842. Sequence longer than 5000.
+2024-09-02 18:07:55,427 - root - INFO - Computing predictions for: ENST00000421755-linearfold
+2024-09-02 18:07:56,112 - root - WARNING - Skipping ENST00000532090. Sequence longer than 5000.
+2024-09-02 18:07:56,112 - root - WARNING - Skipping ENST00000261558. Sequence longer than 5000.
+2024-09-02 18:07:56,112 - root - WARNING - Skipping ENST00000615891. Sequence longer than 5000.
+2024-09-02 18:07:56,113 - root - WARNING - Skipping ENST00000265381. Sequence longer than 5000.
+2024-09-02 18:07:56,113 - root - INFO - Computing predictions for: ENST00000316757-linearfold
+2024-09-02 18:07:57,248 - root - INFO - Computing predictions for: ENST00000609360-linearfold
+2024-09-02 18:07:58,523 - root - INFO - Computing predictions for: ENST00000376236-linearfold
+2024-09-02 18:07:59,551 - root - WARNING - Skipping ENST00000295974. Sequence longer than 5000.
+2024-09-02 18:07:59,551 - root - WARNING - Skipping ENST00000508376. Sequence longer than 5000.
+2024-09-02 18:07:59,551 - root - WARNING - Skipping ENST00000535453. Sequence longer than 5000.
+2024-09-02 18:07:59,551 - root - INFO - Computing predictions for: ENST00000355285-linearfold
+2024-09-02 18:08:01,109 - root - INFO - Computing predictions for: ENST00000371149-linearfold
+2024-09-02 18:08:02,947 - root - INFO - Computing predictions for: ENST00000255040-linearfold
+2024-09-02 18:08:03,264 - root - INFO - Computing predictions for: ENST00000296456-linearfold
+2024-09-02 18:08:04,592 - root - INFO - Computing predictions for: ENST00000555414-linearfold
+2024-09-02 18:08:05,098 - root - INFO - Computing predictions for: ENST00000374987-linearfold
+2024-09-02 18:08:06,390 - root - INFO - Computing predictions for: ENST00000360244-linearfold
+2024-09-02 18:08:07,327 - root - INFO - Computing predictions for: ENST00000380343-linearfold
+2024-09-02 18:08:07,578 - root - INFO - Computing predictions for: ENST00000378852-linearfold
+2024-09-02 18:08:08,508 - root - INFO - Computing predictions for: ENST00000395787-linearfold
+2024-09-02 18:08:08,863 - root - INFO - Computing predictions for: ENST00000400900-linearfold
+2024-09-02 18:08:09,394 - root - INFO - Computing predictions for: ENST00000303795-linearfold
+2024-09-02 18:08:10,359 - root - INFO - Computing predictions for: ENST00000537454-linearfold
+2024-09-02 18:08:11,414 - root - INFO - Computing predictions for: ENST00000263574-linearfold
+2024-09-02 18:08:12,794 - root - INFO - Computing predictions for: ENST00000217456-linearfold
+2024-09-02 18:08:13,616 - root - INFO - Computing predictions for: ENST00000375323-linearfold
+2024-09-02 18:08:14,153 - root - INFO - Computing predictions for: ENST00000368235-linearfold
+2024-09-02 18:08:14,615 - root - INFO - Computing predictions for: ENST00000367990-linearfold
+2024-09-02 18:08:14,817 - root - INFO - Computing predictions for: ENST00000357780-linearfold
+2024-09-02 18:08:15,499 - root - INFO - Computing predictions for: ENST00000542499-linearfold
+2024-09-02 18:08:16,373 - root - WARNING - Skipping ENST00000233242. Sequence longer than 5000.
+2024-09-02 18:08:16,373 - root - INFO - Computing predictions for: ENST00000244669-linearfold
+2024-09-02 18:08:16,943 - root - INFO - Computing predictions for: ENST00000333467-linearfold
+2024-09-02 18:08:17,495 - root - INFO - Computing predictions for: ENST00000361441-linearfold
+2024-09-02 18:08:18,431 - root - INFO - Computing predictions for: ENST00000308521-linearfold
+2024-09-02 18:08:20,117 - root - INFO - Computing predictions for: ENST00000227667-linearfold
+2024-09-02 18:08:20,370 - root - INFO - Computing predictions for: ENST00000592954-linearfold
+2024-09-02 18:08:20,640 - root - INFO - Computing predictions for: ENST00000589057-linearfold
+2024-09-02 18:08:20,935 - root - INFO - Computing predictions for: ENST00000343267-linearfold
+2024-09-02 18:08:21,238 - root - INFO - Computing predictions for: ENST00000252486-linearfold
+2024-09-02 18:08:21,891 - root - INFO - Computing predictions for: ENST00000398189-linearfold
+2024-09-02 18:08:22,476 - root - INFO - Computing predictions for: ENST00000205948-linearfold
+2024-09-02 18:08:22,835 - root - INFO - Computing predictions for: ENST00000358502-linearfold
+2024-09-02 18:08:23,730 - root - INFO - Computing predictions for: ENST00000349314-linearfold
+2024-09-02 18:08:24,524 - root - WARNING - Skipping ENST00000409652. Sequence longer than 5000.
+2024-09-02 18:08:24,524 - root - INFO - Computing predictions for: ENST00000346798-linearfold
+2024-09-02 18:08:25,761 - root - WARNING - Skipping ENST00000083182. Sequence longer than 5000.
+2024-09-02 18:08:25,762 - root - WARNING - Skipping ENST00000288266. Sequence longer than 5000.
+2024-09-02 18:08:25,762 - root - INFO - Computing predictions for: ENST00000258530-linearfold
+2024-09-02 18:08:26,774 - root - INFO - Computing predictions for: ENST00000378364-linearfold
+2024-09-02 18:08:27,221 - root - INFO - Computing predictions for: ENST00000324978-linearfold
+2024-09-02 18:08:28,011 - root - INFO - Computing predictions for: ENST00000199280-linearfold
+2024-09-02 18:08:29,784 - root - INFO - Computing predictions for: ENST00000293599-linearfold
+2024-09-02 18:08:30,506 - root - INFO - Computing predictions for: ENST00000379507-linearfold
+2024-09-02 18:08:31,594 - root - INFO - Computing predictions for: ENST00000558772-linearfold
+2024-09-02 18:08:32,015 - root - WARNING - Skipping ENST00000156471. Sequence longer than 5000.
+2024-09-02 18:08:32,015 - root - WARNING - Skipping ENST00000374690. Sequence longer than 5000.
+2024-09-02 18:08:32,016 - root - INFO - Computing predictions for: ENST00000377045-linearfold
+2024-09-02 18:08:33,055 - root - WARNING - Skipping ENST00000393609. Sequence longer than 5000.
+2024-09-02 18:08:33,055 - root - WARNING - Skipping ENST00000303965. Sequence longer than 5000.
+2024-09-02 18:08:33,056 - root - WARNING - Skipping ENST00000239440. Sequence longer than 5000.
+2024-09-02 18:08:33,056 - root - INFO - Computing predictions for: ENST00000264028-linearfold
+2024-09-02 18:08:34,233 - root - INFO - Computing predictions for: ENST00000395748-linearfold
+2024-09-02 18:08:34,645 - root - INFO - Computing predictions for: ENST00000303436-linearfold
+2024-09-02 18:08:35,058 - root - INFO - Computing predictions for: ENST00000000233-linearfold
+2024-09-02 18:08:35,589 - root - INFO - Computing predictions for: ENST00000298316-linearfold
+2024-09-02 18:08:37,145 - root - INFO - Computing predictions for: ENST00000370283-linearfold
+2024-09-02 18:08:39,219 - root - INFO - Computing predictions for: ENST00000524782-linearfold
+2024-09-02 18:08:40,687 - root - INFO - Computing predictions for: ENST00000263245-linearfold
+2024-09-02 18:08:41,631 - root - WARNING - Skipping ENST00000262215. Sequence longer than 5000.
+2024-09-02 18:08:41,631 - root - WARNING - Skipping ENST00000251691. Sequence longer than 5000.
+2024-09-02 18:08:41,631 - root - INFO - Computing predictions for: ENST00000451320-linearfold
+2024-09-02 18:08:42,641 - root - INFO - Computing predictions for: ENST00000396777-linearfold
+2024-09-02 18:08:43,501 - root - INFO - Computing predictions for: ENST00000622789-linearfold
+2024-09-02 18:08:44,956 - root - INFO - Computing predictions for: ENST00000368087-linearfold
+2024-09-02 18:08:45,486 - root - INFO - Computing predictions for: ENST00000261783-linearfold
+2024-09-02 18:08:46,252 - root - INFO - Computing predictions for: ENST00000400198-linearfold
+2024-09-02 18:08:47,128 - root - INFO - Computing predictions for: ENST00000311956-linearfold
+2024-09-02 18:08:48,692 - root - INFO - Computing predictions for: ENST00000336498-linearfold
+2024-09-02 18:08:49,846 - root - INFO - Computing predictions for: ENST00000375250-linearfold
+2024-09-02 18:08:51,099 - root - INFO - Computing predictions for: ENST00000295095-linearfold
+2024-09-02 18:08:51,539 - root - INFO - Computing predictions for: ENST00000289968-linearfold
+2024-09-02 18:08:52,884 - root - INFO - Computing predictions for: ENST00000368149-linearfold
+2024-09-02 18:08:54,000 - root - WARNING - Skipping ENST00000358308. Sequence longer than 5000.
+2024-09-02 18:08:54,001 - root - WARNING - Skipping ENST00000528829. Sequence longer than 5000.
+2024-09-02 18:08:54,001 - root - WARNING - Skipping ENST00000396432. Sequence longer than 5000.
+2024-09-02 18:08:54,001 - root - INFO - Computing predictions for: ENST00000374172-linearfold
+2024-09-02 18:08:55,091 - root - WARNING - Skipping ENST00000622683. Sequence longer than 5000.
+2024-09-02 18:08:55,091 - root - INFO - Computing predictions for: ENST00000395184-linearfold
+2024-09-02 18:08:56,526 - root - INFO - Computing predictions for: ENST00000409202-linearfold
+2024-09-02 18:08:57,526 - root - INFO - Computing predictions for: ENST00000531294-linearfold
+2024-09-02 18:08:58,134 - root - WARNING - Skipping ENST00000260526. Sequence longer than 5000.
+2024-09-02 18:08:58,134 - root - INFO - Computing predictions for: ENST00000368013-linearfold
+2024-09-02 18:09:00,088 - root - WARNING - Skipping ENST00000264245. Sequence longer than 5000.
+2024-09-02 18:09:00,089 - root - INFO - Computing predictions for: ENST00000412432-linearfold
+2024-09-02 18:09:01,030 - root - INFO - Computing predictions for: ENST00000276826-linearfold
+2024-09-02 18:09:03,713 - root - INFO - Computing predictions for: ENST00000350060-linearfold
+2024-09-02 18:09:05,449 - root - INFO - Computing predictions for: ENST00000340825-linearfold
+2024-09-02 18:09:07,237 - root - INFO - Computing predictions for: ENST00000556611-linearfold
+2024-09-02 18:09:08,426 - root - WARNING - Skipping ENST00000337414. Sequence longer than 5000.
+2024-09-02 18:09:08,427 - root - INFO - Computing predictions for: ENST00000430041-linearfold
+2024-09-02 18:09:09,457 - root - INFO - Computing predictions for: ENST00000580685-linearfold
+2024-09-02 18:09:10,060 - root - INFO - Computing predictions for: ENST00000541644-linearfold
+2024-09-02 18:09:10,384 - root - INFO - Computing predictions for: ENST00000599846-linearfold
+2024-09-02 18:09:12,241 - root - INFO - Computing predictions for: ENST00000361221-linearfold
+2024-09-02 18:09:14,586 - root - WARNING - Skipping ENST00000368194. Sequence longer than 5000.
+2024-09-02 18:09:14,586 - root - WARNING - Skipping ENST00000397843. Sequence longer than 5000.
+2024-09-02 18:09:14,587 - root - INFO - Computing predictions for: ENST00000421050-linearfold
+2024-09-02 18:09:16,415 - root - INFO - Computing predictions for: ENST00000378378-linearfold
+2024-09-02 18:09:17,903 - root - WARNING - Skipping ENST00000263674. Sequence longer than 5000.
+2024-09-02 18:09:17,903 - root - WARNING - Skipping ENST00000359920. Sequence longer than 5000.
+2024-09-02 18:09:17,903 - root - INFO - Computing predictions for: ENST00000462460-linearfold
+2024-09-02 18:09:19,848 - root - INFO - Computing predictions for: ENST00000333972-linearfold
+2024-09-02 18:09:20,809 - root - WARNING - Skipping ENST00000296794. Sequence longer than 5000.
+2024-09-02 18:09:20,809 - root - INFO - Computing predictions for: ENST00000495373-linearfold
+2024-09-02 18:09:21,523 - root - INFO - Computing predictions for: ENST00000378115-linearfold
+2024-09-02 18:09:22,445 - root - INFO - Computing predictions for: ENST00000333677-linearfold
+2024-09-02 18:09:24,447 - root - WARNING - Skipping ENST00000420470. Sequence longer than 5000.
+2024-09-02 18:09:24,447 - root - INFO - Computing predictions for: ENST00000326016-linearfold
+2024-09-02 18:09:26,202 - root - WARNING - Skipping ENST00000298694. Sequence longer than 5000.
+2024-09-02 18:09:26,202 - root - WARNING - Skipping ENST00000056217. Sequence longer than 5000.
+2024-09-02 18:09:26,202 - root - INFO - Computing predictions for: ENST00000250617-linearfold
+2024-09-02 18:09:27,596 - root - WARNING - Skipping ENST00000218789. Sequence longer than 5000.
+2024-09-02 18:09:27,597 - root - INFO - Computing predictions for: ENST00000624843-linearfold
+2024-09-02 18:09:28,444 - root - WARNING - Skipping ENST00000324856. Sequence longer than 5000.
+2024-09-02 18:09:28,444 - root - WARNING - Skipping ENST00000334344. Sequence longer than 5000.
+2024-09-02 18:09:28,444 - root - WARNING - Skipping ENST00000263620. Sequence longer than 5000.
+2024-09-02 18:09:28,444 - root - INFO - Computing predictions for: ENST00000346246-linearfold
+2024-09-02 18:09:30,405 - root - WARNING - Skipping ENST00000355431. Sequence longer than 5000.
+2024-09-02 18:09:30,405 - root - WARNING - Skipping ENST00000349213. Sequence longer than 5000.
+2024-09-02 18:09:30,405 - root - WARNING - Skipping ENST00000279873. Sequence longer than 5000.
+2024-09-02 18:09:30,405 - root - WARNING - Skipping ENST00000379887. Sequence longer than 5000.
+2024-09-02 18:09:30,405 - root - INFO - Computing predictions for: ENST00000449376-linearfold
+2024-09-02 18:09:31,238 - root - INFO - Computing predictions for: ENST00000551828-linearfold
+2024-09-02 18:09:31,505 - root - WARNING - Skipping ENST00000310389. Sequence longer than 5000.
+2024-09-02 18:09:31,505 - root - INFO - Computing predictions for: ENST00000471138-linearfold
+2024-09-02 18:09:32,130 - root - INFO - Computing predictions for: ENST00000320767-linearfold
+2024-09-02 18:09:32,457 - root - INFO - Computing predictions for: ENST00000282032-linearfold
+2024-09-02 18:09:33,053 - root - INFO - Computing predictions for: ENST00000529384-linearfold
+2024-09-02 18:09:33,482 - root - INFO - Computing predictions for: ENST00000219204-linearfold
+2024-09-02 18:09:34,157 - root - INFO - Computing predictions for: ENST00000260746-linearfold
+2024-09-02 18:09:35,565 - root - INFO - Computing predictions for: ENST00000404894-linearfold
+2024-09-02 18:09:35,831 - root - INFO - Computing predictions for: ENST00000390645-linearfold
+2024-09-02 18:09:37,445 - root - INFO - Computing predictions for: ENST00000320033-linearfold
+2024-09-02 18:09:38,079 - root - WARNING - Skipping ENST00000295087. Sequence longer than 5000.
+2024-09-02 18:09:38,080 - root - WARNING - Skipping ENST00000377275. Sequence longer than 5000.
+2024-09-02 18:09:38,080 - root - INFO - Computing predictions for: ENST00000463745-linearfold
+2024-09-02 18:09:38,958 - root - INFO - Computing predictions for: ENST00000315580-linearfold
+2024-09-02 18:09:39,601 - root - INFO - Computing predictions for: ENST00000273258-linearfold
+2024-09-02 18:09:40,317 - root - INFO - Computing predictions for: ENST00000326446-linearfold
+2024-09-02 18:09:41,421 - root - INFO - Computing predictions for: ENST00000272217-linearfold
+2024-09-02 18:09:42,420 - root - INFO - Computing predictions for: ENST00000276569-linearfold
+2024-09-02 18:09:43,395 - root - INFO - Computing predictions for: ENST00000428183-linearfold
+2024-09-02 18:09:44,510 - root - INFO - Computing predictions for: ENST00000373869-linearfold
+2024-09-02 18:09:45,075 - root - INFO - Computing predictions for: ENST00000392644-linearfold
+2024-09-02 18:09:46,522 - root - INFO - Computing predictions for: ENST00000298032-linearfold
+2024-09-02 18:09:48,012 - root - INFO - Computing predictions for: ENST00000305242-linearfold
+2024-09-02 18:09:49,185 - root - INFO - Computing predictions for: ENST00000392335-linearfold
+2024-09-02 18:09:50,386 - root - INFO - Computing predictions for: ENST00000245543-linearfold
+2024-09-02 18:09:51,325 - root - INFO - Computing predictions for: ENST00000469044-linearfold
+2024-09-02 18:09:52,605 - root - INFO - Computing predictions for: ENST00000372829-linearfold
+2024-09-02 18:09:53,284 - root - INFO - Computing predictions for: ENST00000356824-linearfold
+2024-09-02 18:09:54,284 - root - INFO - Computing predictions for: ENST00000471229-linearfold
+2024-09-02 18:09:55,198 - root - WARNING - Skipping ENST00000423738. Sequence longer than 5000.
+2024-09-02 18:09:55,198 - root - INFO - Computing predictions for: ENST00000604957-linearfold
+2024-09-02 18:09:56,608 - root - INFO - Computing predictions for: ENST00000539247-linearfold
+2024-09-02 18:09:57,297 - root - INFO - Computing predictions for: ENST00000367294-linearfold
+2024-09-02 18:09:57,869 - root - INFO - Computing predictions for: ENST00000505755-linearfold
+2024-09-02 18:09:58,739 - root - INFO - Computing predictions for: ENST00000527771-linearfold
+2024-09-02 18:09:59,669 - root - INFO - Computing predictions for: ENST00000262942-linearfold
+2024-09-02 18:10:00,235 - root - INFO - Computing predictions for: ENST00000451682-linearfold
+2024-09-02 18:10:01,006 - root - INFO - Computing predictions for: ENST00000315717-linearfold
+2024-09-02 18:10:01,462 - root - INFO - Computing predictions for: ENST00000228825-linearfold
+2024-09-02 18:10:01,752 - root - INFO - Computing predictions for: ENST00000397261-linearfold
+2024-09-02 18:10:02,318 - root - WARNING - Skipping ENST00000359856. Sequence longer than 5000.
+2024-09-02 18:10:02,318 - root - INFO - Computing predictions for: ENST00000353214-linearfold
+2024-09-02 18:10:03,407 - root - WARNING - Skipping ENST00000566423. Sequence longer than 5000.
+2024-09-02 18:10:03,407 - root - WARNING - Skipping ENST00000420843. Sequence longer than 5000.
+2024-09-02 18:10:03,407 - root - INFO - Computing predictions for: ENST00000269260-linearfold
+2024-09-02 18:10:04,150 - root - INFO - Computing predictions for: ENST00000371421-linearfold
+2024-09-02 18:10:04,932 - root - INFO - Computing predictions for: ENST00000265138-linearfold
+2024-09-02 18:10:05,968 - root - INFO - Computing predictions for: ENST00000395621-linearfold
+2024-09-02 18:10:06,977 - root - INFO - Computing predictions for: ENST00000264914-linearfold
+2024-09-02 18:10:08,548 - root - WARNING - Skipping ENST00000381154. Sequence longer than 5000.
+2024-09-02 18:10:08,548 - root - INFO - Computing predictions for: ENST00000540563-linearfold
+2024-09-02 18:10:09,426 - root - INFO - Computing predictions for: ENST00000381127-linearfold
+2024-09-02 18:10:10,221 - root - INFO - Computing predictions for: ENST00000341029-linearfold
+2024-09-02 18:10:10,664 - root - INFO - Computing predictions for: ENST00000366658-linearfold
+2024-09-02 18:10:11,008 - root - INFO - Computing predictions for: ENST00000379044-linearfold
+2024-09-02 18:10:12,449 - root - INFO - Computing predictions for: ENST00000369880-linearfold
+2024-09-02 18:10:13,225 - root - INFO - Computing predictions for: ENST00000520781-linearfold
+2024-09-02 18:10:13,852 - root - WARNING - Skipping ENST00000357668. Sequence longer than 5000.
+2024-09-02 18:10:13,853 - root - WARNING - Skipping ENST00000281419. Sequence longer than 5000.
+2024-09-02 18:10:13,853 - root - WARNING - Skipping ENST00000264607. Sequence longer than 5000.
+2024-09-02 18:10:13,853 - root - INFO - Computing predictions for: ENST00000275838-linearfold
+2024-09-02 18:10:14,789 - root - INFO - Computing predictions for: ENST00000406687-linearfold
+2024-09-02 18:10:15,485 - root - INFO - Computing predictions for: ENST00000512254-linearfold
+2024-09-02 18:10:15,812 - root - INFO - Computing predictions for: ENST00000277458-linearfold
+2024-09-02 18:10:19,244 - root - INFO - Computing predictions for: ENST00000332783-linearfold
+2024-09-02 18:10:20,719 - root - INFO - Computing predictions for: ENST00000380488-linearfold
+2024-09-02 18:10:21,262 - root - INFO - Computing predictions for: ENST00000394919-linearfold
+2024-09-02 18:10:22,121 - root - INFO - Computing predictions for: ENST00000397771-linearfold
+2024-09-02 18:10:23,342 - root - WARNING - Skipping ENST00000369162. Sequence longer than 5000.
+2024-09-02 18:10:23,342 - root - INFO - Computing predictions for: ENST00000229595-linearfold
+2024-09-02 18:10:24,012 - root - INFO - Computing predictions for: ENST00000263382-linearfold
+2024-09-02 18:10:24,740 - root - INFO - Computing predictions for: ENST00000619926-linearfold
+2024-09-02 18:10:25,456 - root - INFO - Computing predictions for: ENST00000355035-linearfold
+2024-09-02 18:10:26,095 - root - WARNING - Skipping ENST00000392403. Sequence longer than 5000.
+2024-09-02 18:10:26,095 - root - INFO - Computing predictions for: ENST00000428278-linearfold
+2024-09-02 18:10:27,092 - root - INFO - Computing predictions for: ENST00000447966-linearfold
+2024-09-02 18:10:28,821 - root - INFO - Computing predictions for: ENST00000347842-linearfold
+2024-09-02 18:10:30,132 - root - INFO - Computing predictions for: ENST00000395332-linearfold
+2024-09-02 18:10:30,994 - root - INFO - Computing predictions for: ENST00000381317-linearfold
+2024-09-02 18:10:31,994 - root - INFO - Computing predictions for: ENST00000591090-linearfold
+2024-09-02 18:10:32,569 - root - INFO - Computing predictions for: ENST00000422745-linearfold
+2024-09-02 18:10:33,120 - root - INFO - Computing predictions for: ENST00000389208-linearfold
+2024-09-02 18:10:33,666 - root - INFO - Computing predictions for: ENST00000546892-linearfold
+2024-09-02 18:10:34,677 - root - WARNING - Skipping ENST00000379454. Sequence longer than 5000.
+2024-09-02 18:10:34,677 - root - INFO - Computing predictions for: ENST00000215906-linearfold
+2024-09-02 18:10:36,188 - root - INFO - Computing predictions for: ENST00000375544-linearfold
+2024-09-02 18:10:36,843 - root - INFO - Computing predictions for: ENST00000320256-linearfold
+2024-09-02 18:10:37,466 - root - INFO - Computing predictions for: ENST00000306729-linearfold
+2024-09-02 18:10:38,620 - root - INFO - Computing predictions for: ENST00000415229-linearfold
+2024-09-02 18:10:39,478 - root - INFO - Computing predictions for: ENST00000372394-linearfold
+2024-09-02 18:10:40,339 - root - WARNING - Skipping ENST00000361833. Sequence longer than 5000.
+2024-09-02 18:10:40,339 - root - WARNING - Skipping ENST00000313400. Sequence longer than 5000.
+2024-09-02 18:10:40,339 - root - INFO - Computing predictions for: ENST00000261191-linearfold
+2024-09-02 18:10:41,025 - root - WARNING - Skipping ENST00000435504. Sequence longer than 5000.
+2024-09-02 18:10:41,025 - root - INFO - Computing predictions for: ENST00000284629-linearfold
+2024-09-02 18:10:41,490 - root - WARNING - Skipping ENST00000287394. Sequence longer than 5000.
+2024-09-02 18:10:41,490 - root - WARNING - Skipping ENST00000238789. Sequence longer than 5000.
+2024-09-02 18:10:41,491 - root - INFO - Computing predictions for: ENST00000378756-linearfold
+2024-09-02 18:10:42,878 - root - INFO - Computing predictions for: ENST00000308647-linearfold
+2024-09-02 18:10:44,239 - root - WARNING - Skipping ENST00000321990. Sequence longer than 5000.
+2024-09-02 18:10:44,240 - root - INFO - Computing predictions for: ENST00000450849-linearfold
+2024-09-02 18:10:46,405 - root - INFO - Computing predictions for: ENST00000369043-linearfold
+2024-09-02 18:10:47,798 - root - INFO - Computing predictions for: ENST00000426833-linearfold
+2024-09-02 18:10:48,819 - root - INFO - Computing predictions for: ENST00000613954-linearfold
+2024-09-02 18:10:49,554 - root - WARNING - Skipping ENST00000367942. Sequence longer than 5000.
+2024-09-02 18:10:49,554 - root - WARNING - Skipping ENST00000420353. Sequence longer than 5000.
+2024-09-02 18:10:49,554 - root - WARNING - Skipping ENST00000536444. Sequence longer than 5000.
+2024-09-02 18:10:49,554 - root - INFO - Computing predictions for: ENST00000336854-linearfold
+2024-09-02 18:10:50,192 - root - INFO - Computing predictions for: ENST00000509910-linearfold
+2024-09-02 18:10:51,157 - root - INFO - Computing predictions for: ENST00000529655-linearfold
+2024-09-02 18:10:52,106 - root - INFO - Computing predictions for: ENST00000247178-linearfold
+2024-09-02 18:10:53,580 - root - INFO - Computing predictions for: ENST00000321297-linearfold
+2024-09-02 18:10:54,645 - root - WARNING - Skipping ENST00000377264. Sequence longer than 5000.
+2024-09-02 18:10:54,645 - root - WARNING - Skipping ENST00000359933. Sequence longer than 5000.
+2024-09-02 18:10:54,646 - root - INFO - Computing predictions for: ENST00000283290-linearfold
+2024-09-02 18:10:55,204 - root - INFO - Computing predictions for: ENST00000372232-linearfold
+2024-09-02 18:10:55,800 - root - INFO - Computing predictions for: ENST00000405546-linearfold
+2024-09-02 18:10:57,560 - root - INFO - Computing predictions for: ENST00000371120-linearfold
+2024-09-02 18:10:58,203 - root - INFO - Computing predictions for: ENST00000369076-linearfold
+2024-09-02 18:10:59,031 - root - INFO - Computing predictions for: ENST00000354449-linearfold
+2024-09-02 18:11:00,898 - root - INFO - Computing predictions for: ENST00000409618-linearfold
+2024-09-02 18:11:02,814 - root - INFO - Computing predictions for: ENST00000409548-linearfold
+2024-09-02 18:11:04,835 - root - INFO - Computing predictions for: ENST00000236959-linearfold
+2024-09-02 18:11:05,555 - root - INFO - Computing predictions for: ENST00000441560-linearfold
+2024-09-02 18:11:06,360 - root - WARNING - Skipping ENST00000398868. Sequence longer than 5000.
+2024-09-02 18:11:06,360 - root - WARNING - Skipping ENST00000452508. Sequence longer than 5000.
+2024-09-02 18:11:06,360 - root - INFO - Computing predictions for: ENST00000564241-linearfold
+2024-09-02 18:11:07,649 - root - INFO - Computing predictions for: ENST00000396684-linearfold
+2024-09-02 18:11:09,987 - root - INFO - Computing predictions for: ENST00000524142-linearfold
+2024-09-02 18:11:10,359 - root - WARNING - Skipping ENST00000327245. Sequence longer than 5000.
+2024-09-02 18:11:10,360 - root - WARNING - Skipping ENST00000273859. Sequence longer than 5000.
+2024-09-02 18:11:10,360 - root - WARNING - Skipping ENST00000375630. Sequence longer than 5000.
+2024-09-02 18:11:10,360 - root - WARNING - Skipping ENST00000323116. Sequence longer than 5000.
+2024-09-02 18:11:10,360 - root - WARNING - Skipping ENST00000361648. Sequence longer than 5000.
+2024-09-02 18:11:10,360 - root - INFO - Computing predictions for: ENST00000381946-linearfold
+2024-09-02 18:11:11,968 - root - INFO - Computing predictions for: ENST00000357324-linearfold
+2024-09-02 18:11:13,921 - root - INFO - Computing predictions for: ENST00000452699-linearfold
+2024-09-02 18:11:16,074 - root - INFO - Computing predictions for: ENST00000439040-linearfold
+2024-09-02 18:11:17,113 - root - INFO - Computing predictions for: ENST00000392443-linearfold
+2024-09-02 18:11:18,326 - root - INFO - Computing predictions for: ENST00000537345-linearfold
+2024-09-02 18:11:19,725 - root - INFO - Computing predictions for: ENST00000392233-linearfold
+2024-09-02 18:11:21,160 - root - INFO - Computing predictions for: ENST00000602133-linearfold
+2024-09-02 18:11:22,719 - root - INFO - Computing predictions for: ENST00000367816-linearfold
+2024-09-02 18:11:23,581 - root - INFO - Computing predictions for: ENST00000250111-linearfold
+2024-09-02 18:11:24,908 - root - INFO - Computing predictions for: ENST00000286371-linearfold
+2024-09-02 18:11:25,430 - root - WARNING - Skipping ENST00000539276. Sequence longer than 5000.
+2024-09-02 18:11:25,430 - root - INFO - Computing predictions for: ENST00000397043-linearfold
+2024-09-02 18:11:27,120 - root - WARNING - Skipping ENST00000428670. Sequence longer than 5000.
+2024-09-02 18:11:27,120 - root - WARNING - Skipping ENST00000360273. Sequence longer than 5000.
+2024-09-02 18:11:27,121 - root - INFO - Computing predictions for: ENST00000393842-linearfold
+2024-09-02 18:11:29,141 - root - WARNING - Skipping ENST00000357681. Sequence longer than 5000.
+2024-09-02 18:11:29,141 - root - INFO - Computing predictions for: ENST00000510168-linearfold
+2024-09-02 18:11:30,485 - root - INFO - Computing predictions for: ENST00000262429-linearfold
+2024-09-02 18:11:31,854 - root - INFO - Computing predictions for: ENST00000593152-linearfold
+2024-09-02 18:11:32,647 - root - INFO - Computing predictions for: ENST00000262030-linearfold
+2024-09-02 18:11:33,486 - root - INFO - Computing predictions for: ENST00000356708-linearfold
+2024-09-02 18:11:33,901 - root - INFO - Computing predictions for: ENST00000591660-linearfold
+2024-09-02 18:11:34,286 - root - INFO - Computing predictions for: ENST00000395663-linearfold
+2024-09-02 18:11:34,491 - root - INFO - Computing predictions for: ENST00000369722-linearfold
+2024-09-02 18:11:35,195 - root - INFO - Computing predictions for: ENST00000301587-linearfold
+2024-09-02 18:11:35,405 - root - INFO - Computing predictions for: ENST00000304312-linearfold
+2024-09-02 18:11:35,549 - root - INFO - Computing predictions for: ENST00000400094-linearfold
+2024-09-02 18:11:35,765 - root - INFO - Computing predictions for: ENST00000292475-linearfold
+2024-09-02 18:11:35,946 - root - INFO - Computing predictions for: ENST00000413834-linearfold
+2024-09-02 18:11:37,114 - root - INFO - Computing predictions for: ENST00000524422-linearfold
+2024-09-02 18:11:37,416 - root - INFO - Computing predictions for: ENST00000290299-linearfold
+2024-09-02 18:11:37,681 - root - INFO - Computing predictions for: ENST00000311459-linearfold
+2024-09-02 18:11:38,830 - root - INFO - Computing predictions for: ENST00000369762-linearfold
+2024-09-02 18:11:39,714 - root - INFO - Computing predictions for: ENST00000378438-linearfold
+2024-09-02 18:11:40,274 - root - INFO - Computing predictions for: ENST00000264649-linearfold
+2024-09-02 18:11:41,923 - root - WARNING - Skipping ENST00000330342. Sequence longer than 5000.
+2024-09-02 18:11:41,923 - root - INFO - Computing predictions for: ENST00000393054-linearfold
+2024-09-02 18:11:43,039 - root - INFO - Computing predictions for: ENST00000330398-linearfold
+2024-09-02 18:11:43,598 - root - INFO - Computing predictions for: ENST00000290949-linearfold
+2024-09-02 18:11:44,293 - root - INFO - Computing predictions for: ENST00000285393-linearfold
+2024-09-02 18:11:44,948 - root - INFO - Computing predictions for: ENST00000273398-linearfold
+2024-09-02 18:11:46,200 - root - INFO - Computing predictions for: ENST00000412314-linearfold
+2024-09-02 18:11:46,998 - root - INFO - Computing predictions for: ENST00000276390-linearfold
+2024-09-02 18:11:47,846 - root - WARNING - Skipping ENST00000518738. Sequence longer than 5000.
+2024-09-02 18:11:47,846 - root - INFO - Computing predictions for: ENST00000272238-linearfold
+2024-09-02 18:11:48,845 - root - INFO - Computing predictions for: ENST00000253413-linearfold
+2024-09-02 18:11:49,271 - root - INFO - Computing predictions for: ENST00000522587-linearfold
+2024-09-02 18:11:49,881 - root - INFO - Computing predictions for: ENST00000249289-linearfold
+2024-09-02 18:11:50,167 - root - INFO - Computing predictions for: ENST00000374050-linearfold
+2024-09-02 18:11:50,591 - root - INFO - Computing predictions for: ENST00000355221-linearfold
+2024-09-02 18:11:51,402 - root - WARNING - Skipping ENST00000343533. Sequence longer than 5000.
+2024-09-02 18:11:51,402 - root - WARNING - Skipping ENST00000448424. Sequence longer than 5000.
+2024-09-02 18:11:51,402 - root - WARNING - Skipping ENST00000264449. Sequence longer than 5000.
+2024-09-02 18:11:51,403 - root - WARNING - Skipping ENST00000381655. Sequence longer than 5000.
+2024-09-02 18:11:51,403 - root - INFO - Computing predictions for: ENST00000559829-linearfold
+2024-09-02 18:11:52,708 - root - WARNING - Skipping ENST00000338821. Sequence longer than 5000.
+2024-09-02 18:11:52,708 - root - INFO - Computing predictions for: ENST00000307671-linearfold
+2024-09-02 18:11:54,377 - root - INFO - Computing predictions for: ENST00000574428-linearfold
+2024-09-02 18:11:55,650 - root - INFO - Computing predictions for: ENST00000474627-linearfold
+2024-09-02 18:11:56,297 - root - INFO - Computing predictions for: ENST00000335514-linearfold
+2024-09-02 18:11:56,498 - root - WARNING - Skipping ENST00000350721. Sequence longer than 5000.
+2024-09-02 18:11:56,499 - root - INFO - Computing predictions for: ENST00000412052-linearfold
+2024-09-02 18:11:57,525 - root - WARNING - Skipping ENST00000262919. Sequence longer than 5000.
+2024-09-02 18:11:57,525 - root - WARNING - Skipping ENST00000355044. Sequence longer than 5000.
+2024-09-02 18:11:57,525 - root - WARNING - Skipping ENST00000373344. Sequence longer than 5000.
+2024-09-02 18:11:57,525 - root - WARNING - Skipping ENST00000436367. Sequence longer than 5000.
+2024-09-02 18:11:57,526 - root - INFO - Computing predictions for: ENST00000252934-linearfold
+2024-09-02 18:11:58,511 - root - WARNING - Skipping ENST00000427980. Sequence longer than 5000.
+2024-09-02 18:11:58,511 - root - INFO - Computing predictions for: ENST00000336783-linearfold
+2024-09-02 18:12:00,627 - root - INFO - Computing predictions for: ENST00000487717-linearfold
+2024-09-02 18:12:02,064 - root - WARNING - Skipping ENST00000519948. Sequence longer than 5000.
+2024-09-02 18:12:02,064 - root - INFO - Computing predictions for: ENST00000375731-linearfold
+2024-09-02 18:12:02,578 - root - INFO - Computing predictions for: ENST00000377526-linearfold
+2024-09-02 18:12:03,222 - root - INFO - Computing predictions for: ENST00000395915-linearfold
+2024-09-02 18:12:03,828 - root - INFO - Computing predictions for: ENST00000378853-linearfold
+2024-09-02 18:12:04,301 - root - WARNING - Skipping ENST00000406775. Sequence longer than 5000.
+2024-09-02 18:12:04,301 - root - INFO - Computing predictions for: ENST00000306730-linearfold
+2024-09-02 18:12:05,057 - root - WARNING - Skipping ENST00000318709. Sequence longer than 5000.
+2024-09-02 18:12:05,057 - root - WARNING - Skipping ENST00000299178. Sequence longer than 5000.
+2024-09-02 18:12:05,057 - root - INFO - Computing predictions for: ENST00000354866-linearfold
+2024-09-02 18:12:06,884 - root - INFO - Computing predictions for: ENST00000359092-linearfold
+2024-09-02 18:12:08,541 - root - INFO - Computing predictions for: ENST00000292401-linearfold
+2024-09-02 18:12:09,021 - root - INFO - Computing predictions for: ENST00000479665-linearfold
+2024-09-02 18:12:10,071 - root - INFO - Computing predictions for: ENST00000615480-linearfold
+2024-09-02 18:12:10,602 - root - INFO - Computing predictions for: ENST00000379198-linearfold
+2024-09-02 18:12:12,204 - root - INFO - Computing predictions for: ENST00000534026-linearfold
+2024-09-02 18:12:12,763 - root - INFO - Computing predictions for: ENST00000343307-linearfold
+2024-09-02 18:12:13,891 - root - INFO - Computing predictions for: ENST00000405767-linearfold
+2024-09-02 18:12:14,535 - root - INFO - Computing predictions for: ENST00000595387-linearfold
+2024-09-02 18:12:15,170 - root - INFO - Computing predictions for: ENST00000460419-linearfold
+2024-09-02 18:12:16,153 - root - INFO - Computing predictions for: ENST00000622824-linearfold
+2024-09-02 18:12:17,481 - root - INFO - Computing predictions for: ENST00000287590-linearfold
+2024-09-02 18:12:19,210 - root - INFO - Computing predictions for: ENST00000321702-linearfold
+2024-09-02 18:12:20,172 - root - INFO - Computing predictions for: ENST00000449549-linearfold
+2024-09-02 18:12:23,313 - root - INFO - Computing predictions for: ENST00000418555-linearfold
+2024-09-02 18:12:24,267 - root - INFO - Computing predictions for: ENST00000300404-linearfold
+2024-09-02 18:12:25,045 - root - WARNING - Skipping ENST00000266383. Sequence longer than 5000.
+2024-09-02 18:12:25,046 - root - INFO - Computing predictions for: ENST00000379731-linearfold
+2024-09-02 18:12:26,797 - root - INFO - Computing predictions for: ENST00000622395-linearfold
+2024-09-02 18:12:27,843 - root - INFO - Computing predictions for: ENST00000483209-linearfold
+2024-09-02 18:12:28,665 - root - INFO - Computing predictions for: ENST00000371711-linearfold
+2024-09-02 18:12:30,479 - root - INFO - Computing predictions for: ENST00000029410-linearfold
+2024-09-02 18:12:31,328 - root - INFO - Computing predictions for: ENST00000311181-linearfold
+2024-09-02 18:12:32,246 - root - INFO - Computing predictions for: ENST00000261499-linearfold
+2024-09-02 18:12:32,669 - root - INFO - Computing predictions for: ENST00000243578-linearfold
+2024-09-02 18:12:33,153 - root - INFO - Computing predictions for: ENST00000309982-linearfold
+2024-09-02 18:12:34,192 - root - INFO - Computing predictions for: ENST00000598188-linearfold
+2024-09-02 18:12:34,775 - root - INFO - Computing predictions for: ENST00000328735-linearfold
+2024-09-02 18:12:36,049 - root - WARNING - Skipping ENST00000399921. Sequence longer than 5000.
+2024-09-02 18:12:36,050 - root - INFO - Computing predictions for: ENST00000394532-linearfold
+2024-09-02 18:12:36,706 - root - INFO - Computing predictions for: ENST00000379704-linearfold
+2024-09-02 18:12:37,181 - root - WARNING - Skipping ENST00000370693. Sequence longer than 5000.
+2024-09-02 18:12:37,181 - root - INFO - Computing predictions for: ENST00000369085-linearfold
+2024-09-02 18:12:38,321 - root - INFO - Computing predictions for: ENST00000287322-linearfold
+2024-09-02 18:12:39,463 - root - INFO - Computing predictions for: ENST00000445922-linearfold
+2024-09-02 18:12:40,879 - root - INFO - Computing predictions for: ENST00000435091-linearfold
+2024-09-02 18:12:41,907 - root - INFO - Computing predictions for: ENST00000005260-linearfold
+2024-09-02 18:12:43,414 - root - INFO - Computing predictions for: ENST00000381669-linearfold
+2024-09-02 18:12:44,515 - root - INFO - Computing predictions for: ENST00000421665-linearfold
+2024-09-02 18:12:46,592 - root - INFO - Computing predictions for: ENST00000374467-linearfold
+2024-09-02 18:12:47,571 - root - INFO - Computing predictions for: ENST00000533166-linearfold
+2024-09-02 18:12:48,044 - root - INFO - Computing predictions for: ENST00000322953-linearfold
+2024-09-02 18:12:48,946 - root - INFO - Computing predictions for: ENST00000538234-linearfold
+2024-09-02 18:12:50,008 - root - INFO - Computing predictions for: ENST00000296288-linearfold
+2024-09-02 18:12:51,552 - root - WARNING - Skipping ENST00000260947. Sequence longer than 5000.
+2024-09-02 18:12:51,552 - root - INFO - Computing predictions for: ENST00000253968-linearfold
+2024-09-02 18:12:52,482 - root - INFO - Computing predictions for: ENST00000281437-linearfold
+2024-09-02 18:12:53,300 - root - INFO - Computing predictions for: ENST00000616743-linearfold
+2024-09-02 18:12:53,985 - root - INFO - Computing predictions for: ENST00000286639-linearfold
+2024-09-02 18:12:54,628 - root - WARNING - Skipping ENST00000382422. Sequence longer than 5000.
+2024-09-02 18:12:54,629 - root - WARNING - Skipping ENST00000404251. Sequence longer than 5000.
+2024-09-02 18:12:54,629 - root - WARNING - Skipping ENST00000379441. Sequence longer than 5000.
+2024-09-02 18:12:54,629 - root - WARNING - Skipping ENST00000392782. Sequence longer than 5000.
+2024-09-02 18:12:54,629 - root - INFO - Computing predictions for: ENST00000341983-linearfold
+2024-09-02 18:12:55,400 - root - INFO - Computing predictions for: ENST00000447005-linearfold
+2024-09-02 18:12:55,601 - root - INFO - Computing predictions for: ENST00000529202-linearfold
+2024-09-02 18:12:56,259 - root - INFO - Computing predictions for: ENST00000318312-linearfold
+2024-09-02 18:12:57,632 - root - INFO - Computing predictions for: ENST00000568104-linearfold
+2024-09-02 18:12:58,718 - root - INFO - Computing predictions for: ENST00000268057-linearfold
+2024-09-02 18:12:59,527 - root - INFO - Computing predictions for: ENST00000392663-linearfold
+2024-09-02 18:13:00,715 - root - INFO - Computing predictions for: ENST00000264499-linearfold
+2024-09-02 18:13:01,669 - root - INFO - Computing predictions for: ENST00000242067-linearfold
+2024-09-02 18:13:02,884 - root - WARNING - Skipping ENST00000415149. Sequence longer than 5000.
+2024-09-02 18:13:02,885 - root - INFO - Computing predictions for: ENST00000270233-linearfold
+2024-09-02 18:13:04,252 - root - INFO - Computing predictions for: ENST00000329117-linearfold
+2024-09-02 18:13:05,964 - root - INFO - Computing predictions for: ENST00000379117-linearfold
+2024-09-02 18:13:06,436 - root - INFO - Computing predictions for: ENST00000458587-linearfold
+2024-09-02 18:13:07,239 - root - INFO - Computing predictions for: ENST00000542031-linearfold
+2024-09-02 18:13:08,785 - root - INFO - Computing predictions for: ENST00000370244-linearfold
+2024-09-02 18:13:10,004 - root - INFO - Computing predictions for: ENST00000395961-linearfold
+2024-09-02 18:13:11,148 - root - INFO - Computing predictions for: ENST00000369541-linearfold
+2024-09-02 18:13:11,481 - root - INFO - Computing predictions for: ENST00000390652-linearfold
+2024-09-02 18:13:12,773 - root - INFO - Computing predictions for: ENST00000538118-linearfold
+2024-09-02 18:13:14,045 - root - INFO - Computing predictions for: ENST00000316273-linearfold
+2024-09-02 18:13:14,760 - root - INFO - Computing predictions for: ENST00000278100-linearfold
+2024-09-02 18:13:15,106 - root - INFO - Computing predictions for: ENST00000333924-linearfold
+2024-09-02 18:13:16,108 - root - INFO - Computing predictions for: ENST00000264381-linearfold
+2024-09-02 18:13:16,698 - root - INFO - Computing predictions for: ENST00000269980-linearfold
+2024-09-02 18:13:17,513 - root - INFO - Computing predictions for: ENST00000356489-linearfold
+2024-09-02 18:13:18,002 - root - INFO - Computing predictions for: ENST00000394951-linearfold
+2024-09-02 18:13:18,949 - root - INFO - Computing predictions for: ENST00000358510-linearfold
+2024-09-02 18:13:20,141 - root - WARNING - Skipping ENST00000345514. Sequence longer than 5000.
+2024-09-02 18:13:20,141 - root - WARNING - Skipping ENST00000589955. Sequence longer than 5000.
+2024-09-02 18:13:20,141 - root - INFO - Computing predictions for: ENST00000376055-linearfold
+2024-09-02 18:13:21,221 - root - WARNING - Skipping ENST00000393256. Sequence longer than 5000.
+2024-09-02 18:13:21,221 - root - INFO - Computing predictions for: ENST00000246784-linearfold
+2024-09-02 18:13:21,724 - root - INFO - Computing predictions for: ENST00000317582-linearfold
+2024-09-02 18:13:23,401 - root - WARNING - Skipping ENST00000393316. Sequence longer than 5000.
+2024-09-02 18:13:23,401 - root - INFO - Computing predictions for: ENST00000557008-linearfold
+2024-09-02 18:13:23,986 - root - INFO - Computing predictions for: ENST00000164227-linearfold
+2024-09-02 18:13:24,978 - root - INFO - Computing predictions for: ENST00000621333-linearfold
+2024-09-02 18:13:26,219 - root - INFO - Computing predictions for: ENST00000411832-linearfold
+2024-09-02 18:13:27,032 - root - INFO - Computing predictions for: ENST00000215115-linearfold
+2024-09-02 18:13:27,490 - root - WARNING - Skipping ENST00000334801. Sequence longer than 5000.
+2024-09-02 18:13:27,491 - root - INFO - Computing predictions for: ENST00000527759-linearfold
+2024-09-02 18:13:28,606 - root - INFO - Computing predictions for: ENST00000258168-linearfold
+2024-09-02 18:13:29,464 - root - INFO - Computing predictions for: ENST00000526088-linearfold
+2024-09-02 18:13:30,089 - root - WARNING - Skipping ENST00000378455. Sequence longer than 5000.
+2024-09-02 18:13:30,089 - root - WARNING - Skipping ENST00000540052. Sequence longer than 5000.
+2024-09-02 18:13:30,089 - root - WARNING - Skipping ENST00000305877. Sequence longer than 5000.
+2024-09-02 18:13:30,089 - root - INFO - Computing predictions for: ENST00000431802-linearfold
+2024-09-02 18:13:30,864 - root - INFO - Computing predictions for: ENST00000296424-linearfold
+2024-09-02 18:13:31,691 - root - INFO - Computing predictions for: ENST00000590099-linearfold
+2024-09-02 18:13:32,411 - root - WARNING - Skipping ENST00000429433. Sequence longer than 5000.
+2024-09-02 18:13:32,411 - root - WARNING - Skipping ENST00000502486. Sequence longer than 5000.
+2024-09-02 18:13:32,411 - root - INFO - Computing predictions for: ENST00000378605-linearfold
+2024-09-02 18:13:32,952 - root - INFO - Computing predictions for: ENST00000222547-linearfold
+2024-09-02 18:13:33,326 - root - INFO - Computing predictions for: ENST00000382762-linearfold
+2024-09-02 18:13:34,541 - root - INFO - Computing predictions for: ENST00000331595-linearfold
+2024-09-02 18:13:35,638 - root - INFO - Computing predictions for: ENST00000609256-linearfold
+2024-09-02 18:13:37,406 - root - INFO - Computing predictions for: ENST00000256495-linearfold
+2024-09-02 18:13:38,566 - root - INFO - Computing predictions for: ENST00000242728-linearfold
+2024-09-02 18:13:39,930 - root - INFO - Computing predictions for: ENST00000274353-linearfold
+2024-09-02 18:13:40,755 - root - INFO - Computing predictions for: ENST00000255192-linearfold
+2024-09-02 18:13:41,579 - root - INFO - Computing predictions for: ENST00000375512-linearfold
+2024-09-02 18:13:43,792 - root - INFO - Computing predictions for: ENST00000317361-linearfold
+2024-09-02 18:13:44,773 - root - INFO - Computing predictions for: ENST00000316724-linearfold
+2024-09-02 18:13:46,028 - root - INFO - Computing predictions for: ENST00000276416-linearfold
+2024-09-02 18:13:46,830 - root - INFO - Computing predictions for: ENST00000532672-linearfold
+2024-09-02 18:13:47,620 - root - INFO - Computing predictions for: ENST00000615299-linearfold
+2024-09-02 18:13:48,727 - root - WARNING - Skipping ENST00000421745. Sequence longer than 5000.
+2024-09-02 18:13:48,727 - root - INFO - Computing predictions for: ENST00000529894-linearfold
+2024-09-02 18:13:49,620 - root - WARNING - Skipping ENST00000355112. Sequence longer than 5000.
+2024-09-02 18:13:49,621 - root - INFO - Computing predictions for: ENST00000261714-linearfold
+2024-09-02 18:13:50,374 - root - INFO - Computing predictions for: ENST00000224337-linearfold
+2024-09-02 18:13:51,561 - root - INFO - Computing predictions for: ENST00000548925-linearfold
+2024-09-02 18:13:51,831 - root - INFO - Computing predictions for: ENST00000370372-linearfold
+2024-09-02 18:13:52,574 - root - INFO - Computing predictions for: ENST00000587722-linearfold
+2024-09-02 18:13:53,034 - root - INFO - Computing predictions for: ENST00000320776-linearfold
+2024-09-02 18:13:53,633 - root - INFO - Computing predictions for: ENST00000397457-linearfold
+2024-09-02 18:13:54,689 - root - INFO - Computing predictions for: ENST00000220531-linearfold
+2024-09-02 18:13:55,611 - root - INFO - Computing predictions for: ENST00000402924-linearfold
+2024-09-02 18:13:56,043 - root - INFO - Computing predictions for: ENST00000263368-linearfold
+2024-09-02 18:13:56,424 - root - INFO - Computing predictions for: ENST00000367808-linearfold
+2024-09-02 18:13:57,025 - root - INFO - Computing predictions for: ENST00000561360-linearfold
+2024-09-02 18:13:57,339 - root - INFO - Computing predictions for: ENST00000306385-linearfold
+2024-09-02 18:13:59,020 - root - INFO - Computing predictions for: ENST00000378827-linearfold
+2024-09-02 18:14:00,465 - root - WARNING - Skipping ENST00000282701. Sequence longer than 5000.
+2024-09-02 18:14:00,466 - root - INFO - Computing predictions for: ENST00000370830-linearfold
+2024-09-02 18:14:01,356 - root - INFO - Computing predictions for: ENST00000395864-linearfold
+2024-09-02 18:14:02,175 - root - WARNING - Skipping ENST00000331593. Sequence longer than 5000.
+2024-09-02 18:14:02,176 - root - WARNING - Skipping ENST00000297161. Sequence longer than 5000.
+2024-09-02 18:14:02,176 - root - WARNING - Skipping ENST00000515059. Sequence longer than 5000.
+2024-09-02 18:14:02,176 - root - WARNING - Skipping ENST00000374580. Sequence longer than 5000.
+2024-09-02 18:14:02,176 - root - WARNING - Skipping ENST00000374518. Sequence longer than 5000.
+2024-09-02 18:14:02,176 - root - INFO - Computing predictions for: ENST00000357607-linearfold
+2024-09-02 18:14:02,870 - root - INFO - Computing predictions for: ENST00000380667-linearfold
+2024-09-02 18:14:04,061 - root - INFO - Computing predictions for: ENST00000351486-linearfold
+2024-09-02 18:14:04,472 - root - INFO - Computing predictions for: ENST00000518611-linearfold
+2024-09-02 18:14:04,844 - root - INFO - Computing predictions for: ENST00000495514-linearfold
+2024-09-02 18:14:06,970 - root - INFO - Computing predictions for: ENST00000311086-linearfold
+2024-09-02 18:14:07,663 - root - WARNING - Skipping ENST00000040738. Sequence longer than 5000.
+2024-09-02 18:14:07,663 - root - INFO - Computing predictions for: ENST00000318407-linearfold
+2024-09-02 18:14:09,072 - root - INFO - Computing predictions for: ENST00000369153-linearfold
+2024-09-02 18:14:09,564 - root - INFO - Computing predictions for: ENST00000327428-linearfold
+2024-09-02 18:14:09,767 - root - INFO - Computing predictions for: ENST00000389017-linearfold
+2024-09-02 18:14:10,762 - root - INFO - Computing predictions for: ENST00000369883-linearfold
+2024-09-02 18:14:11,028 - root - INFO - Computing predictions for: ENST00000418040-linearfold
+2024-09-02 18:14:11,584 - root - INFO - Computing predictions for: ENST00000380379-linearfold
+2024-09-02 18:14:12,245 - root - INFO - Computing predictions for: ENST00000262865-linearfold
+2024-09-02 18:14:12,955 - root - INFO - Computing predictions for: ENST00000354932-linearfold
+2024-09-02 18:14:13,390 - root - INFO - Computing predictions for: ENST00000253354-linearfold
+2024-09-02 18:14:14,051 - root - INFO - Computing predictions for: ENST00000170150-linearfold
+2024-09-02 18:14:14,823 - root - INFO - Computing predictions for: ENST00000469520-linearfold
+2024-09-02 18:14:15,744 - root - WARNING - Skipping ENST00000321892. Sequence longer than 5000.
+2024-09-02 18:14:15,744 - root - INFO - Computing predictions for: ENST00000288602-linearfold
+2024-09-02 18:14:16,552 - root - INFO - Computing predictions for: ENST00000419234-linearfold
+2024-09-02 18:14:17,773 - root - INFO - Computing predictions for: ENST00000340611-linearfold
+2024-09-02 18:14:19,387 - root - WARNING - Skipping ENST00000357654. Sequence longer than 5000.
+2024-09-02 18:14:19,387 - root - INFO - Computing predictions for: ENST00000369462-linearfold
+2024-09-02 18:14:20,240 - root - INFO - Computing predictions for: ENST00000404034-linearfold
+2024-09-02 18:14:22,057 - root - INFO - Computing predictions for: ENST00000449085-linearfold
+2024-09-02 18:14:24,011 - root - WARNING - Skipping ENST00000303407. Sequence longer than 5000.
+2024-09-02 18:14:24,011 - root - WARNING - Skipping ENST00000263377. Sequence longer than 5000.
+2024-09-02 18:14:24,012 - root - WARNING - Skipping ENST00000394688. Sequence longer than 5000.
+2024-09-02 18:14:24,012 - root - INFO - Computing predictions for: ENST00000254900-linearfold
+2024-09-02 18:14:25,532 - root - INFO - Computing predictions for: ENST00000467963-linearfold
+2024-09-02 18:14:26,766 - root - INFO - Computing predictions for: ENST00000394530-linearfold
+2024-09-02 18:14:27,639 - root - INFO - Computing predictions for: ENST00000379624-linearfold
+2024-09-02 18:14:28,227 - root - INFO - Computing predictions for: ENST00000547530-linearfold
+2024-09-02 18:14:30,200 - root - WARNING - Skipping ENST00000341446. Sequence longer than 5000.
+2024-09-02 18:14:30,200 - root - INFO - Computing predictions for: ENST00000328540-linearfold
+2024-09-02 18:14:30,665 - root - INFO - Computing predictions for: ENST00000265922-linearfold
+2024-09-02 18:14:31,968 - root - INFO - Computing predictions for: ENST00000361539-linearfold
+2024-09-02 18:14:33,696 - root - INFO - Computing predictions for: ENST00000367462-linearfold
+2024-09-02 18:14:34,881 - root - WARNING - Skipping ENST00000259008. Sequence longer than 5000.
+2024-09-02 18:14:34,881 - root - INFO - Computing predictions for: ENST00000336767-linearfold
+2024-09-02 18:14:35,295 - root - INFO - Computing predictions for: ENST00000530758-linearfold
+2024-09-02 18:14:35,681 - root - INFO - Computing predictions for: ENST00000216807-linearfold
+2024-09-02 18:14:36,446 - root - INFO - Computing predictions for: ENST00000340934-linearfold
+2024-09-02 18:14:37,458 - root - INFO - Computing predictions for: ENST00000424362-linearfold
+2024-09-02 18:14:39,891 - root - WARNING - Skipping ENST00000357641. Sequence longer than 5000.
+2024-09-02 18:14:39,891 - root - INFO - Computing predictions for: ENST00000309383-linearfold
+2024-09-02 18:14:41,843 - root - WARNING - Skipping ENST00000342449. Sequence longer than 5000.
+2024-09-02 18:14:41,843 - root - WARNING - Skipping ENST00000373275. Sequence longer than 5000.
+2024-09-02 18:14:41,843 - root - INFO - Computing predictions for: ENST00000360796-linearfold
+2024-09-02 18:14:42,716 - root - INFO - Computing predictions for: ENST00000455895-linearfold
+2024-09-02 18:14:44,143 - root - INFO - Computing predictions for: ENST00000353555-linearfold
+2024-09-02 18:14:45,076 - root - WARNING - Skipping ENST00000296452. Sequence longer than 5000.
+2024-09-02 18:14:45,076 - root - INFO - Computing predictions for: ENST00000374183-linearfold
+2024-09-02 18:14:46,312 - root - INFO - Computing predictions for: ENST00000265016-linearfold
+2024-09-02 18:14:47,002 - root - INFO - Computing predictions for: ENST00000252593-linearfold
+2024-09-02 18:14:47,412 - root - INFO - Computing predictions for: ENST00000261721-linearfold
+2024-09-02 18:14:48,380 - root - INFO - Computing predictions for: ENST00000528120-linearfold
+2024-09-02 18:14:48,951 - root - WARNING - Skipping ENST00000280758. Sequence longer than 5000.
+2024-09-02 18:14:48,951 - root - INFO - Computing predictions for: ENST00000375366-linearfold
+2024-09-02 18:14:49,943 - root - INFO - Computing predictions for: ENST00000409335-linearfold
+2024-09-02 18:14:50,592 - root - INFO - Computing predictions for: ENST00000255608-linearfold
+2024-09-02 18:14:52,079 - root - INFO - Computing predictions for: ENST00000618918-linearfold
+2024-09-02 18:14:53,320 - root - WARNING - Skipping ENST00000314100. Sequence longer than 5000.
+2024-09-02 18:14:53,320 - root - INFO - Computing predictions for: ENST00000395743-linearfold
+2024-09-02 18:14:54,058 - root - INFO - Computing predictions for: ENST00000380591-linearfold
+2024-09-02 18:14:54,845 - root - INFO - Computing predictions for: ENST00000313334-linearfold
+2024-09-02 18:14:55,974 - root - INFO - Computing predictions for: ENST00000256015-linearfold
+2024-09-02 18:14:57,160 - root - INFO - Computing predictions for: ENST00000308731-linearfold
+2024-09-02 18:14:57,985 - root - INFO - Computing predictions for: ENST00000334529-linearfold
+2024-09-02 18:14:58,727 - root - INFO - Computing predictions for: ENST00000312541-linearfold
+2024-09-02 18:14:59,749 - root - INFO - Computing predictions for: ENST00000289361-linearfold
+2024-09-02 18:15:00,881 - root - INFO - Computing predictions for: ENST00000508906-linearfold
+2024-09-02 18:15:02,137 - root - INFO - Computing predictions for: ENST00000361232-linearfold
+2024-09-02 18:15:02,899 - root - INFO - Computing predictions for: ENST00000342868-linearfold
+2024-09-02 18:15:03,710 - root - INFO - Computing predictions for: ENST00000505126-linearfold
+2024-09-02 18:15:04,176 - root - INFO - Computing predictions for: ENST00000327705-linearfold
+2024-09-02 18:15:05,593 - root - WARNING - Skipping ENST00000408038. Sequence longer than 5000.
+2024-09-02 18:15:05,593 - root - INFO - Computing predictions for: ENST00000409311-linearfold
+2024-09-02 18:15:06,562 - root - INFO - Computing predictions for: ENST00000287598-linearfold
+2024-09-02 18:15:07,615 - root - INFO - Computing predictions for: ENST00000260210-linearfold
+2024-09-02 18:15:08,418 - root - INFO - Computing predictions for: ENST00000403633-linearfold
+2024-09-02 18:15:08,866 - root - INFO - Computing predictions for: ENST00000446408-linearfold
+2024-09-02 18:15:09,309 - root - INFO - Computing predictions for: ENST00000230340-linearfold
+2024-09-02 18:15:10,025 - root - WARNING - Skipping ENST00000409600. Sequence longer than 5000.
+2024-09-02 18:15:10,025 - root - INFO - Computing predictions for: ENST00000441508-linearfold
+2024-09-02 18:15:12,266 - root - INFO - Computing predictions for: ENST00000611255-linearfold
+2024-09-02 18:15:13,531 - root - INFO - Computing predictions for: ENST00000311916-linearfold
+2024-09-02 18:15:15,004 - root - INFO - Computing predictions for: ENST00000373279-linearfold
+2024-09-02 18:15:15,450 - root - INFO - Computing predictions for: ENST00000394957-linearfold
+2024-09-02 18:15:17,704 - root - WARNING - Skipping ENST00000374144. Sequence longer than 5000.
+2024-09-02 18:15:17,705 - root - INFO - Computing predictions for: ENST00000370033-linearfold
+2024-09-02 18:15:19,175 - root - INFO - Computing predictions for: ENST00000481909-linearfold
+2024-09-02 18:15:19,937 - root - INFO - Computing predictions for: ENST00000356858-linearfold
+2024-09-02 18:15:21,069 - root - INFO - Computing predictions for: ENST00000528125-linearfold
+2024-09-02 18:15:21,276 - root - INFO - Computing predictions for: ENST00000525780-linearfold
+2024-09-02 18:15:21,996 - root - INFO - Computing predictions for: ENST00000278460-linearfold
+2024-09-02 18:15:22,695 - root - INFO - Computing predictions for: ENST00000278601-linearfold
+2024-09-02 18:15:23,110 - root - INFO - Computing predictions for: ENST00000528099-linearfold
+2024-09-02 18:15:23,588 - root - INFO - Computing predictions for: ENST00000528634-linearfold
+2024-09-02 18:15:23,866 - root - INFO - Computing predictions for: ENST00000531316-linearfold
+2024-09-02 18:15:24,887 - root - INFO - Computing predictions for: ENST00000449692-linearfold
+2024-09-02 18:15:25,637 - root - INFO - Computing predictions for: ENST00000434758-linearfold
+2024-09-02 18:15:26,207 - root - INFO - Computing predictions for: ENST00000278483-linearfold
+2024-09-02 18:15:26,539 - root - INFO - Computing predictions for: ENST00000617650-linearfold
+2024-09-02 18:15:26,921 - root - INFO - Computing predictions for: ENST00000294244-linearfold
+2024-09-02 18:15:27,932 - root - INFO - Computing predictions for: ENST00000524958-linearfold
+2024-09-02 18:15:28,198 - root - INFO - Computing predictions for: ENST00000267103-linearfold
+2024-09-02 18:15:28,747 - root - INFO - Computing predictions for: ENST00000356891-linearfold
+2024-09-02 18:15:29,405 - root - INFO - Computing predictions for: ENST00000545746-linearfold
+2024-09-02 18:15:29,976 - root - INFO - Computing predictions for: ENST00000288757-linearfold
+2024-09-02 18:15:31,882 - root - WARNING - Skipping ENST00000552951. Sequence longer than 5000.
+2024-09-02 18:15:31,883 - root - INFO - Computing predictions for: ENST00000548356-linearfold
+2024-09-02 18:15:32,222 - root - INFO - Computing predictions for: ENST00000398055-linearfold
+2024-09-02 18:15:33,476 - root - INFO - Computing predictions for: ENST00000547945-linearfold
+2024-09-02 18:15:33,677 - root - INFO - Computing predictions for: ENST00000443585-linearfold
+2024-09-02 18:15:34,089 - root - INFO - Computing predictions for: ENST00000256319-linearfold
+2024-09-02 18:15:34,864 - root - INFO - Computing predictions for: ENST00000554203-linearfold
+2024-09-02 18:15:35,118 - root - INFO - Computing predictions for: ENST00000518868-linearfold
+2024-09-02 18:15:36,284 - root - WARNING - Skipping ENST00000261700. Sequence longer than 5000.
+2024-09-02 18:15:36,284 - root - INFO - Computing predictions for: ENST00000304061-linearfold
+2024-09-02 18:15:37,427 - root - INFO - Computing predictions for: ENST00000554880-linearfold
+2024-09-02 18:15:37,684 - root - INFO - Computing predictions for: ENST00000321731-linearfold
+2024-09-02 18:15:38,260 - root - INFO - Computing predictions for: ENST00000398333-linearfold
+2024-09-02 18:15:39,226 - root - INFO - Computing predictions for: ENST00000394987-linearfold
+2024-09-02 18:15:41,488 - root - WARNING - Skipping ENST00000304177. Sequence longer than 5000.
+2024-09-02 18:15:41,489 - root - INFO - Computing predictions for: ENST00000396650-linearfold
+2024-09-02 18:15:41,693 - root - INFO - Computing predictions for: ENST00000569691-linearfold
+2024-09-02 18:15:41,930 - root - INFO - Computing predictions for: ENST00000301686-linearfold
+2024-09-02 18:15:42,352 - root - INFO - Computing predictions for: ENST00000329410-linearfold
+2024-09-02 18:15:43,471 - root - INFO - Computing predictions for: ENST00000570164-linearfold
+2024-09-02 18:15:44,770 - root - INFO - Computing predictions for: ENST00000417362-linearfold
+2024-09-02 18:15:45,978 - root - INFO - Computing predictions for: ENST00000590191-linearfold
+2024-09-02 18:15:47,222 - root - INFO - Computing predictions for: ENST00000602583-linearfold
+2024-09-02 18:15:47,760 - root - INFO - Computing predictions for: ENST00000403458-linearfold
+2024-09-02 18:15:48,429 - root - INFO - Computing predictions for: ENST00000315997-linearfold
+2024-09-02 18:15:49,240 - root - INFO - Computing predictions for: ENST00000442039-linearfold
+2024-09-02 18:15:49,675 - root - INFO - Computing predictions for: ENST00000409464-linearfold
+2024-09-02 18:15:50,636 - root - INFO - Computing predictions for: ENST00000439424-linearfold
+2024-09-02 18:15:51,012 - root - INFO - Computing predictions for: ENST00000245382-linearfold
+2024-09-02 18:15:51,975 - root - INFO - Computing predictions for: ENST00000449250-linearfold
+2024-09-02 18:15:52,358 - root - INFO - Computing predictions for: ENST00000577436-linearfold
+2024-09-02 18:15:52,874 - root - INFO - Computing predictions for: ENST00000577809-linearfold
+2024-09-02 18:15:54,232 - root - INFO - Computing predictions for: ENST00000426147-linearfold
+2024-09-02 18:15:54,856 - root - INFO - Computing predictions for: ENST00000431388-linearfold
+2024-09-02 18:15:55,120 - root - INFO - Computing predictions for: ENST00000360127-linearfold
+2024-09-02 18:15:55,914 - root - INFO - Computing predictions for: ENST00000610527-linearfold
+2024-09-02 18:15:56,250 - root - WARNING - Skipping ENST00000619301. Sequence longer than 5000.
+2024-09-02 18:15:56,251 - root - WARNING - Skipping ENST00000613385. Sequence longer than 5000.
+2024-09-02 18:15:56,251 - root - INFO - Computing predictions for: ENST00000580650-linearfold
+2024-09-02 18:15:56,439 - root - INFO - Computing predictions for: ENST00000590868-linearfold
+2024-09-02 18:15:57,115 - root - INFO - Computing predictions for: ENST00000585675-linearfold
+2024-09-02 18:15:58,332 - root - INFO - Computing predictions for: ENST00000588605-linearfold
+2024-09-02 18:15:58,819 - root - INFO - Computing predictions for: ENST00000592854-linearfold
+2024-09-02 18:15:59,302 - root - INFO - Computing predictions for: ENST00000242784-linearfold
+2024-09-02 18:15:59,717 - root - INFO - Computing predictions for: ENST00000594035-linearfold
+2024-09-02 18:16:00,819 - root - INFO - Computing predictions for: ENST00000392035-linearfold
+2024-09-02 18:16:02,053 - root - INFO - Computing predictions for: ENST00000270502-linearfold
+2024-09-02 18:16:02,716 - root - INFO - Computing predictions for: ENST00000378313-linearfold
+2024-09-02 18:16:04,036 - root - INFO - Computing predictions for: ENST00000591586-linearfold
+2024-09-02 18:16:04,793 - root - INFO - Computing predictions for: ENST00000253110-linearfold
+2024-09-02 18:16:05,702 - root - INFO - Computing predictions for: ENST00000614654-linearfold
+2024-09-02 18:16:07,736 - root - INFO - Computing predictions for: ENST00000309324-linearfold
+2024-09-02 18:16:08,003 - root - INFO - Computing predictions for: ENST00000574814-linearfold
+2024-09-02 18:16:08,596 - root - INFO - Computing predictions for: ENST00000409302-linearfold
+2024-09-02 18:16:08,835 - root - WARNING - Skipping ENST00000436587. Sequence longer than 5000.
+2024-09-02 18:16:08,836 - root - INFO - Computing predictions for: ENST00000371313-linearfold
+2024-09-02 18:16:09,218 - root - INFO - Computing predictions for: ENST00000413687-linearfold
+2024-09-02 18:16:11,156 - root - INFO - Computing predictions for: ENST00000359326-linearfold
+2024-09-02 18:16:12,342 - root - WARNING - Skipping ENST00000359470. Sequence longer than 5000.
+2024-09-02 18:16:12,342 - root - INFO - Computing predictions for: ENST00000373042-linearfold
+2024-09-02 18:16:13,127 - root - INFO - Computing predictions for: ENST00000294360-linearfold
+2024-09-02 18:16:14,099 - root - INFO - Computing predictions for: ENST00000366651-linearfold
+2024-09-02 18:16:14,536 - root - INFO - Computing predictions for: ENST00000614859-linearfold
+2024-09-02 18:16:15,781 - root - INFO - Computing predictions for: ENST00000343433-linearfold
+2024-09-02 18:16:16,640 - root - INFO - Computing predictions for: ENST00000361605-linearfold
+2024-09-02 18:16:17,242 - root - INFO - Computing predictions for: ENST00000368525-linearfold
+2024-09-02 18:16:17,485 - root - INFO - Computing predictions for: ENST00000369948-linearfold
+2024-09-02 18:16:17,727 - root - INFO - Computing predictions for: ENST00000366663-linearfold
+2024-09-02 18:16:19,151 - root - WARNING - Skipping ENST00000235307. Sequence longer than 5000.
+2024-09-02 18:16:19,152 - root - INFO - Computing predictions for: ENST00000523677-linearfold
+2024-09-02 18:16:19,732 - root - INFO - Computing predictions for: ENST00000426197-linearfold
+2024-09-02 18:16:20,211 - root - INFO - Computing predictions for: ENST00000535358-linearfold
+2024-09-02 18:16:20,919 - root - INFO - Computing predictions for: ENST00000287859-linearfold
+2024-09-02 18:16:21,882 - root - INFO - Computing predictions for: ENST00000272139-linearfold
+2024-09-02 18:16:22,502 - root - INFO - Computing predictions for: ENST00000368521-linearfold
+2024-09-02 18:16:23,065 - root - INFO - Computing predictions for: ENST00000372525-linearfold
+2024-09-02 18:16:24,643 - root - INFO - Computing predictions for: ENST00000471115-linearfold
+2024-09-02 18:16:25,480 - root - INFO - Computing predictions for: ENST00000368926-linearfold
+2024-09-02 18:16:26,338 - root - INFO - Computing predictions for: ENST00000371201-linearfold
+2024-09-02 18:16:26,945 - root - INFO - Computing predictions for: ENST00000366789-linearfold
+2024-09-02 18:16:28,912 - root - INFO - Computing predictions for: ENST00000402322-linearfold
+2024-09-02 18:16:29,410 - root - INFO - Computing predictions for: ENST00000225698-linearfold
+2024-09-02 18:16:29,855 - root - INFO - Computing predictions for: ENST00000374640-linearfold
+2024-09-02 18:16:30,399 - root - INFO - Computing predictions for: ENST00000253407-linearfold
+2024-09-02 18:16:31,550 - root - INFO - Computing predictions for: ENST00000619991-linearfold
+2024-09-02 18:16:31,920 - root - INFO - Computing predictions for: ENST00000334221-linearfold
+2024-09-02 18:16:33,042 - root - INFO - Computing predictions for: ENST00000579760-linearfold
+2024-09-02 18:16:34,414 - root - INFO - Computing predictions for: ENST00000382065-linearfold
+2024-09-02 18:16:35,512 - root - INFO - Computing predictions for: ENST00000302514-linearfold
+2024-09-02 18:16:36,339 - root - INFO - Computing predictions for: ENST00000530681-linearfold
+2024-09-02 18:16:36,930 - root - INFO - Computing predictions for: ENST00000429690-linearfold
+2024-09-02 18:16:38,133 - root - INFO - Computing predictions for: ENST00000266542-linearfold
+2024-09-02 18:16:39,382 - root - INFO - Computing predictions for: ENST00000406697-linearfold
+2024-09-02 18:16:40,376 - root - WARNING - Skipping ENST00000252032. Sequence longer than 5000.
+2024-09-02 18:16:40,377 - root - INFO - Computing predictions for: ENST00000303142-linearfold
+2024-09-02 18:16:40,918 - root - INFO - Computing predictions for: ENST00000399672-linearfold
+2024-09-02 18:16:41,833 - root - INFO - Computing predictions for: ENST00000325223-linearfold
+2024-09-02 18:16:42,551 - root - INFO - Computing predictions for: ENST00000290155-linearfold
+2024-09-02 18:16:43,764 - root - WARNING - Skipping ENST00000284881. Sequence longer than 5000.
+2024-09-02 18:16:43,764 - root - WARNING - Skipping ENST00000380486. Sequence longer than 5000.
+2024-09-02 18:16:43,764 - root - INFO - Computing predictions for: ENST00000336702-linearfold
+2024-09-02 18:16:45,893 - root - WARNING - Skipping ENST00000334126. Sequence longer than 5000.
+2024-09-02 18:16:45,893 - root - INFO - Computing predictions for: ENST00000332235-linearfold
+2024-09-02 18:16:47,621 - root - INFO - Computing predictions for: ENST00000542676-linearfold
+2024-09-02 18:16:48,537 - root - INFO - Computing predictions for: ENST00000409944-linearfold
+2024-09-02 18:16:48,786 - root - INFO - Computing predictions for: ENST00000420306-linearfold
+2024-09-02 18:16:49,481 - root - INFO - Computing predictions for: ENST00000295148-linearfold
+2024-09-02 18:16:50,612 - root - INFO - Computing predictions for: ENST00000392290-linearfold
+2024-09-02 18:16:51,113 - root - INFO - Computing predictions for: ENST00000258457-linearfold
+2024-09-02 18:16:52,184 - root - INFO - Computing predictions for: ENST00000405022-linearfold
+2024-09-02 18:16:52,635 - root - INFO - Computing predictions for: ENST00000388934-linearfold
+2024-09-02 18:16:53,840 - root - INFO - Computing predictions for: ENST00000319974-linearfold
+2024-09-02 18:16:54,790 - root - INFO - Computing predictions for: ENST00000329615-linearfold
+2024-09-02 18:16:55,113 - root - INFO - Computing predictions for: ENST00000373640-linearfold
+2024-09-02 18:16:56,833 - root - INFO - Computing predictions for: ENST00000409877-linearfold
+2024-09-02 18:16:57,157 - root - INFO - Computing predictions for: ENST00000290390-linearfold
+2024-09-02 18:16:58,289 - root - INFO - Computing predictions for: ENST00000443551-linearfold
+2024-09-02 18:16:58,560 - root - WARNING - Skipping ENST00000245907. Sequence longer than 5000.
+2024-09-02 18:16:58,560 - root - INFO - Computing predictions for: ENST00000307637-linearfold
+2024-09-02 18:16:59,501 - root - INFO - Computing predictions for: ENST00000383675-linearfold
+2024-09-02 18:17:00,919 - root - INFO - Computing predictions for: ENST00000422619-linearfold
+2024-09-02 18:17:01,306 - root - INFO - Computing predictions for: ENST00000340171-linearfold
+2024-09-02 18:17:01,817 - root - INFO - Computing predictions for: ENST00000318887-linearfold
+2024-09-02 18:17:02,430 - root - INFO - Computing predictions for: ENST00000315691-linearfold
+2024-09-02 18:17:03,802 - root - WARNING - Skipping ENST00000428956. Sequence longer than 5000.
+2024-09-02 18:17:03,802 - root - WARNING - Skipping ENST00000435363. Sequence longer than 5000.
+2024-09-02 18:17:03,803 - root - INFO - Computing predictions for: ENST00000367070-linearfold
+2024-09-02 18:17:04,442 - root - INFO - Computing predictions for: ENST00000367076-linearfold
+2024-09-02 18:17:04,791 - root - INFO - Computing predictions for: ENST00000381980-linearfold
+2024-09-02 18:17:05,922 - root - INFO - Computing predictions for: ENST00000358105-linearfold
+2024-09-02 18:17:06,188 - root - INFO - Computing predictions for: ENST00000393381-linearfold
+2024-09-02 18:17:06,530 - root - WARNING - Skipping ENST00000309733. Sequence longer than 5000.
+2024-09-02 18:17:06,531 - root - WARNING - Skipping ENST00000425929. Sequence longer than 5000.
+2024-09-02 18:17:06,531 - root - INFO - Computing predictions for: ENST00000378850-linearfold
+2024-09-02 18:17:06,898 - root - WARNING - Skipping ENST00000223642. Sequence longer than 5000.
+2024-09-02 18:17:06,898 - root - INFO - Computing predictions for: ENST00000355085-linearfold
+2024-09-02 18:17:07,755 - root - INFO - Computing predictions for: ENST00000231512-linearfold
+2024-09-02 18:17:08,437 - root - INFO - Computing predictions for: ENST00000325366-linearfold
+2024-09-02 18:17:09,581 - root - INFO - Computing predictions for: ENST00000435259-linearfold
+2024-09-02 18:17:09,902 - root - INFO - Computing predictions for: ENST00000515669-linearfold
+2024-09-02 18:17:10,565 - root - INFO - Skipped 290 sequences because they were too long.
+2024-09-02 18:17:10,566 - root - INFO - Sequences that were skipped: 
+2024-09-02 18:17:10,566 - root - INFO - ['ENST00000299698', 'ENST00000409085', 'ENST00000417368', 'ENST00000417379', 'ENST00000374736', 'ENST00000389661', 'ENST00000371605', 'ENST00000382381', 'ENST00000588877', 'ENST00000284425', 'ENST00000586539', 'ENST00000453985', 'ENST00000622132', 'ENST00000244533', 'ENST00000285238', 'ENST00000265586', 'ENST00000205557', 'ENST00000308666', 'ENST00000272286', 'ENST00000375898', 'ENST00000261017', 'ENST00000471714', 'ENST00000377848', 'ENST00000358776', 'ENST00000326793', 'ENST00000427411', 'ENST00000301608', 'ENST00000583509', 'ENST00000258873', 'ENST00000348502', 'ENST00000263238', 'ENST00000535787', 'ENST00000260408', 'ENST00000368679', 'ENST00000265769', 'ENST00000284984', 'ENST00000504830', 'ENST00000251582', 'ENST00000367996', 'ENST00000284987', 'ENST00000388820', 'ENST00000380548', 'ENST00000567476', 'ENST00000368474', 'ENST00000237283', 'ENST00000297323', 'ENST00000260600', 'ENST00000462833', 'ENST00000550422', 'ENST00000394697', 'ENST00000294016', 'ENST00000397944', 'ENST00000412232', 'ENST00000517894', 'ENST00000283296', 'ENST00000296932', 'ENST00000340736', 'ENST00000621696', 'ENST00000324198', 'ENST00000360265', 'ENST00000296721', 'ENST00000395146', 'ENST00000265343', 'ENST00000304032', 'ENST00000370165', 'ENST00000373204', 'ENST00000220592', 'ENST00000373191', 'ENST00000373210', 'ENST00000320285', 'ENST00000285518', 'ENST00000264167', 'ENST00000379370', 'ENST00000326225', 'ENST00000446544', 'ENST00000374011', 'ENST00000457866', 'ENST00000378024', 'ENST00000333244', 'ENST00000633556', 'ENST00000308182', 'ENST00000545314', 'ENST00000424296', 'ENST00000025301', 'ENST00000354675', 'ENST00000394518', 'ENST00000394718', 'ENST00000280979', 'ENST00000356239', 'ENST00000374088', 'ENST00000380872', 'ENST00000392038', 'ENST00000258494', 'ENST00000261733', 'ENST00000357578', 'ENST00000553458', 'ENST00000308742', 'ENST00000330817', 'ENST00000370205', 'ENST00000389048', 'ENST00000484298', 'ENST00000361673', 'ENST00000258888', 'ENST00000264276', 'ENST00000534300', 'ENST00000515384', 'ENST00000369864', 'ENST00000317829', 'ENST00000341068', 'ENST00000251089', 'ENST00000347528', 'ENST00000357077', 'ENST00000280772', 'ENST00000378392', 'ENST00000341657', 'ENST00000284268', 'ENST00000532219', 'ENST00000265742', 'ENST00000378330', 'ENST00000400020', 'ENST00000282272', 'ENST00000504087', 'ENST00000267116', 'ENST00000369408', 'ENST00000360359', 'ENST00000353234', 'ENST00000423947', 'ENST00000303714', 'ENST00000403729', 'ENST00000274000', 'ENST00000621914', 'ENST00000519295', 'ENST00000336418', 'ENST00000261842', 'ENST00000532090', 'ENST00000261558', 'ENST00000615891', 'ENST00000265381', 'ENST00000295974', 'ENST00000508376', 'ENST00000535453', 'ENST00000233242', 'ENST00000409652', 'ENST00000083182', 'ENST00000288266', 'ENST00000156471', 'ENST00000374690', 'ENST00000393609', 'ENST00000303965', 'ENST00000239440', 'ENST00000262215', 'ENST00000251691', 'ENST00000358308', 'ENST00000528829', 'ENST00000396432', 'ENST00000622683', 'ENST00000260526', 'ENST00000264245', 'ENST00000337414', 'ENST00000368194', 'ENST00000397843', 'ENST00000263674', 'ENST00000359920', 'ENST00000296794', 'ENST00000420470', 'ENST00000298694', 'ENST00000056217', 'ENST00000218789', 'ENST00000324856', 'ENST00000334344', 'ENST00000263620', 'ENST00000355431', 'ENST00000349213', 'ENST00000279873', 'ENST00000379887', 'ENST00000310389', 'ENST00000295087', 'ENST00000377275', 'ENST00000423738', 'ENST00000359856', 'ENST00000566423', 'ENST00000420843', 'ENST00000381154', 'ENST00000357668', 'ENST00000281419', 'ENST00000264607', 'ENST00000369162', 'ENST00000392403', 'ENST00000379454', 'ENST00000361833', 'ENST00000313400', 'ENST00000435504', 'ENST00000287394', 'ENST00000238789', 'ENST00000321990', 'ENST00000367942', 'ENST00000420353', 'ENST00000536444', 'ENST00000377264', 'ENST00000359933', 'ENST00000398868', 'ENST00000452508', 'ENST00000327245', 'ENST00000273859', 'ENST00000375630', 'ENST00000323116', 'ENST00000361648', 'ENST00000539276', 'ENST00000428670', 'ENST00000360273', 'ENST00000357681', 'ENST00000330342', 'ENST00000518738', 'ENST00000343533', 'ENST00000448424', 'ENST00000264449', 'ENST00000381655', 'ENST00000338821', 'ENST00000350721', 'ENST00000262919', 'ENST00000355044', 'ENST00000373344', 'ENST00000436367', 'ENST00000427980', 'ENST00000519948', 'ENST00000406775', 'ENST00000318709', 'ENST00000299178', 'ENST00000266383', 'ENST00000399921', 'ENST00000370693', 'ENST00000260947', 'ENST00000382422', 'ENST00000404251', 'ENST00000379441', 'ENST00000392782', 'ENST00000415149', 'ENST00000345514', 'ENST00000589955', 'ENST00000393256', 'ENST00000393316', 'ENST00000334801', 'ENST00000378455', 'ENST00000540052', 'ENST00000305877', 'ENST00000429433', 'ENST00000502486', 'ENST00000421745', 'ENST00000355112', 'ENST00000282701', 'ENST00000331593', 'ENST00000297161', 'ENST00000515059', 'ENST00000374580', 'ENST00000374518', 'ENST00000040738', 'ENST00000321892', 'ENST00000357654', 'ENST00000303407', 'ENST00000263377', 'ENST00000394688', 'ENST00000341446', 'ENST00000259008', 'ENST00000357641', 'ENST00000342449', 'ENST00000373275', 'ENST00000296452', 'ENST00000280758', 'ENST00000314100', 'ENST00000408038', 'ENST00000409600', 'ENST00000374144', 'ENST00000552951', 'ENST00000261700', 'ENST00000304177', 'ENST00000619301', 'ENST00000613385', 'ENST00000436587', 'ENST00000359470', 'ENST00000235307', 'ENST00000252032', 'ENST00000284881', 'ENST00000380486', 'ENST00000334126', 'ENST00000245907', 'ENST00000428956', 'ENST00000435363', 'ENST00000309733', 'ENST00000425929', 'ENST00000223642']
+2024-09-02 18:17:10,567 - root - INFO - Predicted 1000 secondary structures in 16.111821921666465 minutes.
+2024-09-02 18:17:10,567 - root - INFO - Average time per prediction: 0.9667094366550446 seconds.
+2024-09-02 18:17:10,567 - root - INFO - Done.

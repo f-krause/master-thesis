@@ -1,0 +1,20 @@
+2024-09-02 17:57:14,983 - root - INFO - Predicting secondary structure and loop type.
+2024-09-02 17:57:14,983 - root - INFO - MAX_SEQ_LENGTH: 5000
+2024-09-02 17:57:14,983 - root - INFO - MAX_PRED_NR: 10
+2024-09-02 17:57:15,596 - root - INFO - Computing predictions for: ENST00000263100-linearfold
+2024-09-02 17:57:17,129 - root - INFO - Computing predictions for: ENST00000373993-linearfold
+2024-09-02 17:57:17,765 - root - INFO - Computing predictions for: ENST00000318602-linearfold
+2024-09-02 17:57:19,343 - root - WARNING - Skipping ENST00000299698. Sequence longer than 5000.
+2024-09-02 17:57:19,344 - root - INFO - Computing predictions for: ENST00000401850-linearfold
+2024-09-02 17:57:20,472 - root - INFO - Computing predictions for: ENST00000236709-linearfold
+2024-09-02 17:57:21,049 - root - INFO - Computing predictions for: ENST00000209873-linearfold
+2024-09-02 17:57:21,838 - root - INFO - Computing predictions for: ENST00000316519-linearfold
+2024-09-02 17:57:23,358 - root - INFO - Computing predictions for: ENST00000232892-linearfold
+2024-09-02 17:57:23,822 - root - INFO - Computing predictions for: ENST00000515480-linearfold
+2024-09-02 17:57:24,495 - root - INFO - Computing predictions for: ENST00000261880-linearfold
+2024-09-02 17:57:25,401 - root - INFO - Skipped 1 sequences because they were too long.
+2024-09-02 17:57:25,401 - root - INFO - Sequences that were skipped: 
+2024-09-02 17:57:25,401 - root - INFO - ['ENST00000299698']
+2024-09-02 17:57:25,401 - root - INFO - Predicted 10 secondary structures in 0.16360809803009033 minutes.
+2024-09-02 17:57:25,401 - root - INFO - Average time per prediction: 0.981660270690918 seconds.
+2024-09-02 17:57:25,401 - root - INFO - Done.
