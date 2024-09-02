@@ -3,7 +3,8 @@ import torch
 import pandas as pd
 from tqdm import tqdm
 from log.logger import setup_logger
-from utils import save_checkpoint, mkdir, check_path_exists, TrainConfig
+from box import Box
+from utils import save_checkpoint, mkdir, check_path_exists
 from data_handling.data_loader import get_data_loaders
 from training.optimizer import get_optimizer
 
@@ -11,9 +12,7 @@ from models.dummy.model_dummy import ModelDummy
 from models.baseline.model_baseline import ModelBaseline
 
 
-
-
-def get_model(config: TrainConfig, device: torch.device, logger):
+def get_model(config: Box, device: torch.device, logger):
     if config.model == "dummy":
         logger.warning("Using dummy model")
         return ModelDummy().to(device)
@@ -45,7 +44,7 @@ def get_model(config: TrainConfig, device: torch.device, logger):
                          f"dummy, baseline, lstm, xlstm, mamba, transformer, best")
 
 
-def train(config: TrainConfig):
+def train(config: Box):
     logger = setup_logger()
 
     logger.info("Starting training")

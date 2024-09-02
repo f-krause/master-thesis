@@ -1,13 +1,16 @@
 import os
 from training import training, tuning
 from log.logger import setup_logger
-from utils import set_log_file, set_project_path, TrainConfig
+from utils import set_log_file, set_project_path
+import yaml
+from box import Box
 
 CONFIG_PATH = "config/config_template.yml"
 
 
 if __name__ == "__main__":
-    config = TrainConfig(CONFIG_PATH)
+    with open(CONFIG_PATH, 'r') as file:
+        config = Box(yaml.safe_load(file))
 
     set_project_path(config)
     set_log_file(config)

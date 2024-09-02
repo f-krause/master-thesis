@@ -1,10 +1,10 @@
 import torch
 from torch.utils.data import DataLoader
-from utils import TrainConfig
+from box import Box
 
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, config: TrainConfig, train=True, dummy=False):
+    def __init__(self, config: Box, train=True, dummy=False):
         if config.model == "dummy":
             self.data = torch.rand(100, 10)
             self.targets = torch.rand(100, 1)
@@ -23,7 +23,7 @@ class Dataset(torch.utils.data.Dataset):
         return self.data[index], self.targets[index]
 
 
-def get_data_loaders(config: TrainConfig):
+def get_data_loaders(config: Box):
     train_dataset = Dataset(config, train=True)
     val_dataset = Dataset(config, train=False)
 

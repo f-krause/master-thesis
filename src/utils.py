@@ -2,58 +2,8 @@ import os
 import datetime
 import platform
 import torch
-import yaml
-from typing import Optional
 from log.logger import setup_logger
-from dataclasses import dataclass
-
-
-@dataclass
-class OptimizerConfig:
-    name: str
-    lr: float
-    momentum: float
-
-
-@dataclass
-class TrainConfig:
-    subproject: str
-    project_path: Optional[str]
-    log_file_path: Optional[str]
-    nr_folds: int
-    seed: int
-    model: str
-    epochs: int
-    save_freq: int
-    val_freq: int
-    warmup: int
-    batch_size: int
-    num_workers: int
-    optimizer: OptimizerConfig
-
-    def __init__(self, config_file: str):
-        with open(config_file, 'r') as file:
-            config = yaml.safe_load(file)
-
-        self.subproject = config.get('subproject', "dev")
-        self.project_path = config.get('project_path', None)
-        self.log_file_path = config.get('log_file_path', None)
-        self.nr_folds = config['nr_folds']
-        self.seed = config['seed']
-        self.model = config['model']
-        self.epochs = config['epochs']
-        self.save_freq = config['save_freq']
-        self.val_freq = config['val_freq']
-        self.warmup = config['warmup']
-        self.batch_size = config['batch_size']
-        self.num_workers = config['num_workers']
-
-        optimizer_config = config['optimizer']
-        self.optimizer = OptimizerConfig(
-            name=optimizer_config['name'],
-            lr=optimizer_config['lr'],
-            momentum=optimizer_config['momentum']
-        )
+from box import Box
 
 
 def mkdir(path: str):
@@ -61,7 +11,7 @@ def mkdir(path: str):
         os.makedirs(path, exist_ok=True)
 
 
-def set_log_file(config: TrainConfig):
+def set_log_file(config: Box):
     if not config.log_file_path:
         os.environ["LOG_FILE"] = os.path.join(os.environ["PROJECT_PATH"], config.subproject, "logs",
                                               f"log_{get_timestamp()}.log")
@@ -71,7 +21,7 @@ def set_log_file(config: TrainConfig):
         mkdir(config.log_file_path)
 
 
-def set_project_path(config: TrainConfig):
+def set_project_path(config: Box):
     if config.project_path:
         project_path = config.project_path
     elif platform.node() == "Felix-PC":

@@ -1,8 +1,8 @@
 import torch.optim as optim
-from utils import OptimizerConfig
+from box import Box
 
 
-def get_optimizer(model, optimizer_config: OptimizerConfig):
+def get_optimizer(model, optimizer_config: Box):
     optimizer_name = optimizer_config.name
 
     if optimizer_name == 'adam':
