@@ -324,7 +324,9 @@ dependencies:
       - biopython==1.84
       - biothings-client==0.3.1
       - gprofiler-official==1.0.0
+      - linearfold-unofficial==0.1
       - mygene==3.2.2
       - pooch==1.8.2
+      - python-box==7.2.0
       - viennarna==2.6.4
 prefix: /mnt/data/krausef99dm_thesis/miniforge3/envs/master-env
