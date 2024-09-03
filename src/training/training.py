@@ -45,7 +45,7 @@ def get_model(config: Box, device: torch.device, logger):
                          f"dummy, baseline, lstm, xlstm, mamba, transformer, best")
 
 
-def train(config: Box, fold: int = 0):
+def train_fold(config: Box, fold: int = 0):
     logger = setup_logger()
 
     # Initialize Aim run
@@ -114,10 +114,16 @@ def train(config: Box, fold: int = 0):
                 'epoch': epoch,
                 'state_dict': model.state_dict(),
                 'optimizer': optimizer.state_dict(),
-            }, filename=os.path.join(checkpoint_path, f'checkpoint_{epoch}.pth.tar'))
+            }, filename=os.path.join(checkpoint_path, f'checkpoint_{epoch}_fold-{fold}.pth.tar'))
             losses[epoch].update({"stored": 1})
             logger.info(f'Checkpoint saved at epoch {epoch}')
 
     # Save losses to a CSV file
     pd.DataFrame(losses).T.to_csv(os.path.join(checkpoint_path, "losses.csv"))
     logger.info("Training process completed")
+
+
+def train(config: Box):
+    # TODO possibility of parallelization
+    for fold in range(config.nr_folds):
+        train_fold(config, fold)
