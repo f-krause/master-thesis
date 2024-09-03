@@ -1,5 +1,6 @@
 import os
 import torch
+# import aim  # https://aimstack.io/#demos
 import pandas as pd
 from tqdm import tqdm
 from log.logger import setup_logger
@@ -44,8 +45,12 @@ def get_model(config: Box, device: torch.device, logger):
                          f"dummy, baseline, lstm, xlstm, mamba, transformer, best")
 
 
-def train(config: Box):
+def train(config: Box, fold: int = 0):
     logger = setup_logger()
+
+    # Initialize Aim run
+    # aim_run = aim.Run()
+    # aim_run.set_params(config.to_dict(), name='config')
 
     logger.info("Starting training")
 
@@ -62,7 +67,7 @@ def train(config: Box):
     optimizer = get_optimizer(model, config.optimizer)
 
     criterion = torch.nn.MSELoss()  # Define your loss function
-    train_loader, val_loader = get_data_loaders(config)
+    train_loader, val_loader = get_data_loaders(config, fold=fold)
 
     losses = {}
 
@@ -78,8 +83,13 @@ def train(config: Box):
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
-        losses[epoch] = {"train": running_loss / len(train_loader)}
-        logger.info(f'Epoch {epoch}, Loss: {running_loss / len(train_loader)}')
+
+        train_loss = running_loss / len(train_loader)
+        losses[epoch] = {"train": train_loss}
+        logger.info(f'Epoch {epoch}, Loss: {train_loss}')
+
+        # Log training loss to Aim
+        # aim_run.track(train_loss, name='train_loss', epoch=epoch)
 
         # Validation
         if (epoch % config.val_freq == 0 and epoch > config.warmup) or epoch == config.epochs - 1:
@@ -91,8 +101,12 @@ def train(config: Box):
                     outputs = model(data)
                     loss = criterion(outputs, target)
                     val_loss += loss.item()
-            losses[epoch].update({"val": val_loss / len(val_loader)})
-            logger.info(f'Validation loss: {val_loss / len(val_loader)}')
+            val_loss /= len(val_loader)
+            losses[epoch].update({"val": val_loss})
+            logger.info(f'Validation loss: {val_loss}')
+
+            # Log validation loss to Aim
+            # aim_run.track(val_loss, name='val_loss', epoch=epoch)
 
         # Save checkpoint
         if (epoch % config.save_freq == 0 and epoch > config.warmup) or epoch == config.epochs - 1:
@@ -104,5 +118,6 @@ def train(config: Box):
             losses[epoch].update({"stored": 1})
             logger.info(f'Checkpoint saved at epoch {epoch}')
 
+    # Save losses to a CSV file
     pd.DataFrame(losses).T.to_csv(os.path.join(checkpoint_path, "losses.csv"))
     logger.info("Training process completed")
