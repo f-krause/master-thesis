@@ -1,6 +1,8 @@
 """
 Creates labeled sequences for processing.
 
+Code shared by Prof. Sebastian Tschiatschek
+
 ptr.csv - Sheet 2 from Additional File 2 from Hernandez-Alias (Base: Human Proteine Atlas)
 link: https://figshare.com/articles/dataset/Additional_file_2_Protein-to-mRNA_ratios_among_tissues/21379197?file=37938894
 
