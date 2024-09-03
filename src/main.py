@@ -17,6 +17,7 @@ if __name__ == "__main__":
 
     logger = setup_logger()
     logger.info(f"Project path: {os.path.join(os.environ['PROJECT_PATH'], os.environ['SUBPROJECT'])}")
+    logger.info(f"Config: \n {config}")
 
     try:
         logger.info("TRAINING TEST")
