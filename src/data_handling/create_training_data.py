@@ -27,9 +27,9 @@ def get_train_data_file(config: Box):
                 continue
             try:
                 data.append({
-                    'seq': [tokens.index(c) for c in sequence],  # one hot encoded
-                    'sec_struc': [tokens.index(c) for c in sec_struc],
-                    'loop_type': [tokens.index(c) for c in loop_type],
+                    'seq': [tokens.index(c) + 1 for c in sequence],  # one hot encoded, 0 is for padding
+                    'sec_struc': [tokens.index(c) + 1 for c in sec_struc],
+                    'loop_type': [tokens.index(c) + 1 for c in loop_type],
                     'target_id': target_id,
                 })
                 targets.append(target)
