@@ -28,8 +28,6 @@ class RNADataset(torch.utils.data.Dataset):
                 data_full = np.array(data_full)
                 targets_full = torch.tensor(targets_full, dtype=torch.float64)
 
-
-
         train_indices, val_indices = self._get_train_val_indices(data_full, targets_full, fold, config.seed,
                                                                  config.nr_folds)
 
@@ -45,17 +43,14 @@ class RNADataset(torch.utils.data.Dataset):
     @staticmethod
     def _get_train_val_indices(X, y, fold, seed=42, nr_folds=5):
         if nr_folds == 1:
-            train_indices, val_indices = train_test_split(
-                range(len(X)), test_size=0.2, random_state=seed, stratify=y
-            )
+            return train_test_split(range(len(X)), test_size=0.2, random_state=seed)
         else:
             # splits = StratifiedKFold(n_splits=nr_folds, random_state=seed, shuffle=True)
             splits = KFold(n_splits=nr_folds, random_state=seed, shuffle=True)
             splits = list(splits.split(X))
             train_indices = splits[fold][0]
             val_indices = splits[fold][1]
-
-        return train_indices.tolist(), val_indices.tolist()
+            return train_indices.tolist(), val_indices.tolist()
 
     def __len__(self):
         return len(self.data)
