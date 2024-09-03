@@ -2,6 +2,7 @@ subproject: "dev"
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 
+folding_algorithm: "viennarna" # viennarna, linearfold  # TODO allow for data augmentation, by using different folding algorithms?
 nr_folds: 5
 seed: 2024
 
