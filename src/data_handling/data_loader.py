@@ -3,7 +3,7 @@ import torch
 import pickle
 from box import Box
 import numpy as np
-from sklearn.model_selection import StratifiedKFold, KFold
+from sklearn.model_selection import StratifiedKFold, KFold, train_test_split
 from torch.utils.data import DataLoader
 from log.logger import setup_logger
 
@@ -44,12 +44,16 @@ class RNADataset(torch.utils.data.Dataset):
 
     @staticmethod
     def _get_train_val_indices(X, y, fold, seed=42, nr_folds=5):
-        # TODO
-        # splits = StratifiedKFold(n_splits=nr_folds, random_state=seed, shuffle=True)
-        splits = KFold(n_splits=nr_folds, random_state=seed, shuffle=True)
-        splits = list(splits.split(X))
-        train_indices = splits[fold][0]
-        val_indices = splits[fold][1]
+        if nr_folds == 1:
+            train_indices, val_indices = train_test_split(
+                range(len(X)), test_size=0.2, random_state=seed, stratify=y
+            )
+        else:
+            # splits = StratifiedKFold(n_splits=nr_folds, random_state=seed, shuffle=True)
+            splits = KFold(n_splits=nr_folds, random_state=seed, shuffle=True)
+            splits = list(splits.split(X))
+            train_indices = splits[fold][0]
+            val_indices = splits[fold][1]
 
         return train_indices.tolist(), val_indices.tolist()
 

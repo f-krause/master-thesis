@@ -3,7 +3,7 @@ project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 
 folding_algorithm: "viennarna" # viennarna, linearfold  # TODO allow for data augmentation, by using different folding algorithms?
-nr_folds: 5
+nr_folds: 5  # if 1, will take 20% of the data as validation set
 seed: 2024
 
 model: "dummy" # dummy, baseline, lstm, xlstm, mamba, transformer, best
