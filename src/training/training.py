@@ -19,7 +19,7 @@ def get_model(config: Box, device: torch.device, logger):
         return ModelDummy().to(device)
     if config.model == "baseline":
         logger.info("Using baseline model")
-        return ModelBaseline().to(device)
+        return ModelBaseline(config).to(device)
     if config.model == "lstm":
         logger.info("Using LSTM model")
         # TODO
