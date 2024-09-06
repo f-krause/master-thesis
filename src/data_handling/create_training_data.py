@@ -47,6 +47,7 @@ def get_train_data_file(config: Box, return_dict=False):
             else:
                 # create matrix 3 x n: Seq, SecStruc, LoopType
                 tensor_data = torch.tensor([numeric_data["seq"], numeric_data["sec_struc"], numeric_data["loop_type"]])
+                tensor_data = tensor_data.permute(1, 0)
                 rna_data.append(tensor_data)
                 target_ids.append(target_id)
                 targets.append(target)
@@ -57,7 +58,7 @@ def get_train_data_file(config: Box, return_dict=False):
             break
 
     with open(os.path.join(os.environ["PROJECT_PATH"], "data/dev_train_data_small.pkl"), 'wb') as f:
-        pickle.dump([rna_data, target_ids, targets], f)
+        pickle.dump([rna_data, torch.tensor(target_ids), torch.tensor(targets)], f)
 
     # TODO: Implement test data creation
 
