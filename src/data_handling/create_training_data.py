@@ -1,18 +1,23 @@
 import os
 import json
 import pickle
+import torch
 import numpy as np
 from box import Box
 
-tokens = 'ACGT().BEHIMSX'
+TOKENS = 'ACGT().BEHIMSX'
+MAX_SEQ_LENGTH = 5000
+MAX_DATA = 1000
+FOLDING_ALG = "viennarna"
 
 
-def get_train_data_file(config: Box):
+def get_train_data_file(config: Box, return_dict=False):
     with open(os.path.join(os.environ["PROJECT_PATH"], "data/ptr_data.pkl"), 'rb') as f:
         raw_data = pickle.load(f)
 
-    data = []
+    rna_data = []
     targets = []
+    target_ids = []
 
     counter = 0
     for identifier, content in raw_data.items():
@@ -22,25 +27,37 @@ def get_train_data_file(config: Box):
             continue
 
         sequence = content['fasta']
+        if len(sequence) > MAX_SEQ_LENGTH:
+            continue
+
         for target_id, target in enumerate(content['targets']):
             if np.isnan(target):
                 continue
-            try:
-                data.append({
-                    'seq': [tokens.index(c) + 1 for c in sequence],  # one hot encoded, 0 is for padding
-                    'sec_struc': [tokens.index(c) + 1 for c in sec_struc],
-                    'loop_type': [tokens.index(c) + 1 for c in loop_type],
-                    'target_id': target_id,
-                })
+
+            numeric_data = {
+                'seq': [TOKENS.index(c) + 1 for c in sequence],  # label encoded, 0 is reserved for padding
+                'sec_struc': [TOKENS.index(c) + 1 for c in sec_struc],
+                'loop_type': [TOKENS.index(c) + 1 for c in loop_type],
+                'target_id': target_id,
+            }
+
+            if return_dict:
+                rna_data.append(numeric_data)
                 targets.append(target)
-            except ValueError:
-                print(sequence)
-            counter += 1
-            if counter >= 10:
+            else:
+                # create matrix 3 x n: Seq, SecStruc, LoopType
+                tensor_data = torch.tensor([numeric_data["seq"], numeric_data["sec_struc"], numeric_data["loop_type"]])
+                rna_data.append(tensor_data)
+                target_ids.append(target_id)
+                targets.append(target)
+
+            if len(rna_data) >= MAX_DATA:
                 break
+        if len(rna_data) >= MAX_DATA:
+            break
 
     with open(os.path.join(os.environ["PROJECT_PATH"], "data/dev_train_data_small.pkl"), 'wb') as f:
-        pickle.dump([data, targets], f)
+        pickle.dump([rna_data, target_ids, targets], f)
 
     # TODO: Implement test data creation
 
@@ -59,7 +76,7 @@ if __name__ == '__main__':
     from utils import set_project_path, set_log_file
 
     config = Box({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
-                  "batch_size": 32, "num_workers": 4, "folding_algorithm": "viennarna"})
+                  "batch_size": 32, "num_workers": 4, "folding_algorithm": FOLDING_ALG})
     set_project_path(config)
     set_log_file(config)
     get_train_data_file(config)
