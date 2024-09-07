@@ -1,5 +1,6 @@
 # Vienna RNAfold 2 Mac using installer:
-vienna_2=C:\Users\felix.krause\AppData\Local\Programs\ViennaRNA Package
+# vienna_2=C:\Users\felix.krause\AppData\Local\Programs\ViennaRNA Package
+vienna_2: /mnt/data/krausef99dm_thesis/miniforge3/envs/master-env/bin
 
 # NUPACK build:
 # nupack: /path/to/nupack3.0.6/src/bin
@@ -8,7 +9,7 @@ vienna_2=C:\Users\felix.krause\AppData\Local\Programs\ViennaRNA Package
 # contrafold_2: /path/to/contrafold-se/src
 
 # RNASoft build
-rnasoft=C:\Users\felix.krause\code\uni\master-thesis\src\data_handling\folding_algorithms\MultiRNAFold
+# rnasoft=C:\Users\felix.krause\code\uni\master-thesis\src\data_handling\folding_algorithms\MultiRNAFold
 
 # RNAstructure (precompiled command line src)
 # rnastructure: /path/to/RNAstructure/exe
@@ -23,4 +24,5 @@ rnasoft=C:\Users\felix.krause\code\uni\master-thesis\src\data_handling\folding_a
 # linearpartition: /path/to/LinearPartition/bin
 
 #directory to write temp files
-TMP=C:\Users\felix.krause\code\uni\master-thesis\src\data_handling\folding_algorithms\tmp
+#TMP=C:\Users\felix.krause\code\uni\master-thesis\src\data_handling\folding_algorithms\tmp
+TMP: /mnt/data/krausef99dm_thesis/data/tmp_folding
