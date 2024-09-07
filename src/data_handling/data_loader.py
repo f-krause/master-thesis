@@ -69,7 +69,8 @@ def _pad_sequences(batch):
     rna_data_padded = torch.nn.utils.rnn.pad_sequence(rna_data, batch_first=True)
     # rna_data_packed = torch.nn.utils.rnn.pack_padded_sequence(rna_data_padded, lengths, batch_first=True,
     #                                                           enforce_sorted=False)  # TODO can be useful for LSTM!
-    return list(zip(rna_data_padded, tissue_ids)), targets
+
+    return list(zip(rna_data_padded, tissue_ids)), torch.tensor(targets)
 
 
 def get_data_loaders(config: Box, fold: int):

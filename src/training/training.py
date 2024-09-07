@@ -19,7 +19,7 @@ def get_model(config: Box, device: torch.device, logger):
         return ModelDummy().to(device)
     if config.model == "baseline":
         logger.info("Using baseline model")
-        return ModelBaseline(config).to(device)
+        return ModelBaseline(config, device).to(device)
     if config.model == "lstm":
         logger.info("Using LSTM model")
         # TODO
@@ -76,7 +76,9 @@ def train_fold(config: Box, fold: int = 0):
         model.train()
         running_loss = 0.0
         for batch_idx, (data, target) in enumerate(tqdm(train_loader)):
-            data, target = data.to(device), target.to(device)
+            # data and target are lists
+            # data = data.to(device)
+            target = target.to(device)
             optimizer.zero_grad()
             output = model(data)
             loss = criterion(output, target)
