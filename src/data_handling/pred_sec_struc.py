@@ -11,9 +11,9 @@ import linearfold
 FOLD_PACKAGE = 'linearfold'
 DATA_PATH = '/mnt/data/krausef99dm_thesis/data'
 
-OVERWRITE_FILES = False  # only for debugging!
-MAX_SEQ_LENGTH = 2000  # 3241 seq with len below 2000
-MAX_PRED_NR = 600
+OVERWRITE_FILES = False  # set True only for debugging!
+MAX_SEQ_LENGTH = 8000  # 3241 seq with len below 2000; 5697 below 3000; Skipped 818 above 8000
+MAX_PRED_NR = 3000
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

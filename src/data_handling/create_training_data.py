@@ -6,7 +6,7 @@ import numpy as np
 from box import Box
 
 TOKENS = 'ACGT().BEHIMSX'
-MAX_SEQ_LENGTH = 5000
+MAX_SEQ_LENGTH = 1000
 MAX_DATA = 1000
 FOLDING_ALG = "viennarna"
 
