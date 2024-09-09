@@ -79,7 +79,7 @@ def get_data_loaders(config: Box, fold: int):
 
     train_loader = DataLoader(dataset=train_dataset, batch_size=config.batch_size, shuffle=True,
                               num_workers=config.num_workers,
-                              collate_fn=_pad_sequences)  # TODO add collate_fn to pad batches
+                              collate_fn=_pad_sequences)
     val_loader = DataLoader(dataset=val_dataset, batch_size=config.batch_size, shuffle=False,
                             num_workers=config.num_workers, collate_fn=_pad_sequences)
     return train_loader, val_loader
