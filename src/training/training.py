@@ -54,16 +54,21 @@ def train_fold(config: Box, fold: int = 0):
 
     logger.info("Starting training")
 
+    # gpu selection
+    logger.info(
+        f"Devices found for training: {[(i, torch.cuda.get_device_name(i)) for i in range(torch.cuda.device_count())]}")
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(config.gpu_id)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # device = "cpu"
+    logger.info(f"Using device: {device}")
+
+    # Create checkpoint directory
     checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], os.environ["SUBPROJECT"], "weights")
     checkpoint_path = check_path_exists(checkpoint_path, create_unique=True)
     mkdir(checkpoint_path)
     logger.info(f"Checkpoint path: {checkpoint_path}")
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    logger.info(f"Using device: {device}")
-
     model = get_model(config, device, logger)
-
     optimizer = get_optimizer(model, config.optimizer)
 
     criterion = torch.nn.MSELoss()  # Define your loss function
@@ -81,7 +86,7 @@ def train_fold(config: Box, fold: int = 0):
             target = target.to(device)
             optimizer.zero_grad()
             output = model(data)
-            loss = criterion(output, target)
+            loss = criterion(output.float(), target.float())
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
@@ -99,9 +104,12 @@ def train_fold(config: Box, fold: int = 0):
             val_loss = 0.0
             with torch.no_grad():
                 for data, target in val_loader:
-                    data, target = data.to(device), target.to(device)
-                    outputs = model(data)
-                    loss = criterion(outputs, target)
+                    # data and target are lists
+                    # data = data.to(device)
+                    target = target.to(device)
+                    output = model(data)
+                    output, target = output.float(), target.float()
+                    loss = criterion(output, target)
                     val_loss += loss.item()
             val_loss /= len(val_loader)
             losses[epoch].update({"val": val_loss})
@@ -121,11 +129,13 @@ def train_fold(config: Box, fold: int = 0):
             logger.info(f'Checkpoint saved at epoch {epoch}')
 
     # Save losses to a CSV file
-    pd.DataFrame(losses).T.to_csv(os.path.join(checkpoint_path, "losses.csv"))
+    pd.DataFrame(losses).T.to_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
     logger.info("Training process completed")
+    logger.info(f"Weights path: {checkpoint_path}")
 
 
 def train(config: Box):
-    # TODO possibility of parallelization
+    # TODO possibility of parallelization across folds!
     for fold in range(config.nr_folds):
         train_fold(config, fold)
+        # train_fold(config, 1)  # for development

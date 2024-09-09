@@ -5,55 +5,57 @@ from box import Box
 
 
 class ModelBaseline(nn.Module):
-    def __init__(self, config: Box, device: torch.device, hidden_size=256, reduced_dim=512):
+    def __init__(self, config: Box, device: torch.device, hidden_size=128, pooling_dim=128):
         super(ModelBaseline, self).__init__()
 
         self.device = device
+        self.max_norm = 2
         self.max_seq_length = config.max_seq_length
-        self.tissue_encoder = nn.Embedding(29, config.dim_embedding_tissue, padding_idx=0)  # 29 tissues in total
-        self.seq_encoder = nn.Embedding(5, config.dim_embedding_token, padding_idx=0)  # 4 nucleotides in total + padding
-        self.sec_structure_encoder = nn.Embedding(4, config.dim_embedding_token, padding_idx=0)  # 3 secondary structures in total + padding
-        self.loop_type_encoder = nn.Embedding(8, config.dim_embedding_token, padding_idx=0)  # 7 loop types in total + padding
+        self.tissue_encoder = nn.Embedding(29, config.dim_embedding_tissue, padding_idx=0,
+                                           max_norm=self.max_norm)  # 29 tissues in total
+        self.seq_encoder = nn.Embedding(5, config.dim_embedding_token, padding_idx=0,
+                                        max_norm=self.max_norm)  # 4 nucleotides + padding
+        self.sec_structure_encoder = nn.Embedding(4, config.dim_embedding_token, padding_idx=0,
+                                                  max_norm=self.max_norm)  # 3 structures + padding
+        self.loop_type_encoder = nn.Embedding(8, config.dim_embedding_token, padding_idx=0,
+                                              max_norm=self.max_norm)  # 7 loop types + padding
 
-        # Define the layers
-        # self.input_size = config.dim_embedding_tissue + config.max_seq_length * 3 * config.dim_embedding_token  # max seq length
-        # TODO add pooling here
-        self.fc1 = nn.Linear(self.reduced_dim, hidden_size*2)  # Input layer to hidden layer
-        self.relu = nn.ReLU()  # Activation function
-        self.fc2 = nn.Linear(hidden_size*2, hidden_size)  # Hidden layer to hidden layer
-        self.fc3 = nn.Linear(hidden_size, 1)  # Hidden layer to output layer
+        # Pooling to reduce the sequence dimension
+        self.pooling_dim = pooling_dim
+        self.pool = nn.AdaptiveAvgPool1d(self.pooling_dim)  # Reduce sequence length to pooling_dim
+
+        # MLP layers
+        self.fc1 = nn.Linear(config.dim_embedding_tissue + 3 * self.pooling_dim * config.dim_embedding_token,
+                             hidden_size)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_size, hidden_size // 2)
+        self.fc3 = nn.Linear(hidden_size // 2, 1)
 
     def forward(self, x):
         rna_data, tissue_id = zip(*x)
         tissue_id = torch.tensor(tissue_id).to(self.device)
         rna_data = torch.stack(rna_data).to(self.device)
-
-        # FIXME padding rna_data to max_seq_length
-        # torch.nn.utils.rnn.pad_sequence(rna_data, batch_first=True)
-
         rna_data = rna_data.permute(0, 2, 1)
 
-        tissue_embedding = self.tissue_encoder(tissue_id.to(self.device))
+        # RNA data: (batch_size, 3, seq_length), where 3 is [seq, structure, loop]
+        tissue_embedding = self.tissue_encoder(tissue_id)
 
-        seq_embedding = self.seq_encoder(rna_data[:, 0].to(self.device))
-        sec_structure_embedding = self.sec_structure_encoder(rna_data[:, 1].to(self.device))
-        loop_type_embedding = self.loop_type_encoder(rna_data[:, 2].to(self.device))
+        # Embedding for each component
+        seq_embedding = self.seq_encoder(rna_data[:, 0])
+        sec_structure_embedding = self.sec_structure_encoder(rna_data[:, 1])
+        loop_type_embedding = self.loop_type_encoder(rna_data[:, 2])
 
-        # pad embeddings to max_seq_length
-        padding_size = self.max_seq_length - rna_data.shape[2]
-        seq_embedding = F.pad(seq_embedding, (0, 0, 0, padding_size), mode='constant', value=0)
-        sec_structure_embedding = F.pad(sec_structure_embedding, (0, 0, 0, padding_size), mode='constant', value=0)
-        loop_type_embedding = F.pad(loop_type_embedding, (0, 0, 0, padding_size), mode='constant', value=0)
+        # Apply pooling to reduce sequence length
+        seq_embedding = self.pool(seq_embedding.transpose(1, 2)).transpose(1, 2)
+        sec_structure_embedding = self.pool(sec_structure_embedding.transpose(1, 2)).transpose(1, 2)
+        loop_type_embedding = self.pool(loop_type_embedding.transpose(1, 2)).transpose(1, 2)
 
-        # Concatenate the embeddings
-        x = torch.cat((seq_embedding, sec_structure_embedding, loop_type_embedding), dim=1)
-        x = torch.flatten(x, start_dim=1)
+        # Concatenate embeddings along the feature dimension
+        x = torch.cat((seq_embedding, sec_structure_embedding, loop_type_embedding), dim=2)
+        x = x.flatten(start_dim=1)  # Flatten the pooled embeddings
         x = torch.cat((tissue_embedding, x), dim=1)
 
-        # TODO embed to lower space? To large MLP!
-
-
-        # Actual MLP
+        # MLP layers
         x = self.fc1(x)
         x = self.relu(x)
         x = self.fc2(x)
