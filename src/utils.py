@@ -50,21 +50,6 @@ def get_timestamp():
     return datetime.datetime.now().strftime('%Y-%m-%d-%H-%M')
 
 
-# def check_file_exists(file_path, create_unique=False):
-#     # FIXME DELETE?
-#     logger = setup_logger()
-#     if create_unique:
-#         if os.path.exists(file_path):
-#             logger.warning(f"File {file_path} already exists. Creating a unique file name.")
-#             file_path = file_path.split(".")
-#             file_path = f"{file_path[0]}_{get_timestamp()}.{file_path[1]}"
-#             return file_path
-#     if os.path.exists(file_path):
-#         logger.error(f"File {file_path} already exists. Exiting.")
-#         raise FileExistsError
-#     return file_path
-
-
 def check_path_exists(file_path, create_unique=False):
     logger = setup_logger()
 
