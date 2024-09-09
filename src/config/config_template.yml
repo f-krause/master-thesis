@@ -4,6 +4,7 @@ log_file_path: "" # optional
 
 folding_algorithm: "viennarna" # viennarna, linearfold  # TODO allow for data augmentation, by using different folding algorithms?
 nr_folds: 1  # if 1, will take 20% of the data as validation set
+gpu_id: 0
 seed: 2024
 max_seq_length: 1000  # later to 8000
 
@@ -15,8 +16,8 @@ batch_size: 32
 num_workers: 1
 
 model: "baseline" # dummy, baseline, lstm, xlstm, mamba, transformer, best
-dim_embedding_tissue: 64
-dim_embedding_token: 16
+dim_embedding_tissue: 29
+dim_embedding_token: 4
 # model specific parameters
 
 optimizer:
