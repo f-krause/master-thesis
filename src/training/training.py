@@ -5,44 +5,9 @@ import pandas as pd
 from tqdm import tqdm
 from log.logger import setup_logger
 from box import Box
-from utils import save_checkpoint, mkdir, check_path_exists
+from utils import save_checkpoint, mkdir, check_path_exists, get_model, get_device
 from data_handling.data_loader import get_data_loaders
 from training.optimizer import get_optimizer
-
-from models.dummy.model_dummy import ModelDummy
-from models.baseline.model_baseline import ModelBaseline
-
-
-def get_model(config: Box, device: torch.device, logger):
-    if config.model == "dummy":
-        logger.warning("Using dummy model")
-        return ModelDummy().to(device)
-    if config.model == "baseline":
-        logger.info("Using baseline model")
-        return ModelBaseline(config, device).to(device)
-    if config.model == "lstm":
-        logger.info("Using LSTM model")
-        # TODO
-        raise NotImplementedError("LSTM model not implemented yet")
-    if config.model == "xlstm":
-        logger.info("Using xLSTM model")
-        # TODO
-        raise NotImplementedError("XLSTM model not implemented yet")
-    if config.model == "mamba":
-        logger.info("Using Mamba model")
-        # TODO
-        raise NotImplementedError("Mamba model not implemented yet")
-    if config.model == "transformer":
-        logger.info("Using Transformer model")
-        # TODO
-        raise NotImplementedError("Transformer model not implemented yet")
-    if config.model == "best":
-        logger.info("Using best model")
-        # TODO
-        raise NotImplementedError("Best model not implemented yet")
-    else:
-        raise ValueError(f"Model {config.model} not implemented! Choose from: "
-                         f"dummy, baseline, lstm, xlstm, mamba, transformer, best")
 
 
 def train_fold(config: Box, fold: int = 0):
@@ -55,16 +20,11 @@ def train_fold(config: Box, fold: int = 0):
     logger.info("Starting training")
 
     # gpu selection
-    logger.info(
-        f"Devices found for training: {[(i, torch.cuda.get_device_name(i)) for i in range(torch.cuda.device_count())]}")
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(config.gpu_id)
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = get_device(config, logger)
     # device = "cpu"
-    logger.info(f"Using device: {device}")
 
     # Create checkpoint directory
     checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], os.environ["SUBPROJECT"], "weights")
-    checkpoint_path = check_path_exists(checkpoint_path, create_unique=True)
     mkdir(checkpoint_path)
     logger.info(f"Checkpoint path: {checkpoint_path}")
 
@@ -92,7 +52,7 @@ def train_fold(config: Box, fold: int = 0):
             running_loss += loss.item()
 
         train_loss = running_loss / len(train_loader)
-        losses[epoch] = {"train": train_loss}
+        losses[epoch] = {"train_loss": train_loss}
         logger.info(f'Epoch {epoch}, Loss: {train_loss}')
 
         # Log training loss to Aim
@@ -112,14 +72,14 @@ def train_fold(config: Box, fold: int = 0):
                     loss = criterion(output, target)
                     val_loss += loss.item()
             val_loss /= len(val_loader)
-            losses[epoch].update({"val": val_loss})
+            losses[epoch].update({"val_loss": val_loss})
             logger.info(f'Validation loss: {val_loss}')
 
             # Log validation loss to Aim
             # aim_run.track(val_loss, name='val_loss', epoch=epoch)
 
         # Save checkpoint
-        if (epoch % config.save_freq == 0 and epoch > config.warmup) or epoch == config.epochs - 1:
+        if (epoch % config.save_freq == 0 and epoch > config.warmup) or epoch == config.epochs:
             save_checkpoint({
                 'epoch': epoch,
                 'state_dict': model.state_dict(),

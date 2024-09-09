@@ -5,7 +5,9 @@ import torch
 import numpy as np
 from box import Box
 
-TOKENS = 'ACGT().BEHIMSX'
+TOKENS_BASES = 'ACGT'
+TOKENS_STRUC = '().'
+TOKENS_LOOP = 'BEHIMSX'
 MAX_SEQ_LENGTH = 1000
 MAX_DATA = 1000
 FOLDING_ALG = "viennarna"
@@ -35,9 +37,9 @@ def get_train_data_file(config: Box, return_dict=False):
                 continue
 
             numeric_data = {
-                'seq': [TOKENS.index(c) + 1 for c in sequence],  # label encoded, 0 is reserved for padding
-                'sec_struc': [TOKENS.index(c) + 1 for c in sec_struc],
-                'loop_type': [TOKENS.index(c) + 1 for c in loop_type],
+                'seq': [TOKENS_BASES.index(c) + 1 for c in sequence],  # label encoded, 0 is reserved for padding
+                'sec_struc': [TOKENS_STRUC.index(c) + 1 for c in sec_struc],
+                'loop_type': [TOKENS_LOOP.index(c) + 1 for c in loop_type],
                 'target_id': target_id,
             }
 
