@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from box import Box
+from utils import TISSUES
 
 
 class ModelBaseline(nn.Module):
@@ -11,7 +12,7 @@ class ModelBaseline(nn.Module):
         self.device = device
         self.max_norm = 2
         self.max_seq_length = config.max_seq_length
-        self.tissue_encoder = nn.Embedding(29, config.dim_embedding_tissue, padding_idx=0,
+        self.tissue_encoder = nn.Embedding(len(TISSUES), config.dim_embedding_tissue, padding_idx=0,
                                            max_norm=self.max_norm)  # 29 tissues in total
         self.seq_encoder = nn.Embedding(5, config.dim_embedding_token, padding_idx=0,
                                         max_norm=self.max_norm)  # 4 nucleotides + padding
