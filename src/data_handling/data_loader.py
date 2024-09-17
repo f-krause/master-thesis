@@ -89,13 +89,13 @@ if __name__ == "__main__":
     # for debugging
     from utils import set_project_path, set_log_file
 
-    config = Box({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
+    dev_config = Box({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
                   "batch_size": 32, "num_workers": 4, "folding_algorithm": "viennarna", "seed": 42, "nr_folds": 5})
-    set_project_path(config)
-    set_log_file(config)
+    set_project_path(dev_config)
+    set_log_file(dev_config)
     # train_dataloader = RNADataset(config, train=True)
     # print(len(train_dataloader))
-    train_loader, val_loader = get_data_loaders(config, 1)
+    train_loader, val_loader = get_data_loaders(dev_config, 1)
     data_iter = iter(train_loader)
     x, z = next(data_iter)
     print(x)

@@ -78,9 +78,9 @@ def _get_structure_pred(identifier: str, config: Box):
 if __name__ == '__main__':
     from utils import set_project_path, set_log_file
 
-    config = Box({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
+    dev_config = Box({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
                   "batch_size": 32, "num_workers": 4, "folding_algorithm": FOLDING_ALG})
-    set_project_path(config)
-    set_log_file(config)
-    get_train_data_file(config)
+    set_project_path(dev_config)
+    set_log_file(dev_config)
+    get_train_data_file(dev_config)
     print("Data successfully created")
