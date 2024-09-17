@@ -21,6 +21,7 @@ class RNADataset(torch.utils.data.Dataset):
         if config.model == "dummy":
             logger.warning("USING DUMMY DATA")
             rna_data_full = torch.rand(100, 10)
+            tissue_ids_full = np.random.choice(range(10), 100)
             targets_full = torch.rand(100, 1)
         else:
             with open(os.path.join(os.environ["PROJECT_PATH"], "data/dev_train_data_small.pkl"), 'rb') as f:  # TODO

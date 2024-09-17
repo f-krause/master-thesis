@@ -5,7 +5,8 @@ import pandas as pd
 from tqdm import tqdm
 from log.logger import setup_logger
 from box import Box
-from utils import save_checkpoint, mkdir, check_path_exists, get_model, get_device
+from utils import save_checkpoint, mkdir, check_path_exists, get_device
+from models.get_model import get_model
 from data_handling.data_loader import get_data_loaders
 from training.optimizer import get_optimizer
 

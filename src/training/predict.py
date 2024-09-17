@@ -7,7 +7,8 @@ from box import Box
 from tqdm import tqdm
 from sklearn.metrics import root_mean_squared_error, r2_score
 
-from utils import mkdir, set_project_path, set_log_file, get_model, get_device
+from utils import mkdir, set_project_path, set_log_file, get_device
+from models.get_model import get_model
 from log.logger import setup_logger
 from data_handling.data_loader import get_data_loaders
 
