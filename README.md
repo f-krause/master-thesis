@@ -48,6 +48,15 @@ Connect to the university server with the following command:
 ssh krausef99dm@rey.dm.univie.ac.at
 ```
 
+```shell
+ssh krausef99dm@jyn.dm.univie.ac.at
+```
+
+Data path
+```shell
+/export/share/krausef99dm/
+```
+
 Export environment dependencies
 ```shell
 mamba env export -n master-env > environment_linux.yml
