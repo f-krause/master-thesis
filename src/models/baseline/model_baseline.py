@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from box import Box
-from utils import TISSUES
+from knowledge_db import TISSUES
 
 
 class ModelBaseline(nn.Module):

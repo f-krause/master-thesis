@@ -5,12 +5,6 @@ import torch
 from log.logger import setup_logger
 from box import Box
 
-TISSUES = ['Adrenal', 'Appendices', 'Brain', 'Colon', 'Duodenum', 'Uterus',
-           'Esophagus', 'Fallopiantube', 'Fat', 'Gallbladder', 'Heart', 'Kidney',
-           'Liver', 'Lung', 'Lymphnode', 'Ovary', 'Pancreas', 'Placenta',
-           'Prostate', 'Rectum', 'Salivarygland', 'Smallintestine', 'Smoothmuscle',
-           'Spleen', 'Stomach', 'Testis', 'Thyroid', 'Tonsil', 'Urinarybladder']
-
 
 def mkdir(path: str):
     os.makedirs(path, exist_ok=True)
