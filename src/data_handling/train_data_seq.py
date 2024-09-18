@@ -5,12 +5,12 @@ import torch
 import numpy as np
 from box import Box
 
+MAX_SEQ_LENGTH = 1000  # Maximum sequence length (nr of bases of whole mRNA)
+MAX_DATA = 1000
+FOLDING_ALG = "viennarna"
 TOKENS_BASES = 'ACGT'
 TOKENS_STRUC = '().'
 TOKENS_LOOP = 'BEHIMSX'
-MAX_SEQ_LENGTH = 1000
-MAX_DATA = 1000
-FOLDING_ALG = "viennarna"
 
 
 def get_train_data_file(config: Box, return_dict=False):
