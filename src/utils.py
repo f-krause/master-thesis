@@ -37,8 +37,8 @@ def set_project_path(config: Box):
         project_path = r"C:\Users\Felix\code\uni\UniVie\master-thesis-data"
     elif platform.node() == "TGA-NB-060":
         project_path = r"C:\Users\felix.krause\code\uni\master-thesis-data"
-    elif platform.node() == "rey":
-        project_path = r"/mnt/data/krausef99dm_thesis"
+    elif platform.node() == "rey" or platform.node() == "jyn":
+        project_path = r"/export/share/krausef99dm"
     else:
         raise ValueError("Unknown platform. Please specify project path in config file.")
 
