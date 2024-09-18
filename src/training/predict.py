@@ -1,3 +1,5 @@
+# TODO move to evaluate.py
+
 import os
 import torch
 import yaml
@@ -70,9 +72,10 @@ def predict():
     preds_df.to_csv(os.path.join(predictions_path, "predictions.csv"))
     logger.info(f"Predictions stored at {predictions_path}")
 
-    # compute RMSE and R2 with sklearn
+    # evaluate
     rmse = root_mean_squared_error(targets, predictions)
     r2 = r2_score(targets, predictions)
+    # TODO also include MSE, MAD
     logger.info(f"RMSE: {rmse}, R2: {r2}")
 
 
