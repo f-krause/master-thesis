@@ -1,7 +1,7 @@
 # TODO https://medium.com/optuna/scaling-up-optuna-with-ray-tune-88f6ca87b8c7
 import optuna
 import yaml
-from training.training import train
+from training.train import train
 from log.logger import setup_logger
 from utils import get_timestamp
 

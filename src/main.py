@@ -1,5 +1,5 @@
 import os
-from training import training, tuning
+from training import train, tuning
 from log.logger import setup_logger
 from utils import set_log_file, set_project_path
 import yaml
