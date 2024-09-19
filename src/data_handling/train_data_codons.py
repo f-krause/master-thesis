@@ -13,7 +13,7 @@ MAX_DATA = 1000
 
 
 def get_train_data_file(config: Box, return_dict=False):
-    with open(os.path.join(os.environ["PROJECT_PATH"], "data/ptr_data.pkl"), 'rb') as f:
+    with open(os.path.join(os.environ["PROJECT_PATH"], "data/ptr_data/ptr_data.pkl"), 'rb') as f:
         raw_data = pickle.load(f)
 
     rna_data = []

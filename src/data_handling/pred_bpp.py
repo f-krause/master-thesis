@@ -16,7 +16,7 @@ from arnie.bpps import bpps
 from arnie.mea.mea import MEA
 
 FOLD_PACKAGE = 'vienna_2'  # see doc for more packages: https://github.com/DasLab/arnie/blob/master/docs/setup_doc.md
-DATA_PATH = '/mnt/data/krausef99dm_thesis/data'
+DATA_PATH = '/export/share/krausef99dm/data'
 
 OVERWRITE_FILES = True  # FIXME for dev only
 MAX_SEQ_LENGTH = 400  # 3241 seq with len below 2000

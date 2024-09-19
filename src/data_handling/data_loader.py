@@ -24,7 +24,7 @@ class RNADataset(torch.utils.data.Dataset):
             tissue_ids_full = np.random.choice(range(10), 100)
             targets_full = torch.rand(100, 1)
         else:
-            with open(os.path.join(os.environ["PROJECT_PATH"], "data/dev_train_data_small.pkl"), 'rb') as f:  # TODO
+            with open(os.path.join(os.environ["PROJECT_PATH"], "data/train_data/dev_train_data_small.pkl"), 'rb') as f:  # TODO
                 logger.warning("LOADING SMALL DEV TRAINING DATA")
                 rna_data_full, tissue_ids_full, targets_full = pickle.load(f)  # n x 3, n, n
                 targets_full = torch.tensor(targets_full, dtype=torch.float64)

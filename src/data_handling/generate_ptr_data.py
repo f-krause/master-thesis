@@ -20,9 +20,9 @@ import logging
 from collections import OrderedDict
 from Bio import SeqIO
 
-BED_FILES_FOLDER = "../../data/BED6__protein_coding_strict"
-FASTA_FILES_FOLDER = "../../data/FA_protein_coding_strict_mRNA"
-PTR_CSV_FILE = "../../data/ptr.csv"
+BED_FILES_FOLDER = "../../data/ptr_data/BED6__protein_coding_strict"
+FASTA_FILES_FOLDER = "../../data/ptr_data/FA_protein_coding_strict_mRNA"
+PTR_CSV_FILE = "../../data/ptr_data/ptr.csv"
 TISSUES = ['Adrenal', 'Appendices', 'Brain', 'Colon', 'Duodenum', 'Uterus',
            'Esophagus', 'Fallopiantube', 'Fat', 'Gallbladder', 'Heart', 'Kidney',
            'Liver', 'Lung', 'Lymphnode', 'Ovary', 'Pancreas', 'Placenta',
@@ -234,7 +234,7 @@ if __name__ == "__main__":
     # save data
     import pickle
     try:
-        pickle.dump(data, open('../../data/ptr_data_TEST.pkl', 'wb'))
+        pickle.dump(data, open('../../data/ptr_data/ptr_data_TEST.pkl', 'wb'))
     except:
         logging.error("Could not save data.pkl.")
 

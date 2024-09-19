@@ -9,7 +9,7 @@ import linearfold
 
 # FOLD_PACKAGE = 'viennarna'
 FOLD_PACKAGE = 'linearfold'
-DATA_PATH = '/mnt/data/krausef99dm_thesis/data'
+DATA_PATH = '/export/share/krausef99dm/data'
 
 OVERWRITE_FILES = False  # set True only for debugging!
 MAX_SEQ_LENGTH = 8000  # 3241 seq with len below 2000; 5697 below 3000; Skipped 818 above 8000
