@@ -76,7 +76,10 @@ def get_device(config: Box, logger=None):
         logger.info(f"Devices found for training: "
                     f"{[(i, torch.cuda.get_device_name(i)) for i in range(torch.cuda.device_count())]}")
     os.environ["CUDA_VISIBLE_DEVICES"] = str(config.gpu_id)
+    
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     if logger:
         logger.info(f"Using device: {device}")
+        if device.type == 'cuda':
+            logger.info("Using GPU: " + str(config.gpu_id))
     return device
