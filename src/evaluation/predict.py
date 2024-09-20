@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 from box import Box
 from tqdm import tqdm
-from sklearn.metrics import root_mean_squared_error, r2_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error, root_mean_squared_error, r2_score
 
 from utils import mkdir, set_project_path, set_log_file, get_device
 from models.get_model import get_model
@@ -21,14 +21,14 @@ with open(CONFIG_PATH, 'r') as file:
     config = Box(yaml.safe_load(file))
 
 set_project_path(config)
-predictions_path = os.path.join(os.environ["PROJECT_PATH"], os.environ["SUBPROJECT"], "predictions")
+predictions_path = os.path.join(os.environ["PROJECT_PATH"], "runs", config.subproject, "predictions")
 mkdir(predictions_path)
 os.environ["LOG_FILE"] = os.path.join(predictions_path, "log_predict.log")
 logger = setup_logger()
 
 
 def load_model(config: Box, device):
-    checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], os.environ["SUBPROJECT"], weights_folder)
+    checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], "runs", config.subproject, weights_folder)
 
     model = get_model(config, device, logger)
     model.eval()
@@ -36,8 +36,7 @@ def load_model(config: Box, device):
     # later average models: https://git01lab.cs.univie.ac.at/a1142469/dap/-/blob/main/RNAdegformer/src/OpenVaccine/predict.py#L98
     for fold in range(config.nr_folds):
         losses = pd.read_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
-        scores = np.asarray(losses.val_loss)
-        best_epoch = np.nanargmin(scores) + 1
+        best_epoch = int(losses.loc[losses.val_loss.idxmin(), "epoch"])
         data = torch.load(os.path.join(checkpoint_path, f'checkpoint_{best_epoch}_fold-{fold}.pth.tar'))
         model.load_state_dict(data['state_dict'])
 
@@ -73,10 +72,12 @@ def predict():
     logger.info(f"Predictions stored at {predictions_path}")
 
     # evaluate
+    mae = mean_absolute_error(targets, predictions)
+    mse = mean_squared_error(targets, predictions)
     rmse = root_mean_squared_error(targets, predictions)
     r2 = r2_score(targets, predictions)
-    # TODO also include MSE, MAD
-    logger.info(f"RMSE: {rmse}, R2: {r2}")
+
+    logger.info(f"MAE: {mae}, MSE: {mse}, RMSE: {rmse}, R2: {r2}")
 
 
 if __name__ == "__main__":
