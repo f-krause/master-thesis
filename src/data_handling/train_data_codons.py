@@ -55,8 +55,7 @@ def get_train_data_file(config: Box, return_dict=False):
         if len(rna_data) >= MAX_DATA:
             break
 
-    # with open(os.path.join(os.environ["PROJECT_PATH"], "data/dev_train_data_small.pkl"), 'wb') as f:
-    with open(os.path.join(os.environ["PROJECT_PATH"], "data/TEST_DELETE.pkl"), 'wb') as f:
+    with open(os.path.join(os.environ["PROJECT_PATH"], "data/train_data/dev_train_data_1000.pkl"), 'wb') as f:
         pickle.dump([rna_data, torch.tensor(target_ids), torch.tensor(targets)], f)
 
     # TODO: Implement test data creation
@@ -78,6 +77,5 @@ if __name__ == '__main__':
     dev_config = Box({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
                       "batch_size": 32, "num_workers": 4})
     set_project_path(dev_config)
-    set_log_file(dev_config)
     get_train_data_file(dev_config)
     print("Data successfully created")
