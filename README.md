@@ -18,22 +18,23 @@ mamba activate master-env
 Create project structure, and specify project path and subproject in ``main.py``
 ```
 root
-├── krausef99dm_thesis  (project folder)
+├── krausef99dm  (project folder)
 │   ├── data
-│   ├── dev
-│   │   ├── logs
-│   │   ├── weights
-│   │   ├── weights_best
-│   ├── lstm
-│   │   ├── ...
-│   ├── xlstm
-│   │   ├── ...
-│   ├── gru
-│   │   ├── ...
-│   ├── transformer
-│   │   ├── ...
-│   ├── best_model
-│   │   ├── ...
+│   ├── runs
+│   │   ├── dev
+│   │   │   ├── logs
+│   │   │   ├── weights
+│   │   │   ├── weights_best
+│   │   ├── lstm
+│   │   │   ├── ...
+│   │   ├── xlstm
+│   │   │   ├── ...
+│   │   ├── gru
+│   │   │   ├── ...
+│   │   ├── transformer
+│   │   │   ├── ...
+│   │   ├── best_model (PTRNet)
+│   │   │   ├── ...
 └── master-thesis  (this repo)
 ```
 
