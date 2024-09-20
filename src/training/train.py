@@ -22,7 +22,7 @@ def train_fold(config: Box, fold: int = 0):
 
     # gpu selection
     device = get_device(config, logger)
-    # device = "cpu"
+    # device = "cpu"  # FIXME for development
 
     # Create checkpoint directory
     checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], os.environ["SUBPROJECT"], "weights")
@@ -47,20 +47,21 @@ def train_fold(config: Box, fold: int = 0):
             target = target.to(device)
             optimizer.zero_grad()
             output = model(data)
-            loss = criterion(output.float(), target.float())
+            loss = criterion(output.squeeze().float(), target.float())
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
 
         train_loss = running_loss / len(train_loader)
-        losses[epoch] = {"train_loss": train_loss}
+        losses[epoch] = {"epoch": epoch, "train_loss": train_loss}
         logger.info(f'Epoch {epoch}, Loss: {train_loss}')
 
         # Log training loss to Aim
         # aim_run.track(train_loss, name='train_loss', epoch=epoch)
 
         # Validation
-        if (epoch % config.val_freq == 0 and epoch > config.warmup) or epoch == config.epochs - 1:
+        if ((epoch % config.val_freq == 0 or epoch % config.save_freq == 0 or epoch == config.epochs - 1)
+                and epoch > config.warmup):  # ensure validation if stored
             model.eval()
             val_loss = 0.0
             with torch.no_grad():
@@ -69,7 +70,7 @@ def train_fold(config: Box, fold: int = 0):
                     # data = data.to(device)
                     target = target.to(device)
                     output = model(data)
-                    output, target = output.float(), target.float()
+                    output, target = output.squeeze().float(), target.float()
                     loss = criterion(output, target)
                     val_loss += loss.item()
             val_loss /= len(val_loader)
@@ -80,7 +81,7 @@ def train_fold(config: Box, fold: int = 0):
             # aim_run.track(val_loss, name='val_loss', epoch=epoch)
 
         # Save checkpoint
-        if (epoch % config.save_freq == 0 and epoch > config.warmup) or epoch == config.epochs:
+        if (epoch % config.save_freq == 0 and epoch > config.warmup) or epoch == config.epochs - 1:
             save_checkpoint({
                 'epoch': epoch,
                 'state_dict': model.state_dict(),

@@ -24,7 +24,7 @@ def set_log_file(config: Box, predict=False):
         mkdir(config.log_file_path)
 
 
-def set_project_path(config: Box):
+def set_project_path(config: Box, unique=True):
     if config.project_path:
         project_path = config.project_path
     elif platform.node() == "Felix-PC":
@@ -39,7 +39,7 @@ def set_project_path(config: Box):
     os.environ["PROJECT_PATH"] = project_path
 
     subproject_path = os.path.join(project_path, "runs",  config.subproject)
-    if os.path.isdir(subproject_path):
+    if os.path.isdir(subproject_path) and unique:
         os.environ["SUBPROJECT"] = os.path.join("runs", config.subproject + "_" + get_timestamp())
     else:
         os.environ["SUBPROJECT"] = os.path.join("runs", config.subproject)
