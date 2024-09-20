@@ -81,7 +81,7 @@ def train_fold(config: Box, fold: int = 0):
             # aim_run.track(val_loss, name='val_loss', epoch=epoch)
 
         # Save checkpoint
-        if (epoch % config.save_freq == 0 and epoch > config.warmup) or epoch == config.epochs - 1:
+        if (epoch % config.save_freq == 0 and epoch >= config.warmup) or epoch == config.epochs:
             save_checkpoint({
                 'epoch': epoch,
                 'state_dict': model.state_dict(),
