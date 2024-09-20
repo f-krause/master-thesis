@@ -60,8 +60,8 @@ def train_fold(config: Box, fold: int = 0):
         # aim_run.track(train_loss, name='train_loss', epoch=epoch)
 
         # Validation
-        if ((epoch % config.val_freq == 0 or epoch % config.save_freq == 0 or epoch == config.epochs - 1)
-                and epoch > config.warmup):  # ensure validation if stored
+        if ((epoch % config.val_freq == 0 or epoch % config.save_freq == 0 or epoch == config.epochs)
+                and epoch >= config.warmup):  # ensure validation if stored
             model.eval()
             val_loss = 0.0
             with torch.no_grad():
