@@ -8,6 +8,7 @@ dependencies:
   - _openmp_mutex=4.5=2_kmp_llvm
   - _sysroot_linux-64_curr_repodata_hack=3=h69a702a_16
   - alembic=1.13.2=pyhd8ed1ab_0
+  - alsa-lib=1.2.12=h4ab18f5_0
   - anyio=4.4.0=pyhd8ed1ab_0
   - aom=3.9.1=hac33072_0
   - argon2-cffi=23.1.0=pyhd8ed1ab_0
@@ -21,18 +22,21 @@ dependencies:
   - binutils_impl_linux-64=2.40=ha1999f0_7
   - blas=1.0=mkl
   - bleach=6.1.0=pyhd8ed1ab_0
+  - brotli=1.1.0=hd590300_1
+  - brotli-bin=1.1.0=hd590300_1
   - brotli-python=1.1.0=py39h3d6467e_1
   - bzip2=1.0.8=h4bc722e_7
-  - ca-certificates=2024.7.4=hbcca054_0
+  - ca-certificates=2024.8.30=hbcca054_0
   - cached-property=1.5.2=hd8ed1ab_1
   - cached_property=1.5.2=pyha770c72_1
   - cairo=1.18.0=hebfffa5_3
-  - certifi=2024.7.4=pyhd8ed1ab_0
+  - certifi=2024.8.30=pyhd8ed1ab_0
   - cffi=1.17.0=py39h49a4b6b_0
   - charset-normalizer=3.3.2=pyhd8ed1ab_0
   - colorama=0.4.6=pyhd8ed1ab_0
   - colorlog=6.8.2=py39hf3d152e_0
   - comm=0.2.2=pyhd8ed1ab_0
+  - contourpy=1.3.0=py39h74842e3_1
   - cuda-cudart=11.8.89=0
   - cuda-cupti=11.8.87=0
   - cuda-libraries=11.8.0=0
@@ -40,10 +44,13 @@ dependencies:
   - cuda-nvtx=11.8.86=0
   - cuda-opencl=12.4.127=0
   - cuda-runtime=11.8.0=0
+  - cycler=0.12.1=pyhd8ed1ab_0
   - dav1d=1.2.1=hd590300_0
+  - dbus=1.13.6=h5008d03_3
   - debugpy=1.8.5=py39h98e3656_0
   - decorator=5.1.1=pyhd8ed1ab_0
   - defusedxml=0.7.1=pyhd8ed1ab_0
+  - double-conversion=3.3.0=h59595ed_0
   - entrypoints=0.4=pyhd8ed1ab_0
   - exceptiongroup=1.2.2=pyhd8ed1ab_0
   - executing=2.0.1=pyhd8ed1ab_0
@@ -57,6 +64,7 @@ dependencies:
   - fontconfig=2.14.2=h14ed4e7_0
   - fonts-conda-ecosystem=1=0
   - fonts-conda-forge=1=0
+  - fonttools=4.53.1=py39h8cd3c5a_1
   - fqdn=1.5.1=pyhd8ed1ab_0
   - freetype=2.12.1=h267a509_2
   - fribidi=1.0.10=h36c2ea0_0
@@ -80,6 +88,7 @@ dependencies:
   - icu=75.1=he02047a_0
   - idna=3.7=pyhd8ed1ab_0
   - importlib-metadata=8.2.0=pyha770c72_0
+  - importlib-resources=6.4.0=pyhd8ed1ab_0
   - importlib_metadata=8.2.0=hd8ed1ab_0
   - importlib_resources=6.4.0=pyhd8ed1ab_0
   - ipykernel=6.29.5=pyh3099207_0
@@ -108,6 +117,7 @@ dependencies:
   - jupyterlab_widgets=3.0.11=pyhd8ed1ab_0
   - kernel-headers_linux-64=3.10.0=h4a8ded7_16
   - keyutils=1.6.1=h166bdaf_0
+  - kiwisolver=1.4.7=py39h74842e3_0
   - krb5=1.21.3=h659f571_0
   - lame=3.100=h166bdaf_1003
   - lcms2=2.16=hb7c19ff_0
@@ -118,32 +128,43 @@ dependencies:
   - libasprintf-devel=0.22.5=h661eb56_2
   - libass=0.17.3=h1dc1e6a_0
   - libblas=3.9.0=16_linux64_mkl
+  - libbrotlicommon=1.1.0=hd590300_1
+  - libbrotlidec=1.1.0=hd590300_1
+  - libbrotlienc=1.1.0=hd590300_1
   - libcblas=3.9.0=16_linux64_mkl
+  - libclang-cpp18.1=18.1.8=default_hf981a13_4
+  - libclang13=18.1.8=default_h9def88c_4
   - libcublas=11.11.3.6=0
   - libcufft=10.9.0.58=0
   - libcufile=1.9.1.3=0
+  - libcups=2.3.3=h4637d8d_4
   - libcurand=10.3.5.147=0
   - libcusolver=11.4.1.48=0
   - libcusparse=11.7.5.86=0
   - libdeflate=1.21=h4bc722e_0
   - libdrm=2.4.122=h4ab18f5_0
   - libedit=3.1.20191231=he28a2e2_2
+  - libegl=1.7.0=ha4b6fd6_0
   - libexpat=2.6.2=h59595ed_0
   - libffi=3.4.2=h7f98852_5
-  - libgcc=7.2.0=h69d50b8_2
+  - libgcc=14.1.0=h77fa898_1
   - libgcc-devel_linux-64=14.1.0=h5d3d1c9_100
-  - libgcc-ng=14.1.0=h77fa898_0
+  - libgcc-ng=14.1.0=h69a702a_1
   - libgettextpo=0.22.5=h59595ed_2
   - libgettextpo-devel=0.22.5=h59595ed_2
   - libgfortran-ng=14.1.0=h69a702a_0
   - libgfortran5=14.1.0=hc5f4f2c_0
+  - libgl=1.7.0=ha4b6fd6_0
   - libglib=2.80.3=h315aac3_2
-  - libgomp=14.1.0=h77fa898_0
+  - libglvnd=1.7.0=ha4b6fd6_0
+  - libglx=1.7.0=ha4b6fd6_0
+  - libgomp=14.1.0=h77fa898_1
   - libhwloc=2.11.1=default_hecaa2ac_1000
   - libiconv=1.17=hd590300_2
   - libidn2=2.3.7=hd590300_0
   - libjpeg-turbo=3.0.0=hd590300_1
   - liblapack=3.9.0=16_linux64_mkl
+  - libllvm18=18.1.8=h8b73ec9_2
   - libnpp=11.8.0.86=0
   - libnsl=2.0.1=hd590300_0
   - libnvjitlink=12.1.105=0
@@ -165,11 +186,13 @@ dependencies:
   - libopus=1.3.1=h7f98852_1
   - libpciaccess=0.18=hd590300_0
   - libpng=1.6.43=h2797004_0
+  - libpq=16.4=h2d7952a_1
   - libprotobuf=4.25.3=h08a7969_0
   - libsanitizer=14.1.0=hcba0ae0_0
   - libsodium=1.0.18=h36c2ea0_1
   - libsqlite=3.46.0=hde9e2c9_0
-  - libstdcxx-ng=14.1.0=hc0a3c3a_0
+  - libstdcxx=14.1.0=hc0a3c3a_1
+  - libstdcxx-ng=14.1.0=h4852527_1
   - libtasn1=4.19.0=h166bdaf_0
   - libtiff=4.6.0=h46a8edc_4
   - libunistring=0.9.10=h7f98852_0
@@ -179,17 +202,24 @@ dependencies:
   - libwebp-base=1.4.0=hd590300_0
   - libxcb=1.16=hd590300_0
   - libxcrypt=4.4.36=hd590300_1
+  - libxkbcommon=1.7.0=h2c5496b_1
   - libxml2=2.12.7=he7c6b58_4
+  - libxslt=1.1.39=h76b75d6_0
   - libzlib=1.3.1=h4ab18f5_1
   - llvm-openmp=15.0.7=h0cdce71_0
   - mako=1.3.5=pyhd8ed1ab_0
   - markupsafe=2.1.5=py39hd1e30aa_0
+  - matplotlib=3.9.2=py39hf3d152e_1
+  - matplotlib-base=3.9.2=py39h16632d1_1
   - matplotlib-inline=0.1.7=pyhd8ed1ab_0
   - mistune=3.0.2=pyhd8ed1ab_0
   - mkl=2022.2.1=h84fe81f_16997
   - mpc=1.3.1=hfe3b2da_0
   - mpfr=4.2.1=h38ae2d0_2
   - mpmath=1.3.0=pyhd8ed1ab_0
+  - munkres=1.1.4=pyh9f0ad1d_0
+  - mysql-common=9.0.1=h70512c7_0
+  - mysql-libs=9.0.1=ha479ceb_0
   - nbclient=0.10.0=pyhd8ed1ab_0
   - nbconvert=7.16.4=hd8ed1ab_1
   - nbconvert-core=7.16.4=pyhd8ed1ab_1
@@ -205,7 +235,7 @@ dependencies:
   - ocl-icd=2.3.2=hd590300_1
   - openh264=2.4.1=h59595ed_0
   - openjpeg=2.5.2=h488ebb8_0
-  - openssl=3.3.1=h4bc722e_2
+  - openssl=3.3.2=hb9d3cd8_0
   - optuna=3.6.1=pyhd8ed1ab_0
   - overrides=7.7.0=pyhd8ed1ab_0
   - p11-kit=0.24.1=hc5aa10d_0
@@ -234,6 +264,8 @@ dependencies:
   - pure_eval=0.2.3=pyhd8ed1ab_0
   - pycparser=2.22=pyhd8ed1ab_0
   - pygments=2.18.0=pyhd8ed1ab_0
+  - pyparsing=3.1.4=pyhd8ed1ab_0
+  - pyside6=6.7.2=py39h0383914_3
   - pysocks=1.7.1=pyha2e5f31_6
   - python=3.9.19=h0755675_0_cpython
   - python-dateutil=2.9.0=pyhd8ed1ab_0
@@ -248,6 +280,8 @@ dependencies:
   - pytz=2024.1=pyhd8ed1ab_0
   - pyyaml=6.0.2=py39hcd6043d_0
   - pyzmq=26.1.0=py39hbdd323a_0
+  - qhull=2020.2=h434a139_5
+  - qt6-main=6.7.2=hb12f9c5_5
   - qtconsole-base=5.5.2=pyha770c72_0
   - qtpy=2.4.1=pyhd8ed1ab_0
   - readline=8.2=h8228510_1
@@ -286,6 +320,7 @@ dependencies:
   - typing_extensions=4.12.2=pyha770c72_0
   - typing_utils=0.1.0=pyhd8ed1ab_0
   - tzdata=2024a=h0c530f3_0
+  - unicodedata2=15.1.0=py39hd1e30aa_0
   - uri-template=1.3.0=pyhd8ed1ab_0
   - urllib3=2.2.2=pyhd8ed1ab_1
   - wayland=1.23.0=h5291e77_0
@@ -298,7 +333,15 @@ dependencies:
   - widgetsnbextension=4.0.11=pyhd8ed1ab_0
   - x264=1!164.3095=h166bdaf_2
   - x265=3.5=h924138e_3
+  - xcb-util=0.4.1=hb711507_2
+  - xcb-util-cursor=0.1.5=hb9d3cd8_0
+  - xcb-util-image=0.4.0=hb711507_2
+  - xcb-util-keysyms=0.4.1=hb711507_0
+  - xcb-util-renderutil=0.3.10=hb711507_0
+  - xcb-util-wm=0.4.2=hb711507_0
+  - xkeyboard-config=2.42=h4ab18f5_0
   - xorg-fixesproto=5.0=h7f98852_1002
+  - xorg-inputproto=2.3.2=hb9d3cd8_1003
   - xorg-kbproto=1.0.7=h7f98852_1002
   - xorg-libice=1.1.1=hd590300_0
   - xorg-libsm=1.2.4=h7391055_0
@@ -307,7 +350,11 @@ dependencies:
   - xorg-libxdmcp=1.1.3=h7f98852_0
   - xorg-libxext=1.3.4=h0b41bf4_2
   - xorg-libxfixes=5.0.3=h7f98852_1004
+  - xorg-libxi=1.7.10=h4bc722e_1
   - xorg-libxrender=0.9.11=hd590300_0
+  - xorg-libxtst=1.2.5=h4bc722e_0
+  - xorg-libxxf86vm=1.1.5=hb9d3cd8_2
+  - xorg-recordproto=1.14.2=h7f98852_1002
   - xorg-renderproto=0.11.1=h7f98852_1002
   - xorg-xextproto=7.3.0=h0b41bf4_1003
   - xorg-xproto=7.0.31=h7f98852_1007
@@ -329,4 +376,4 @@ dependencies:
       - pooch==1.8.2
       - python-box==7.2.0
       - viennarna==2.6.4
-prefix: /mnt/data/krausef99dm_thesis/miniforge3/envs/master-env
+prefix: /export/share/krausef99dm/miniforge3/envs/master-env
