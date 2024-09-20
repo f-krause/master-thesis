@@ -1,4 +1,4 @@
-subproject: "dev/run"
+subproject: "dev_baseline/test_run_300_3"
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 
@@ -8,10 +8,10 @@ gpu_id: 0
 seed: 2024
 max_seq_length: 1000  # later to 8000
 
-epochs: 6
-save_freq: 3
-val_freq: 3
-warmup: 0
+epochs: 250
+save_freq: 25
+val_freq: 10
+warmup: 50
 batch_size: 32
 num_workers: 1
 
