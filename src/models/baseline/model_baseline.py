@@ -6,7 +6,7 @@ from knowledge_db import TISSUES, CODON_MAP_DNA
 
 
 class ModelBaseline(nn.Module):
-    def __init__(self, config: Box, device: torch.device, hidden_size=512, pooling_dim=1024):
+    def __init__(self, config: Box, device: torch.device, pooling_dim=1024):
         super(ModelBaseline, self).__init__()
 
         self.device = device
@@ -26,10 +26,10 @@ class ModelBaseline(nn.Module):
         # self.fc1 = nn.Linear(config.dim_embedding_tissue + self.pooling_dim * config.dim_embedding_token,
         #                      hidden_size)
         self.fc1 = nn.Linear(config.dim_embedding_tissue + self.max_seq_length * config.dim_embedding_token,
-                             hidden_size)
+                             config.hidden_size)
         self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(hidden_size, hidden_size // 2)
-        self.fc3 = nn.Linear(hidden_size // 2, 1)
+        self.fc2 = nn.Linear(config.hidden_size, config.hidden_size // 2)
+        self.fc3 = nn.Linear(config.hidden_size // 2, 1)
 
     def forward(self, inputs):
         rna_data, tissue_id = zip(*inputs)

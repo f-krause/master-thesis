@@ -1,13 +1,16 @@
+# Paths
 subproject: "dev_baseline/test_run_300_3"
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 
+# General
 folding_algorithm: "viennarna" # viennarna, linearfold  # TODO allow for data augmentation, by using different folding algorithms?
 nr_folds: 1  # if 1, will take 20% of the data as validation set
 gpu_id: 0
 seed: 2024
 max_seq_length: 1000  # later to 8000
 
+# Training
 epochs: 250
 save_freq: 25
 val_freq: 10
@@ -15,11 +18,13 @@ warmup: 50
 batch_size: 32
 num_workers: 1
 
+# Model
 model: "baseline" # dummy, baseline, lstm, xlstm, mamba, transformer, best
 dim_embedding_tissue: 16  # max 29 tissues
 dim_embedding_token: 32  # 64 codons or 4 nucleotides/
-# model specific parameters
+hidden_size: 512
 
+# Optimizer
 optimizer:
   name: adam
   lr: 0.001
