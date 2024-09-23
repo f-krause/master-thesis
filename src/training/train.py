@@ -1,5 +1,6 @@
 import os
 import torch
+import time
 # import aim  # https://aimstack.io/#demos
 import pandas as pd
 from tqdm import tqdm
@@ -18,8 +19,6 @@ def train_fold(config: Box, fold: int = 0):
     # aim_run = aim.Run()
     # aim_run.set_params(config.to_dict(), name='config')
 
-    logger.info("Starting training")
-
     # gpu selection
     device = get_device(config, logger)
     # device = "cpu"  # FIXME for development
@@ -37,6 +36,8 @@ def train_fold(config: Box, fold: int = 0):
 
     losses = {}
 
+    logger.info("Starting training")
+    start_time = time.time()
     for epoch in range(1, config.epochs + 1):
         # Training
         model.train()
@@ -90,9 +91,11 @@ def train_fold(config: Box, fold: int = 0):
             losses[epoch].update({"stored": 1})
             logger.info(f'Checkpoint saved at epoch {epoch}')
 
+    end_time = time.time()
+
     # Save losses to a CSV file
     pd.DataFrame(losses).T.to_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
-    logger.info("Training process completed")
+    logger.info(f"Training process completed. Training time: {round((end_time - start_time)/60, 4)} mins.")
     logger.info(f"Weights path: {checkpoint_path}")
 
 
