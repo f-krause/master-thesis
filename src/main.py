@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser(prog='main.py', description='Trains DL models o
 parser.add_argument('-c', '--custom_path', help="Path to config file", type=str, default=None)
 parser.add_argument('-b', "--baseline", help="Use baseline config", action="store_true")
 parser.add_argument('-l', "--lstm", help="Use lstm config", action="store_true")
+parser.add_argument('-g', "--gru", help="Use gru config", action="store_true")
 parser.add_argument('-x', "--xlstm", help="Use xlstm config", action="store_true")
 parser.add_argument('-t', "--transformer", help="Use transformer config", action="store_true")
 parser.add_argument('-m', "--mamba", help="Use mamba config", action="store_true")
@@ -24,18 +25,16 @@ if args.custom_path:
     config_path = args.custom_path
 elif args.baseline:
     config_path = "config/config_baseline.yml"
+elif args.gru:
+    config_path = "config/config_gru.yml"
 elif args.lstm:
-    raise NotImplementedError("LSTM config not implemented yet")
-    # config_path = "config/config_lstm.yml"
+    config_path = "config/config_lstm.yml"
 elif args.xlstm:
-    raise NotImplementedError("XLSTM config not implemented yet")
-    # config_path = "config/config_xlstm.yml"
+    config_path = "config/config_xlstm.yml"
 elif args.transformer:
-    raise NotImplementedError("Transformer config not implemented yet")
-    # config_path = "config/config_transformer.yml"
+    config_path = "config/config_transformer.yml"
 elif args.mamba:
-    raise NotImplementedError("Mamba config not implemented yet")
-    # config_path = "config/config_mamba.yml"
+    config_path = "config/config_mamba.yml"
 else:
     config_path = CONFIG_PATH_DEFAULT
 
