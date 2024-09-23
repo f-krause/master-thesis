@@ -12,6 +12,7 @@ CONFIG_PATH_DEFAULT = "config/config_template.yml"
 parser = argparse.ArgumentParser(prog='main.py', description='Trains DL models on mRNA data to predict PTR ratios.')
 
 parser.add_argument('-c', '--custom_path', help="Path to config file", type=str, default=None)
+parser.add_argument('-d', "--dummy", help="Use dummy config for test", action="store_true")
 parser.add_argument('-b', "--baseline", help="Use baseline config", action="store_true")
 parser.add_argument('-l', "--lstm", help="Use lstm config", action="store_true")
 parser.add_argument('-g', "--gru", help="Use gru config", action="store_true")
@@ -23,6 +24,8 @@ args = parser.parse_args()
 
 if args.custom_path:
     config_path = args.custom_path
+if args.dummy:
+    config_path = "config/config_dummy.yml"
 elif args.baseline:
     config_path = "config/config_baseline.yml"
 elif args.gru:
