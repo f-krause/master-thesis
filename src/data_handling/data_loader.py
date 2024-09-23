@@ -64,9 +64,10 @@ class RNADataset(torch.utils.data.Dataset):
 def _pad_sequences(batch):
     data, targets = zip(*batch)
     rna_data, tissue_ids = zip(*data)
+    seq_lengths = torch.tensor([seq.size(0) for seq in rna_data])
     rna_data_padded = torch.nn.utils.rnn.pad_sequence(rna_data, batch_first=True)
 
-    return [rna_data_padded, tissue_ids], torch.tensor(targets)
+    return [rna_data_padded, tissue_ids, seq_lengths], torch.tensor(targets)
 
 
 def get_data_loaders(config: Box, fold: int):

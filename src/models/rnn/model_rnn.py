@@ -13,7 +13,7 @@ class ModelRNN(nn.Module):
         self.max_norm = 2
         self.max_seq_length = config.max_seq_length
 
-        self.tissue_encoder = nn.Embedding(len(TISSUES), config.dim_embedding_tissue,
+        self.tissue_encoder = nn.Embedding(len(TISSUES), config.rnn_hidden_size,
                                            max_norm=self.max_norm)  # 29 tissues
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, config.dim_embedding_token, padding_idx=0,
                                         max_norm=self.max_norm)  # 64 codons + padding 0
@@ -25,6 +25,7 @@ class ModelRNN(nn.Module):
             self.rnn = nn.LSTM(input_size=input_size, hidden_size=config.rnn_hidden_size, num_layers=config.num_layers,
                                bidirectional=config.bidirectional, dropout=config.dropout, batch_first=True)
         elif model.lower() == "gru":
+            # TODO TEST
             self.rnn = nn.GRU(input_size=input_size, hidden_size=config.rnn_hidden_size, num_layers=config.num_layers,
                               bidirectional=config.bidirectional, dropout=config.dropout, batch_first=True)
 
@@ -40,21 +41,23 @@ class ModelRNN(nn.Module):
         rna_data_pad = rna_data_pad.to(self.device)  # (batch_size, padded_seq_length), upper bounded by max length
 
         # Embedding for each component
-        tissue_embedding = self.tissue_encoder(tissue_id)
-        seq_embedding = self.seq_encoder(rna_data_pad)
+        tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, tissue_embedding_dim)
+        seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, padded_seq_length, seq_embedding_dim)
 
-        # Concatenate embeddings along the feature dimension
-        # x = seq_embedding.flatten(start_dim=1)
+        # Project tissue embedding to the LSTM hidden state dimension
+        h0 = tissue_embedding.unsqueeze(0).repeat(self.rnn.num_layers, 1, 1)  # (num_layers, batch_size, hidden_dim)
+        if self.rnn.bidirectional:
+            h0 = h0.repeat(2, 1, 1)
+        c0 = torch.zeros_like(h0)  # (1, batch_size, hidden_dim)
 
-        # x = torch.cat((tissue_embedding, x), dim=1)  # use?
-        x = seq_embedding
-
-        x_packed = torch.nn.utils.rnn.pack_padded_sequence(x, seq_lengths, batch_first=True,
+        # Packing the sequence
+        x_packed = torch.nn.utils.rnn.pack_padded_sequence(seq_embedding, seq_lengths, batch_first=True,
                                                            enforce_sorted=False)
-        # How to include tissue embedding?
-        h, c = self.rnn(x_packed)  # rnn(input, (h0, c0)), could also give tissue embedding as initial states
+
+        h, _ = self.rnn(x_packed, (h0, c0))  # RNN forward pass with tissue embedding as initial states
         h_unpacked, _ = torch.nn.utils.rnn.pad_packed_sequence(h, batch_first=True, padding_value=0)
 
+        # Prediction based on last hidden state
         y_pred = self.predictor(h_unpacked[:, -1, :])
 
         return y_pred
