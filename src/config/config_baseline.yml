@@ -19,7 +19,7 @@ batch_size: 32
 num_workers: 1
 
 # Model
-model: "baseline" # dummy, baseline, lstm, xlstm, mamba, transformer, best
+model: "baseline"
 dim_embedding_tissue: 16  # max 29 tissues
 dim_embedding_token: 32  # 64 codons or 4 nucleotides/
 hidden_size: 512
