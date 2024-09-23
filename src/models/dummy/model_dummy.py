@@ -9,6 +9,6 @@ class ModelDummy(nn.Module):
         self.layer = nn.Linear(10, 1)  # Example layer
 
     def forward(self, x):
-        rna_data, tissue_id = zip(*x)
-        rna_data = torch.stack(rna_data).to(self.device)
+        rna_data = x[0].to(self.device)
+
         return self.layer(rna_data)

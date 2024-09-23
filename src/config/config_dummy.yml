@@ -1,0 +1,28 @@
+# Paths
+subproject: "dev/dummy"
+project_path: ""  # optional, project path with data and model weights
+log_file_path: "" # optional
+
+# General
+folding_algorithm: "viennarna" # viennarna, linearfold  # TODO allow for data augmentation, by using different folding algorithms?
+nr_folds: 1  # if 1, will take 20% of the data as validation set
+gpu_id: 0
+seed: 2024
+max_seq_length: 1000  # later to 8000
+
+# Training
+epochs: 6
+save_freq: 3
+val_freq: 3
+warmup: 0
+batch_size: 32
+num_workers: 1
+
+# Model
+model: "dummy" # dummy, baseline, gru, lstm, xlstm, mamba, transformer, best
+
+# Optimizer
+optimizer:
+  name: adam
+  lr: 0.001
+  momentum: 0.9
