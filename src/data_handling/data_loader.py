@@ -24,8 +24,8 @@ class RNADataset(torch.utils.data.Dataset):
             tissue_ids_full = np.random.choice(range(10), 100)
             targets_full = torch.rand(100, 1)
         else:
-            with open(os.path.join(os.environ["PROJECT_PATH"], "data/train_data/dev_train_data_small.pkl"), 'rb') as f:  # TODO
-                logger.warning("LOADING SMALL DEV TRAINING DATA")
+            with open(os.path.join(os.environ["PROJECT_PATH"], "data/train_data/dev_train_data_1000.pkl"), 'rb') as f:
+                logger.warning("LOADING SMALL DEV TRAINING DATA")  # TODO
                 rna_data_full, tissue_ids_full, targets_full = pickle.load(f)  # n x 3, n, n
 
         train_indices, val_indices = self._get_train_val_indices(rna_data_full, targets_full, fold, config.seed,
@@ -58,19 +58,15 @@ class RNADataset(torch.utils.data.Dataset):
         return len(self.rna_data)
 
     def __getitem__(self, index):
-        return (self.rna_data[index], self.tissue_ids[index]), self.targets[index]
+        return [self.rna_data[index], self.tissue_ids[index]], self.targets[index]
 
 
 def _pad_sequences(batch):
-    # TODO might be useful to pad sequences: pack_padded_sequence
     data, targets = zip(*batch)
     rna_data, tissue_ids = zip(*data)
-    lengths = torch.tensor([seq.size(0) for seq in rna_data])
     rna_data_padded = torch.nn.utils.rnn.pad_sequence(rna_data, batch_first=True)
-    # rna_data_packed = torch.nn.utils.rnn.pack_padded_sequence(rna_data_padded, lengths, batch_first=True,
-    #                                                           enforce_sorted=False)  # TODO can be useful for LSTM!
 
-    return list(zip(rna_data_padded, tissue_ids)), torch.tensor(targets)
+    return [rna_data_padded, tissue_ids], torch.tensor(targets)
 
 
 def get_data_loaders(config: Box, fold: int):
