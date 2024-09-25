@@ -18,7 +18,7 @@ class ModelBaseline(nn.Module):
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, config.dim_embedding_token, padding_idx=0,
                                         max_norm=self.max_norm)  # 64 codons + padding 0
 
-        self.MLP = nn.Sequential(
+        self.fc = nn.Sequential(
             nn.Linear(config.dim_embedding_tissue + self.max_seq_length * config.dim_embedding_token,
                                  config.hidden_size),
             nn.ReLU(),  # TODO try nn.ELU(),
@@ -51,6 +51,6 @@ class ModelBaseline(nn.Module):
 
         x = torch.cat((tissue_embedding, seq_embedding_flat), dim=1)
 
-        y_pred = self.MLP(x)
+        y_pred = self.fc(x)
 
         return y_pred
