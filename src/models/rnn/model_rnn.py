@@ -30,7 +30,8 @@ class ModelRNN(nn.Module):
                               bidirectional=config.bidirectional, dropout=config.dropout, batch_first=True)
 
         self.predictor = nn.Sequential(
-            nn.Linear(config.num_layers * config.rnn_hidden_size, config.out_hidden_size),
+            # nn.LayerNorm(self.n_embd),
+            nn.Linear((int(config.bidirectional) + 1) * config.rnn_hidden_size, config.out_hidden_size),
             nn.ELU(),
             nn.Linear(config.out_hidden_size, 1),
         )
@@ -54,7 +55,13 @@ class ModelRNN(nn.Module):
         x_packed = torch.nn.utils.rnn.pack_padded_sequence(seq_embedding, seq_lengths, batch_first=True,
                                                            enforce_sorted=False)
 
-        h, _ = self.rnn(x_packed, (h0, c0))  # RNN forward pass with tissue embedding as initial states
+        if isinstance(self.rnn, nn.LSTM):
+            h, _ = self.rnn(x_packed, (h0, c0))  # RNN forward pass with tissue embedding as initial states
+        elif isinstance(self.rnn, nn.GRU):
+            h, _ = self.rnn(x_packed, h0)
+        else:
+            raise ValueError("RNN type not supported")
+
         h_unpacked, _ = torch.nn.utils.rnn.pad_packed_sequence(h, batch_first=True, padding_value=0)
 
         # Prediction based on last hidden state
