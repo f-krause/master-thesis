@@ -36,6 +36,7 @@ def load_model(config: Box, device):
     # later average models: https://git01lab.cs.univie.ac.at/a1142469/dap/-/blob/main/RNAdegformer/src/OpenVaccine/predict.py#L98
     for fold in range(config.nr_folds):
         losses = pd.read_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
+        losses = losses[~losses.stored.isna()]
         best_epoch = int(losses.loc[losses.val_loss.idxmin(), "epoch"])
         data = torch.load(os.path.join(checkpoint_path, f'checkpoint_{best_epoch}_fold-{fold}.pth.tar'))
         model.load_state_dict(data['state_dict'])
