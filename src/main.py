@@ -5,9 +5,7 @@ from box import Box
 
 from training import train, tuning
 from log.logger import setup_logger
-from utils import set_log_file, set_project_path
-
-CONFIG_PATH_DEFAULT = "config/config_template.yml"
+from utils import set_log_file, set_project_path, get_config
 
 parser = argparse.ArgumentParser(prog='main.py', description='Trains DL models on mRNA data to predict PTR ratios.')
 
@@ -22,27 +20,10 @@ parser.add_argument('-m', "--mamba", help="Use mamba config", action="store_true
 
 args = parser.parse_args()
 
-if args.custom_path:
-    config_path = args.custom_path
-if args.dummy:
-    config_path = "config/config_dummy.yml"
-elif args.baseline:
-    config_path = "config/config_baseline.yml"
-elif args.gru:
-    config_path = "config/config_gru.yml"
-elif args.lstm:
-    config_path = "config/config_lstm.yml"
-elif args.xlstm:
-    config_path = "config/config_xlstm.yml"
-elif args.transformer:
-    config_path = "config/config_transformer.yml"
-elif args.mamba:
-    config_path = "config/config_mamba.yml"
-else:
-    config_path = CONFIG_PATH_DEFAULT
-
 
 if __name__ == "__main__":
+    config_path = get_config(args)
+
     with open(config_path, 'r') as file:
         config = Box(yaml.safe_load(file))
 

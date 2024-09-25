@@ -51,6 +51,26 @@ def get_timestamp():
     return datetime.datetime.now().strftime('%Y-%m-%d-%H-%M')
 
 
+def get_config(args, default="config/config_baseline.yml"):
+    if args.custom_path:
+        return args.custom_path
+    if args.dummy:
+        return "config/config_dummy.yml"
+    elif args.baseline:
+        return "config/config_baseline.yml"
+    elif args.gru:
+        return "config/config_gru.yml"
+    elif args.lstm:
+        return "config/config_lstm.yml"
+    elif args.xlstm:
+        return "config/config_xlstm.yml"
+    elif args.transformer:
+        return "config/config_transformer.yml"
+    elif args.mamba:
+        return "config/config_mamba.yml"
+    else:
+        return default
+
 def check_path_exists(file_path, create_unique=False):
     logger = setup_logger()
 
