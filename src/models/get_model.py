@@ -4,6 +4,7 @@ from box import Box
 from models.baseline.model_baseline import ModelBaseline
 from models.dummy.model_dummy import ModelDummy
 from models.rnn.model_rnn import ModelRNN
+from models.xlstm.model_xlstm import ModelXLSTM
 
 
 def get_model(config: Box, device: torch.device, logger=None):
@@ -21,8 +22,7 @@ def get_model(config: Box, device: torch.device, logger=None):
         return ModelRNN(config, device, model="lstm").to(device)
     elif config.model == "xlstm":
         if logger: logger.info("Using xLSTM model")
-        # TODO
-        raise NotImplementedError("XLSTM model not implemented yet")
+        return ModelXLSTM(config, device).to(device)
     elif config.model == "mamba":
         if logger: logger.info("Using Mamba model")
         # TODO
