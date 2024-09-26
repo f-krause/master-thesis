@@ -15,8 +15,8 @@ parser.add_argument('-b', "--baseline", help="Use baseline config", action="stor
 parser.add_argument('-l', "--lstm", help="Use lstm config", action="store_true")
 parser.add_argument('-g', "--gru", help="Use gru config", action="store_true")
 parser.add_argument('-x', "--xlstm", help="Use xlstm config", action="store_true")
-parser.add_argument('-t', "--transformer", help="Use transformer config", action="store_true")
 parser.add_argument('-m', "--mamba", help="Use mamba config", action="store_true")
+parser.add_argument('-t', "--transformer", help="Use transformer config", action="store_true")
 
 args = parser.parse_args()
 
