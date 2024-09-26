@@ -11,7 +11,7 @@ used in DAP 2024 on university servers
 ## Set up environment
 Create virtual environment with mamba/conda
 ```shell
-mamba env create -f environment_linux.yml
+mamba env create -f environment_files/environment_linux_py3.10.yml
 mamba activate master-env
 ```
 
@@ -60,12 +60,12 @@ Data path
 
 Export environment dependencies
 ```shell
-mamba env export -n master-env > environment_linux.yml
+mamba env export -n master-env > environment_files/environment_linux_py3.10.yml
 ```
 
 Update environment dependencies
 ```shell
-mamba env update -n master-env -f environment_linux.yml
+mamba env update -n master-env -f environment_files/environment_linux_py3.9.yml
 ```
 
 Count files in a directory
