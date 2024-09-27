@@ -1,10 +1,10 @@
 import torch
 from box import Box
 
-from models.baseline.model_baseline import ModelBaseline
-from models.dummy.model_dummy import ModelDummy
-from models.rnn.model_rnn import ModelRNN
-from models.xlstm.model_xlstm import ModelXLSTM
+from models.baseline.baseline import ModelBaseline
+from models.dummy.dummy import ModelDummy
+from models.rnn.rnn import ModelRNN
+from models.xlstm.xlstm import ModelXLSTM
 
 
 def get_model(config: Box, device: torch.device, logger=None):
