@@ -51,23 +51,23 @@ def get_timestamp():
     return datetime.datetime.now().strftime('%Y-%m-%d-%H-%M')
 
 
-def get_config(args, default="config/config_baseline.yml"):
+def get_config(args, default="config/baseline.yml"):
     if args.custom_path:
         return args.custom_path
     if args.dummy:
-        return "config/config_dummy.yml"
+        return "config/dummy.yml"
     elif args.baseline:
-        return "config/config_baseline.yml"
+        return "config/baseline.yml"
     elif args.gru:
-        return "config/config_gru.yml"
+        return "config/gru.yml"
     elif args.lstm:
-        return "config/config_lstm.yml"
+        return "config/lstm.yml"
     elif args.xlstm:
-        return "config/config_xlstm.yml"
+        return "config/xlstm.yml"
     elif args.transformer:
-        return "config/config_transformer.yml"
+        return "config/transformer.yml"
     elif args.mamba:
-        return "config/config_mamba.yml"
+        return "config/mamba.yml"
     else:
         return default
 

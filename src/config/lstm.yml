@@ -1,5 +1,5 @@
 # Paths
-subproject: "dev_lstm/delete_me"
+subproject: "dev_lstm/test_250_2"
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 
@@ -11,7 +11,7 @@ seed: 2024
 max_seq_length: 1000  # later to 8000
 
 # Training
-epochs: 10
+epochs: 250
 save_freq: 25
 val_freq: 10
 warmup: 50
@@ -21,9 +21,9 @@ num_workers: 1
 # Model
 model: "lstm"
 dim_embedding_token: 32  # 64 codons or 4 nucleotides
-dropout: 0.0
-bidirectional: True
-rnn_hidden_size: 128
+dropout: 0.2
+bidirectional: False
+rnn_hidden_size: 256
 out_hidden_size: 64
 output: 1
 num_layers: 2
@@ -32,5 +32,5 @@ num_layers: 2
 # Optimizer
 optimizer:
   name: adam
-  lr: 0.001
+  lr: 0.0001
   momentum: 0.9
