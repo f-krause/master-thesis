@@ -1,4 +1,6 @@
-# TODO try out jamba, otherwise uninstall "pip uninstall jamba" (a lot of packages)
+# TODO try out jamba
+#  otherwise uninstall "pip uninstall jamba" (pip install jamba installed (and uninstalled) a lot of packages)
+
 
 import torch
 import torch.nn as nn
