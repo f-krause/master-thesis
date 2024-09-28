@@ -1,9 +1,11 @@
 import torch
 import torch.nn as nn
+from torch import Tensor
 from box import Box
 from knowledge_db import TISSUES, CODON_MAP_DNA
+
+from models.predictor import Predictor
 from mamba_ssm import Mamba2, Mamba
-from jamba.model import Jamba
 
 
 class ModelMamba(nn.Module):
@@ -33,13 +35,9 @@ class ModelMamba(nn.Module):
         ).to(self.device)
 
         # Predictor network
-        self.predictor = nn.Sequential(
-            nn.Linear(self.embedding_dim, config.out_hidden_size),
-            nn.ELU(),  # TODO other activation function?
-            nn.Linear(config.out_hidden_size, 1),
-        )
+        self.predictor = Predictor(self.embedding_dim, config.out_hidden_size).to(self.device)
 
-    def forward(self, inputs):
+    def forward(self, inputs: Tensor) -> Tensor:
         rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
         tissue_id = torch.tensor(tissue_id).to(self.device)
         rna_data_pad = rna_data_pad.to(self.device)

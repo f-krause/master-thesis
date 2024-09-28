@@ -1,8 +1,10 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+from torch import Tensor
 from box import Box
 from knowledge_db import TISSUES, CODON_MAP_DNA
+
+from models.predictor import Predictor
 
 
 class ModelRNN(nn.Module):
@@ -29,14 +31,10 @@ class ModelRNN(nn.Module):
             self.rnn = nn.GRU(input_size=input_size, hidden_size=config.rnn_hidden_size, num_layers=config.num_layers,
                               bidirectional=config.bidirectional, dropout=config.dropout, batch_first=True)
 
-        self.predictor = nn.Sequential(
-            # nn.LayerNorm(self.n_embd),
-            nn.Linear((int(config.bidirectional) + 1) * config.rnn_hidden_size, config.out_hidden_size),
-            nn.ELU(),
-            nn.Linear(config.out_hidden_size, 1),
-        )
+        predictor = Predictor((int(config.bidirectional) + 1) * config.rnn_hidden_size, config.out_hidden_size)
+        self.predictor = predictor.to(self.device)
 
-    def forward(self, inputs):
+    def forward(self, inputs: Tensor) -> Tensor:
         rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
         tissue_id = torch.tensor(tissue_id).to(self.device)
         rna_data_pad = rna_data_pad.to(self.device)  # (batch_size, padded_seq_length), upper bounded by max length
