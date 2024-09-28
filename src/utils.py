@@ -64,12 +64,15 @@ def get_config(args, default="config/baseline.yml"):
         return "config/lstm.yml"
     elif args.xlstm:
         return "config/xlstm.yml"
-    elif args.transformer:
-        return "config/transformer.yml"
     elif args.mamba:
         return "config/mamba.yml"
+    elif args.jamba:
+        return "config/jamba.yml"
+    elif args.transformer:
+        return "config/transformer.yml"
     else:
-        return default
+        raise ValueError("No config file specified.")
+
 
 def check_path_exists(file_path, create_unique=False):
     logger = setup_logger()
