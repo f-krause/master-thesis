@@ -5,6 +5,8 @@ from models.baseline.baseline import ModelBaseline
 from models.dummy.dummy import ModelDummy
 from models.rnn.rnn import ModelRNN
 from models.xlstm.xlstm import ModelXLSTM
+from models.mamba.mamba import ModelMamba
+from models.transformer.transformer import ModelTransformer
 
 
 def get_model(config: Box, device: torch.device, logger=None):
@@ -25,12 +27,10 @@ def get_model(config: Box, device: torch.device, logger=None):
         return ModelXLSTM(config, device).to(device)
     elif config.model == "mamba":
         if logger: logger.info("Using Mamba model")
-        # TODO
-        raise NotImplementedError("Mamba model not implemented yet")
+        return ModelMamba(config, device).to(device)
     elif config.model == "transformer":
         if logger: logger.info("Using Transformer model")
-        # TODO
-        raise NotImplementedError("Transformer model not implemented yet")
+        return ModelTransformer(config, device).to(device)
     elif config.model == "best":
         if logger: logger.info("Using best model")
         # TODO
