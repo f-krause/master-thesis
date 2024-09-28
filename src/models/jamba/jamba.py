@@ -110,7 +110,7 @@ class ModelJamba(nn.Module):
 
         # Apply Jamba layers
         for layer in self.jamba_layers:
-            x = layer(x) # cuda OOM already with first call of layer()
+            x = layer(x)  # FIXME cuda OOM already with first call of layer()
 
         # Extract outputs corresponding to the last valid time step
         idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, x.size(2)))  # (batch_size, 1, embedding_dim)
