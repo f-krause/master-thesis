@@ -1,0 +1,40 @@
+# Paths
+subproject: "dev_jamba/test_150"
+#subproject: "dev_mamba/delete_me"
+project_path: ""  # optional, project path with data and model weights
+log_file_path: "" # optional
+
+# General
+folding_algorithm: "viennarna"  # options: viennarna, linearfold
+nr_folds: 1  # if 1, will take 20% of the data as validation set
+gpu_id: 0
+seed: 2024
+max_seq_length: 1000  # Should match context_length in Mamba2
+
+# Training
+epochs: 150
+save_freq: 25
+val_freq: 10
+warmup: 0
+batch_size: 32
+num_workers: 1
+
+# Model
+model: "mamba"
+dim_embedding_token: 64  # Embedding dimension for tokens
+tissue_embedding_dim: 64  # Embedding dimension for tissues
+out_hidden_size: 64
+output: 1
+
+# Mamba2 Config
+# Requirement: (dim_embedding_token + tissue_embedding_dim) * expand / headdim = multiple of 8
+d_state: 64   # SSM state expansion factor
+d_conv: 4     # Local convolution width
+expand: 2     # Block expansion factor
+headdim: 32   # for mamba-2
+
+# Optimizer
+optimizer:
+  name: adam
+  lr: 0.0001
+  momentum: 0.9
