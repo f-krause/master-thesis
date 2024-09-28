@@ -1,0 +1,43 @@
+# FIXME Cuda out of memory error!
+
+# Paths
+subproject: "dev_jamba/test_150"
+#subproject: "dev_jamba/delete_me"
+project_path: ""  # optional, project path with data and model weights
+log_file_path: "" # optional
+
+# General
+folding_algorithm: "viennarna"  # options: viennarna, linearfold
+nr_folds: 1  # if 1, will take 20% of the data as validation set
+gpu_id: 0
+seed: 2024
+max_seq_length: 1000  # Should match context_length in Mamba2
+
+# Training
+epochs: 150
+save_freq: 25
+val_freq: 10
+warmup: 0
+batch_size: 16
+num_workers: 1
+
+# Model
+model: "jamba"
+dim_embedding_token: 64  # Embedding dimension for tokens
+tissue_embedding_dim: 32  # Embedding dimension for tissues
+out_hidden_size: 64
+output: 1
+
+# Jamba parameters
+depth: 1
+d_state: 256
+d_conv: 128  # output_dim
+heads: 4
+num_experts: 4
+num_experts_per_token: 2
+
+# Optimizer
+optimizer:
+  name: adam
+  lr: 0.0001
+  momentum: 0.9
