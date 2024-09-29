@@ -1,5 +1,5 @@
 # Paths
-subproject: "dev_xlstm/test_250"
+subproject: "dev_xlstm/test_50"
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 
@@ -11,10 +11,10 @@ seed: 2024
 max_seq_length: 1000  # Should match context_length in xLSTMBlockStack
 
 # Training
-epochs: 250
-save_freq: 25
-val_freq: 10
-warmup: 50
+epochs: 50
+save_freq: 10
+val_freq: 5
+warmup: 0
 batch_size: 32
 num_workers: 1
 
@@ -40,4 +40,3 @@ embedding_dim: 64  # dim_embedding_token + tissue_embedding_dim
 optimizer:
   name: adam
   lr: 0.0001
-  momentum: 0.9
