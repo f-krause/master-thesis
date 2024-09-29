@@ -58,11 +58,15 @@ class ModelRNN(nn.Module):
         elif isinstance(self.rnn, nn.GRU):
             h, _ = self.rnn(x_packed, h0)
         else:
-            raise ValueError("RNN type not supported")
+            raise ValueError(f"RNN type {type(self.rnn)} not supported")
 
         h_unpacked, _ = torch.nn.utils.rnn.pad_packed_sequence(h, batch_first=True, padding_value=0)
 
-        # Prediction based on last hidden state
-        y_pred = self.predictor(h_unpacked[:, -1, :])
+        # Extract outputs corresponding to the last valid time step
+        seq_lengths = torch.tensor(seq_lengths).to(self.device)
+        idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, h_unpacked.size(2)))  # wtf is going on here
+        h_last = h_unpacked.gather(1, idx).squeeze(1)
+
+        y_pred = self.predictor(h_last)
 
         return y_pred
