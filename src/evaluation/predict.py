@@ -88,7 +88,7 @@ def predict():
                 f"MSE:        {mse}\n"
                 f"RMSE:       {rmse}\n"
                 f"RMSE_train: {train_loss}\n"
-                f"R2:         {r2}")
+                f"R2:         {r2}\n")
 
 
 if __name__ == "__main__":
