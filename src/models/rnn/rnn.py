@@ -27,9 +27,10 @@ class ModelRNN(nn.Module):
             self.rnn = nn.LSTM(input_size=input_size, hidden_size=config.rnn_hidden_size, num_layers=config.num_layers,
                                bidirectional=config.bidirectional, dropout=config.dropout, batch_first=True)
         elif model.lower() == "gru":
-            # TODO TEST
             self.rnn = nn.GRU(input_size=input_size, hidden_size=config.rnn_hidden_size, num_layers=config.num_layers,
                               bidirectional=config.bidirectional, dropout=config.dropout, batch_first=True)
+        else:
+            raise ValueError(f"Model {model} not supported: either 'lstm' or 'gru'")
 
         predictor = Predictor((int(config.bidirectional) + 1) * config.rnn_hidden_size, config.out_hidden_size)
         self.predictor = predictor.to(self.device)
