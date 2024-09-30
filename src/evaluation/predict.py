@@ -27,7 +27,7 @@ os.environ["LOG_FILE"] = os.path.join(predictions_path, "log_predict.log")
 logger = setup_logger()
 
 
-def load_model(config: Box, device):
+def load_model(config: Box, device, train_loss=False):
     checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], "runs", config.subproject, weights_folder)
 
     model = get_model(config, device, logger)
@@ -38,9 +38,12 @@ def load_model(config: Box, device):
         losses = pd.read_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
         losses = losses[~losses.stored.isna()]
         best_epoch = int(losses.loc[losses.val_loss.idxmin(), "epoch"])
+        train_loss = losses.loc[losses.val_loss.idxmin(), "train_loss"]
         data = torch.load(os.path.join(checkpoint_path, f'checkpoint_{best_epoch}_fold-{fold}.pth.tar'))
         model.load_state_dict(data['state_dict'])
 
+    if train_loss:
+        return model, train_loss
     return model
 
 
@@ -49,7 +52,7 @@ def predict():
     _, data_loader = get_data_loaders(config, 1)  # FIXME later test data loader
 
     device = get_device(config, logger)
-    avg_model = load_model(config, device)
+    avg_model, train_loss = load_model(config, device, train_loss=True)
 
     # predict
     predictions = []
@@ -78,7 +81,14 @@ def predict():
     rmse = root_mean_squared_error(targets, predictions)
     r2 = r2_score(targets, predictions)
 
-    logger.info(f"MAE: {mae}, MSE: {mse}, RMSE: {rmse}, R2: {r2}")
+    logger.info(f"MAE: {mae}, MSE: {mse}, RMSE: {rmse}, RMSE_train: {train_loss}, R2: {r2}")
+
+    with open(os.path.join(predictions_path, "evaluation_metrics.txt"), "w") as f:
+        f.write(f"MAE:        {mae}\n"
+                f"MSE:        {mse}\n"
+                f"RMSE:       {rmse}\n"
+                f"RMSE_train: {train_loss}\n"
+                f"R2:         {r2}\n")
 
 
 if __name__ == "__main__":
