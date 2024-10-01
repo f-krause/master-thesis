@@ -1,5 +1,5 @@
 # Paths
-subproject: "dev_transformer/test_250"
+subproject: "dev_transformer/v2_test_150"
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 
@@ -36,4 +36,3 @@ activation: "gelu"
 optimizer:
   name: adam
   lr: 0.0001
-  momentum: 0.9

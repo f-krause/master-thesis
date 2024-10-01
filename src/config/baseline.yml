@@ -1,5 +1,5 @@
 # Paths
-subproject: "dev_baseline/test_run_300_3"
+subproject: "dev_baseline/v2_test_200"
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 
@@ -11,10 +11,10 @@ seed: 2024
 max_seq_length: 1000  # later to 8000
 
 # Training
-epochs: 250
+epochs: 200
 save_freq: 25
 val_freq: 10
-warmup: 50
+warmup: 25
 batch_size: 32
 num_workers: 1
 
@@ -28,4 +28,3 @@ hidden_size: 512
 optimizer:
   name: adam
   lr: 0.001
-  momentum: 0.9

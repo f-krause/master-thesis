@@ -1,6 +1,5 @@
 # Paths
-subproject: "dev_jamba/test_150"
-#subproject: "dev_mamba/delete_me"
+subproject: "dev_mamba/v2_test_150"
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 
