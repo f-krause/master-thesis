@@ -1,5 +1,3 @@
-# TODO move to evaluate.py
-
 import os
 import torch
 import yaml
@@ -43,7 +41,7 @@ def load_model(config: Box, device, train_loss=False):
         model.load_state_dict(data['state_dict'])
 
     if train_loss:
-        return model, train_loss
+        return model, train_loss, best_epoch
     return model
 
 
@@ -52,7 +50,7 @@ def predict():
     _, data_loader = get_data_loaders(config, 1)  # FIXME later test data loader
 
     device = get_device(config, logger)
-    avg_model, train_loss = load_model(config, device, train_loss=True)
+    avg_model, train_loss, best_epoch = load_model(config, device, train_loss=True)
 
     # predict
     predictions = []
@@ -81,14 +79,15 @@ def predict():
     rmse = root_mean_squared_error(targets, predictions)
     r2 = r2_score(targets, predictions)
 
-    logger.info(f"MAE: {mae}, MSE: {mse}, RMSE: {rmse}, RMSE_train: {train_loss}, R2: {r2}")
+    logger.info(f"MAE: {mae}, MSE: {mse}, RMSE: {rmse}, RMSE_train: {train_loss}, R2: {r2}, best epoch: {best_epoch}")
 
     with open(os.path.join(predictions_path, "evaluation_metrics.txt"), "w") as f:
         f.write(f"MAE:        {mae}\n"
                 f"MSE:        {mse}\n"
                 f"RMSE:       {rmse}\n"
                 f"RMSE_train: {train_loss}\n"
-                f"R2:         {r2}\n")
+                f"R2:         {r2}\n"
+                f"Best epoch: {best_epoch}\n")
 
 
 if __name__ == "__main__":
