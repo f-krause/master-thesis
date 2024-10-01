@@ -36,6 +36,8 @@ class ModelMamba(nn.Module):
 
         # Predictor network
         self.predictor = Predictor(self.embedding_dim, config.out_hidden_size).to(self.device)
+        # self.predictor = Predictor(self.embedding_dim + self.tissue_embedding_dim, config.out_hidden_size).to(
+        #     self.device)
 
     def forward(self, inputs: Tensor) -> Tensor:
         rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
@@ -67,7 +69,9 @@ class ModelMamba(nn.Module):
         idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, out.size(2)))  # (batch_size, 1, embedding_dim)
         out_last = out.gather(1, idx).squeeze(1)  # (batch_size, embedding_dim)
 
-        # Prediction
+        # combined_features = torch.cat((out_last, tissue_embedding), dim=1)  # add tissue embedding to output
+        # seemed to worsen results
+
         y_pred = self.predictor(out_last)
 
         return y_pred
