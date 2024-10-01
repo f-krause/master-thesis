@@ -14,7 +14,7 @@ class Predictor(nn.Module):
         super().__init__()
 
         self.predictor = nn.Sequential(
-            # nn.LayerNorm(input_size),  # TODO layer norm?
+            nn.LayerNorm(input_size),
             nn.Linear(input_size, hidden_size),
             nn.ELU(),  # TODO other activation function?
             nn.Linear(hidden_size, 1),
