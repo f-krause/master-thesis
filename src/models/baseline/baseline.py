@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from box import Box
+from omegaconf import OmegaConf
 from knowledge_db import TISSUES, CODON_MAP_DNA
 
 
 class ModelBaseline(nn.Module):
-    def __init__(self, config: Box, device: torch.device, pooling_dim=1024):
+    def __init__(self, config: OmegaConf, device: torch.device, pooling_dim=1024):
         super(ModelBaseline, self).__init__()
 
         self.device = device

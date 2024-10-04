@@ -1,8 +1,8 @@
 import torch
-from box import Box
+from omegaconf import OmegaConf
 
 
-def get_model(config: Box, device: torch.device, logger=None):
+def get_model(config: OmegaConf, device: torch.device, logger=None):
     if config.model == "dummy":
         if logger: logger.warning("Using dummy model")
         from models.dummy.dummy import ModelDummy

@@ -3,7 +3,7 @@ import json
 import pickle
 import torch
 import numpy as np
-from box import Box
+from omegaconf import OmegaConf
 
 MAX_SEQ_LENGTH = 1000  # Maximum sequence length (nr of bases of whole mRNA)
 MAX_DATA = 1000
@@ -13,7 +13,7 @@ TOKENS_STRUC = '().'
 TOKENS_LOOP = 'BEHIMSX'
 
 
-def get_train_data_file(config: Box, return_dict=False):
+def get_train_data_file(config: OmegaConf, return_dict=False):
     with open(os.path.join(os.environ["PROJECT_PATH"], "data/ptr_data/ptr_data.pkl"), 'rb') as f:
         raw_data = pickle.load(f)
 
@@ -65,7 +65,7 @@ def get_train_data_file(config: Box, return_dict=False):
     # TODO: Implement test data creation
 
 
-def _get_structure_pred(identifier: str, config: Box):
+def _get_structure_pred(identifier: str, config: OmegaConf):
     try:
         with open(os.path.join(os.environ["PROJECT_PATH"],
                                f"data/sec_struc/{identifier}-{config.folding_algorithm}.json"), 'r') as f:

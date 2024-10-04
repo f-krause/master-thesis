@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torch import Tensor
-from box import Box
+from omegaconf import OmegaConf
 from knowledge_db import TISSUES, CODON_MAP_DNA
 
 from models.predictor import Predictor
@@ -9,7 +9,7 @@ from mamba_ssm import Mamba2, Mamba
 
 
 class ModelMamba(nn.Module):
-    def __init__(self, config: Box, device: torch.device):
+    def __init__(self, config: OmegaConf, device: torch.device):
         super(ModelMamba, self).__init__()
 
         self.device = device

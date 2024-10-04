@@ -5,7 +5,7 @@ import time
 import pandas as pd
 from tqdm import tqdm
 from log.logger import setup_logger
-from box import Box
+from omegaconf import OmegaConf
 
 from utils import save_checkpoint, mkdir, check_path_exists, get_device
 from models.get_model import get_model
@@ -13,7 +13,7 @@ from data_handling.data_loader import get_data_loaders
 from training.optimizer import get_optimizer
 
 
-def train_fold(config: Box, fold: int = 0):
+def train_fold(config: OmegaConf, fold: int = 0):
     logger = setup_logger()
 
     # Initialize Aim run
@@ -100,7 +100,7 @@ def train_fold(config: Box, fold: int = 0):
     logger.info(f"Weights path: {checkpoint_path}")
 
 
-def train(config: Box):
+def train(config: OmegaConf):
     # TODO possibility of parallelization across folds!
     for fold in range(config.nr_folds):
         train_fold(config, fold)

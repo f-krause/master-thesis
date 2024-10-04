@@ -1,7 +1,7 @@
 import os
 import torch
 import pickle
-from box import Box
+from omegaconf import OmegaConf
 import numpy as np
 from sklearn.model_selection import StratifiedKFold, KFold, train_test_split
 from torch.utils.data import DataLoader
@@ -11,7 +11,7 @@ TOKENS = 'ACGT().BEHIMSX'
 
 
 class RNADataset(torch.utils.data.Dataset):
-    def __init__(self, config: Box, fold: int, train: bool = True):
+    def __init__(self, config: OmegaConf, fold: int, train: bool = True):
         self.rna_data = None
         self.tissue_ids = None
         self.targets = None
@@ -70,7 +70,7 @@ def _pad_sequences(batch):
     return [rna_data_padded, tissue_ids, seq_lengths], torch.tensor(targets)
 
 
-def get_data_loaders(config: Box, fold: int):
+def get_data_loaders(config: OmegaConf, fold: int):
     train_dataset = RNADataset(config, fold, train=True)
     val_dataset = RNADataset(config, fold, train=False)
 

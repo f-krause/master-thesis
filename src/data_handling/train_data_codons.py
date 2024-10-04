@@ -3,7 +3,7 @@ import json
 import pickle
 import torch
 import numpy as np
-from box import Box
+from omegaconf import OmegaConf
 
 from knowledge_db import CODON_MAP_DNA  # FIXME check why data has DNA and not RNA codons (T instead of U)!
 
@@ -12,7 +12,7 @@ MAX_SEQ_LENGTH = 3000  # Maximum number of codons in CDS
 MAX_DATA = 1000
 
 
-def get_train_data_file(config: Box, return_dict=False):
+def get_train_data_file(config: OmegaConf, return_dict=False):
     with open(os.path.join(os.environ["PROJECT_PATH"], "data/ptr_data/ptr_data.pkl"), 'rb') as f:
         raw_data = pickle.load(f)
 
@@ -60,7 +60,7 @@ def get_train_data_file(config: Box, return_dict=False):
     # TODO: Implement test data creation
 
 
-def _get_structure_pred(identifier: str, config: Box):
+def _get_structure_pred(identifier: str, config: OmegaConf):
     try:
         with open(os.path.join(os.environ["PROJECT_PATH"],
                                f"data/sec_struc/{identifier}-{config.folding_algorithm}.json"), 'r') as f:
@@ -73,7 +73,7 @@ def _get_structure_pred(identifier: str, config: Box):
 if __name__ == '__main__':
     from utils import set_project_path, set_log_file
 
-    dev_config = Box({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
+    dev_config = OmegaConf.create({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
                       "batch_size": 32, "num_workers": 4})
     set_project_path(dev_config)
     get_train_data_file(dev_config)

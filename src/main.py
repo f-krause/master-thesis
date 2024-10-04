@@ -1,7 +1,6 @@
 import os
-import yaml
 import argparse
-from box import Box
+from omegaconf import OmegaConf
 
 from training import train, tuning
 from log.logger import setup_logger
@@ -25,8 +24,7 @@ args = parser.parse_args()
 if __name__ == "__main__":
     config_path = get_config(args)
 
-    with open(config_path, 'r') as file:
-        config = Box(yaml.safe_load(file))
+    config = OmegaConf.load(config_path)
 
     set_project_path(config)
     set_log_file(config)

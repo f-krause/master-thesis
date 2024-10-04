@@ -3,14 +3,14 @@ import datetime
 import platform
 import torch
 from log.logger import setup_logger
-from box import Box
+from omegaconf import OmegaConf
 
 
 def mkdir(path: str):
     os.makedirs(path, exist_ok=True)
 
 
-def set_log_file(config: Box, predict=False):
+def set_log_file(config: OmegaConf, predict=False):
     if predict:
         log_file_name = f"log_predict_{get_timestamp()}.log"
     else:
@@ -24,7 +24,7 @@ def set_log_file(config: Box, predict=False):
         mkdir(config.log_file_path)
 
 
-def set_project_path(config: Box):
+def set_project_path(config: OmegaConf):
     if config.project_path:
         project_path = config.project_path
     elif platform.node() == "Felix-PC":
@@ -94,7 +94,7 @@ def save_checkpoint(state, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
 
 
-def get_device(config: Box, logger=None):
+def get_device(config: OmegaConf, logger=None):
     if logger:
         logger.info(f"Devices found for training: "
                     f"{[(i, torch.cuda.get_device_name(i)) for i in range(torch.cuda.device_count())]}")

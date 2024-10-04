@@ -3,7 +3,7 @@ import torch
 import yaml
 import pandas as pd
 import numpy as np
-from box import Box
+from omegaconf import OmegaConf
 from tqdm import tqdm
 from sklearn.metrics import mean_absolute_error, mean_squared_error, root_mean_squared_error, r2_score
 
@@ -15,8 +15,7 @@ from data_handling.data_loader import get_data_loaders
 CONFIG_PATH = "config/config_template.yml"
 weights_folder = "weights"
 
-with open(CONFIG_PATH, 'r') as file:
-    config = Box(yaml.safe_load(file))
+config = OmegaConf.load(CONFIG_PATH)
 
 set_project_path(config)
 predictions_path = os.path.join(os.environ["PROJECT_PATH"], "runs", config.subproject, "predictions")
@@ -25,7 +24,7 @@ os.environ["LOG_FILE"] = os.path.join(predictions_path, "log_predict.log")
 logger = setup_logger()
 
 
-def load_model(config: Box, device, train_loss=False):
+def load_model(config: OmegaConf, device, train_loss=False):
     checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], "runs", config.subproject, weights_folder)
 
     model = get_model(config, device, logger)
