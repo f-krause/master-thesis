@@ -70,9 +70,6 @@ class ModelTransformer(nn.Module):
 
     def forward(self, inputs: Tensor) -> Tensor:
         rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
-        rna_data_pad = rna_data_pad.to(self.device)
-        tissue_id = torch.tensor(tissue_id).to(self.device)
-        seq_lengths = torch.tensor(seq_lengths).to(self.device)
 
         # Embedding layers
         tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, tissue_embedding_dim)
@@ -85,7 +82,7 @@ class ModelTransformer(nn.Module):
         combined_embedding = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)  # (batch_size, seq_len, embedding_dim)
 
         # Apply positional encoding
-        combined_embedding = self.positional_encoding(combined_embedding)  #(batch_size, seq_len, embedding_dim)
+        combined_embedding = self.positional_encoding(combined_embedding)  # (batch_size, seq_len, embedding_dim)
 
         # Create attention mask (batch_size, seq_len)
         attention_mask = (rna_data_pad == 0)

@@ -36,9 +36,7 @@ class ModelBaseline(nn.Module):
         #                      hidden_size)
 
     def forward(self, inputs):
-        rna_data, tissue_id = inputs[0], inputs[1]
-        tissue_id = torch.tensor(tissue_id).to(self.device)
-        rna_data = rna_data.to(self.device)  # (batch_size, padded_seq_length), upper bounded by max length
+        rna_data, tissue_id = inputs[0], inputs[1]  # (batch_size, padded_seq_length), upper bounded by max length
 
         rna_data_pad = F.pad(rna_data, (0, self.max_seq_length - rna_data.size(1)), value=0)
 

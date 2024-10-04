@@ -68,11 +68,7 @@ class ModelXLSTM(nn.Module):
 
     def forward(self, inputs: Tensor) -> Tensor:
         rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
-        rna_data_pad = rna_data_pad.to(self.device)
-        tissue_id = torch.tensor(tissue_id).to(self.device)
-        seq_lengths = torch.tensor(seq_lengths).to(self.device)
 
-        # Embedding layers
         tissue_embedding = self.tissue_encoder(tissue_id)
         seq_embedding = self.seq_encoder(rna_data_pad)
 

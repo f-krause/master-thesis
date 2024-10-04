@@ -45,7 +45,7 @@ def train_fold(config: OmegaConf, fold: int = 0):
         running_loss = 0.0
         for batch_idx, (data, target) in enumerate(tqdm(train_loader)):
             # data and target are lists
-            # data = data.to(device)
+            data = [d.to(device) for d in data]
             target = target.to(device)
             optimizer.zero_grad()
             output = model(data)
