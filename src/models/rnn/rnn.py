@@ -32,8 +32,7 @@ class ModelRNN(nn.Module):
         else:
             raise ValueError(f"Model {model} not supported: either 'lstm' or 'gru'")
 
-        predictor = Predictor((int(config.bidirectional) + 1) * config.rnn_hidden_size + config.rnn_hidden_size,
-                              config.out_hidden_size)
+        predictor = Predictor((int(config.bidirectional) + 1) * config.rnn_hidden_size, config.out_hidden_size)
         self.predictor = predictor.to(self.device)
 
     def forward(self, inputs: Tensor) -> Tensor:
@@ -69,8 +68,6 @@ class ModelRNN(nn.Module):
         idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, h_unpacked.size(2)))  # wtf is going on here
         h_last = h_unpacked.gather(1, idx).squeeze(1)
 
-        combined_features = torch.cat((h_last, tissue_embedding), dim=1)  # add tissue embedding to output
-
-        y_pred = self.predictor(combined_features)
+        y_pred = self.predictor(h_last)
 
         return y_pred
