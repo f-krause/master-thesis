@@ -1,6 +1,12 @@
-# Master Thesis Repo
+# Master Thesis Repo (DOC v2)
 
 Main Repository for Data Science Master Thesis at University of Vienna 2024
+
+## NOTE
+This branch is a documentation of the v2 runs (as in miro) conducted in September 2024 using a max sequence length of 1000 and 1000 samples for first testing of model functionality.
+
+Stored for reference and documentation purposes.
+
 
 ## Link selection
 
