@@ -8,7 +8,7 @@ from box import Box
 from knowledge_db import CODON_MAP_DNA  # FIXME check why data has DNA and not RNA codons (T instead of U)!
 
 
-MAX_SEQ_LENGTH = 1000  # Maximum number of codons in CDS
+MAX_SEQ_LENGTH = 3000  # Maximum number of codons in CDS
 MAX_DATA = 1000
 
 
@@ -20,7 +20,6 @@ def get_train_data_file(config: Box, return_dict=False):
     targets = []
     target_ids = []
 
-    counter = 0
     for identifier, content in raw_data.items():
         sequence = content['fasta']
 
@@ -55,7 +54,7 @@ def get_train_data_file(config: Box, return_dict=False):
         if len(rna_data) >= MAX_DATA:
             break
 
-    with open(os.path.join(os.environ["PROJECT_PATH"], "data/train_data/dev_train_data_1000.pkl"), 'wb') as f:
+    with open(os.path.join(os.environ["PROJECT_PATH"], "data/train_data/dev_train_data_1000_max_length.pkl"), 'wb') as f:
         pickle.dump([rna_data, torch.tensor(target_ids), torch.tensor(targets)], f)
 
     # TODO: Implement test data creation

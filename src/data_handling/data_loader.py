@@ -24,8 +24,8 @@ class RNADataset(torch.utils.data.Dataset):
             tissue_ids_full = np.random.choice(range(10), 100)
             targets_full = torch.rand(100, 1)
         else:
-            with open(os.path.join(os.environ["PROJECT_PATH"], "data/train_data/dev_train_data_1000.pkl"), 'rb') as f:
-                logger.warning("LOADING SMALL DEV TRAINING DATA")  # TODO
+            with open(os.path.join(os.environ["PROJECT_PATH"], "data/train_data/dev_train_data_1000_max_length.pkl"), 'rb') as f:
+                logger.warning("LOADING SMALL DEV TRAINING DATA WITH MAX SEQ LENGTH")  # TODO
                 rna_data_full, tissue_ids_full, targets_full = pickle.load(f)  # n x 3, n, n
 
         train_indices, val_indices = self._get_train_val_indices(rna_data_full, targets_full, fold, config.seed,

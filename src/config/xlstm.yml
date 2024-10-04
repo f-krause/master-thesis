@@ -9,7 +9,7 @@ folding_algorithm: "viennarna"  # options: viennarna, linearfold
 nr_folds: 1  # if 1, will take 20% of the data as validation set
 gpu_id: 0
 seed: 2024
-max_seq_length: 1000  # Should match context_length in xLSTMBlockStack
+max_seq_length: 3000  # Should match context_length in xLSTMBlockStack
 
 # Training
 epochs: 150
