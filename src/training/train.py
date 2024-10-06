@@ -1,7 +1,7 @@
 import os
 import torch
 import time
-# import aim  # https://aimstack.io/#demos
+import aim  # https://aimstack.io/#demos
 import pandas as pd
 from tqdm import tqdm
 from log.logger import setup_logger
@@ -17,8 +17,8 @@ def train_fold(config: OmegaConf, fold: int = 0):
     logger = setup_logger()
 
     # Initialize Aim run
-    # aim_run = aim.Run()
-    # aim_run.set_params(config.to_dict(), name='config')
+    aim_run = aim.Run(experiment=config.subproject, repo="~/master-thesis", log_system_params=True)
+    aim_run['model_config'] = OmegaConf.to_container(config)
 
     # gpu selection
     device = get_device(config, logger)
@@ -40,11 +40,9 @@ def train_fold(config: OmegaConf, fold: int = 0):
     logger.info("Starting training")
     start_time = time.time()
     for epoch in range(1, config.epochs + 1):
-        # Training
         model.train()
         running_loss = 0.0
         for batch_idx, (data, target) in enumerate(tqdm(train_loader)):
-            # data and target are lists
             data = [d.to(device) for d in data]
             target = target.to(device)
             optimizer.zero_grad()
@@ -56,10 +54,9 @@ def train_fold(config: OmegaConf, fold: int = 0):
 
         train_loss = running_loss / len(train_loader)
         losses[epoch] = {"epoch": epoch, "train_loss": train_loss}
-        logger.info(f'Epoch {epoch}, Loss: {train_loss}')
 
-        # Log training loss to Aim
-        # aim_run.track(train_loss, name='train_loss', epoch=epoch)
+        logger.info(f'Epoch {epoch}, Loss: {train_loss}')
+        aim_run.track(train_loss, name='train_loss', epoch=epoch)
 
         # Validation
         if ((epoch % config.val_freq == 0 or epoch % config.save_freq == 0 or epoch == config.epochs)
@@ -76,10 +73,9 @@ def train_fold(config: OmegaConf, fold: int = 0):
                     val_loss += loss.item()
             val_loss /= len(val_loader)
             losses[epoch].update({"val_loss": val_loss})
-            logger.info(f'Validation loss: {val_loss}')
 
-            # Log validation loss to Aim
-            # aim_run.track(val_loss, name='val_loss', epoch=epoch)
+            logger.info(f'Validation loss: {val_loss}')
+            aim_run.track(val_loss, name='val_loss', epoch=epoch)
 
         # Save checkpoint
         if (epoch % config.save_freq == 0 and epoch >= config.warmup) or epoch == config.epochs:
@@ -90,6 +86,7 @@ def train_fold(config: OmegaConf, fold: int = 0):
             }, filename=os.path.join(checkpoint_path, f'checkpoint_{epoch}_fold-{fold}.pth.tar'))
             losses[epoch].update({"stored": 1})
             logger.info(f'Checkpoint saved at epoch {epoch}')
+            aim_run.track(1, name='stored', epoch=epoch)
 
     end_time = time.time()
 
@@ -97,10 +94,10 @@ def train_fold(config: OmegaConf, fold: int = 0):
     pd.DataFrame(losses).T.to_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
     logger.info(f"Training process completed. Training time: {round((end_time - start_time)/60, 4)} mins.")
     logger.info(f"Weights path: {checkpoint_path}")
+    aim_run.close()
 
 
 def train(config: OmegaConf):
     # TODO possibility of parallelization across folds!
     for fold in range(config.nr_folds):
         train_fold(config, fold)
-        # train_fold(config, 1)  # for development
