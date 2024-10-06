@@ -51,7 +51,7 @@ def get_timestamp():
     return datetime.datetime.now().strftime('%Y-%m-%d-%H-%M')
 
 
-def get_config(args, default="config/baseline.yml"):
+def get_config(args):
     if args.custom_path:
         return args.custom_path
     if args.dummy:
