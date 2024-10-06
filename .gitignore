@@ -1,4 +1,5 @@
 .idea
+.aim
 data
 __pycache__
 src/data_handling/folding_algorithms
