@@ -44,6 +44,7 @@ Install BPP prediction folding algorithms. Follow [arnie tutorial](https://githu
 
 
 ## Command collection
+### SSH connection
 Connect to the university server with the following command:
 ```shell
 ssh krausef99dm@rey.dm.univie.ac.at
@@ -58,6 +59,8 @@ Data path
 /export/share/krausef99dm/
 ```
 
+
+### Environment
 Export environment dependencies
 ```shell
 mamba env export -n master-env > environment_files/environment_linux_py3.10.yml
@@ -68,15 +71,22 @@ Update environment dependencies
 mamba env update -n master-env -f environment_files/environment_linux_py3.9.yml
 ```
 
+### use AIM logging
+```shell
+aim up
+```
+
+```shell
+ssh -f -N -L 43800:localhost:43800 krausef99dm@jyn.dm.univie.ac.at
+```
+
+
+### Other 
 Count files in a directory
 ```shell
 ls -1 | wc -l
 ```
 
-Connect to shh server
-```shell
-ssh krausef99dm@rey.dm.univie.ac.at
-```
 
 ## More
 TBW
