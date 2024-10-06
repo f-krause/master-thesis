@@ -56,6 +56,7 @@ def predict():
     targets = []
     with torch.no_grad():
         for data, target in tqdm(data_loader):
+            data = [d.to(device) for d in data]
             target = target.to(device)
             output = avg_model(data)
             output, target = output.float(), target.float()

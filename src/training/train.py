@@ -68,8 +68,7 @@ def train_fold(config: OmegaConf, fold: int = 0):
             val_loss = 0.0
             with torch.no_grad():
                 for data, target in val_loader:
-                    # data and target are lists
-                    # data = data.to(device)
+                    data = [d.to(device) for d in data]
                     target = target.to(device)
                     output = model(data)
                     output, target = output.squeeze().float(), target.float()
