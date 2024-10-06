@@ -1,5 +1,5 @@
 # Paths
-subproject: "dev/dummy"
+subproject: "dev_dummy/dummy"
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 

@@ -25,7 +25,6 @@ dropout: 0.3
 bidirectional: False
 rnn_hidden_size: 512
 out_hidden_size: 64
-output: 1
 num_layers: 2
 
 
