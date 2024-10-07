@@ -1,5 +1,7 @@
 # TODO try out jamba
-#  otherwise uninstall "pip uninstall jamba" (pip install jamba installed (and uninstalled) a lot of packages)
+#  otherwise uninstall "pip uninstall jamba griffin-torch"
+#  (pip install jamba installed (and uninstalled) a lot of packages)
+
 
 
 import torch
@@ -10,6 +12,7 @@ from knowledge_db import TISSUES, CODON_MAP_DNA
 
 from models.predictor import Predictor
 from jamba.model import JambaBlock
+from griffin_torch.main import GriffinResidualBlock
 
 
 import gc
@@ -69,8 +72,8 @@ class ModelJamba(nn.Module):
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, config.dim_embedding_token, padding_idx=0,
                                         max_norm=self.max_norm)
 
-        # Layers
-        self.jamba_layers = nn.ModuleList(
+        # Jamba Layers
+        self.model_layers = nn.ModuleList(
             [
                 JambaBlock(
                     self.embedding_dim,
@@ -83,6 +86,18 @@ class ModelJamba(nn.Module):
                 for _ in range(config.depth)
             ]
         )
+
+        # Griffin Layers
+        # self.model_layers = nn.ModuleList().to(self.device)
+        # self.model_layers.append(
+        #     GriffinResidualBlock(
+        #         self.embedding_dim,
+        #         2,
+        #         4,
+        #         0.1,
+        #         config.heads,
+        #     ).to(self.device)
+        # )
 
         self.predictor = Predictor(self.embedding_dim, config.out_hidden_size).to(self.device)
 
@@ -107,8 +122,9 @@ class ModelJamba(nn.Module):
         x = combined_embedding.to(self.device)
 
         # Apply Jamba layers
-        for layer in self.jamba_layers:
-            x = layer(x)  # FIXME cuda OOM already with first call of layer()
+        for layer in self.model_layers:
+            x = layer(x)  # Jamba: FIXME cuda OOM already with first call of layer()
+            # x = layer(x) + x  # Griffin: FIXME RuntimeError: Expected all tensors to be on the same device, but found at least two devices, cpu and cuda:0!
 
         # Extract outputs corresponding to the last valid time step
         idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, x.size(2)))  # (batch_size, 1, embedding_dim)
