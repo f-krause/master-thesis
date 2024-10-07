@@ -3,7 +3,7 @@ import json
 import pickle
 import torch
 import numpy as np
-from omegaconf import OmegaConf
+from omegaconf import OmegaConf, DictConfig
 
 MAX_SEQ_LENGTH = 1000  # Maximum sequence length (nr of bases of whole mRNA)
 MAX_DATA = 1000
@@ -13,7 +13,7 @@ TOKENS_STRUC = '().'
 TOKENS_LOOP = 'BEHIMSX'
 
 
-def get_train_data_file(config: OmegaConf, return_dict=False):
+def get_train_data_file(config: DictConfig, return_dict=False):
     with open(os.path.join(os.environ["PROJECT_PATH"], "data/ptr_data/ptr_data.pkl"), 'rb') as f:
         raw_data = pickle.load(f)
 
@@ -65,7 +65,7 @@ def get_train_data_file(config: OmegaConf, return_dict=False):
     # TODO: Implement test data creation
 
 
-def _get_structure_pred(identifier: str, config: OmegaConf):
+def _get_structure_pred(identifier: str, config: DictConfig):
     try:
         with open(os.path.join(os.environ["PROJECT_PATH"],
                                f"data/sec_struc/{identifier}-{config.folding_algorithm}.json"), 'r') as f:
@@ -78,7 +78,7 @@ def _get_structure_pred(identifier: str, config: OmegaConf):
 if __name__ == '__main__':
     from utils import set_project_path, set_log_file
 
-    dev_config = Box({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
+    dev_config = OmegaConf({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
                   "batch_size": 32, "num_workers": 4, "folding_algorithm": FOLDING_ALG})
     set_project_path(dev_config)
     set_log_file(dev_config)

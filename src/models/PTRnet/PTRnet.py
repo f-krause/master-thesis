@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from omegaconf import OmegaConf
+from omegaconf import DictConfig
 from knowledge_db import TISSUES
 
 
 class PTRNet(nn.Module):
-    def __init__(self, config: OmegaConf, device: torch.device, hidden_size=128, pooling_dim=128):
+    def __init__(self, config: DictConfig, device: torch.device, hidden_size=128, pooling_dim=128):
         super(PTRNet, self).__init__()
 
         self.device = device

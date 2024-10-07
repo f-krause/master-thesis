@@ -5,7 +5,7 @@
 import torch
 import torch.nn as nn
 from torch import Tensor
-from omegaconf import OmegaConf
+from omegaconf import DictConfig
 from knowledge_db import TISSUES, CODON_MAP_DNA
 
 from models.predictor import Predictor
@@ -53,7 +53,7 @@ class ModelJamba(nn.Module):
 
     """
 
-    def __init__(self, config: OmegaConf, device: torch.device):
+    def __init__(self, config: DictConfig, device: torch.device):
         super(ModelJamba, self).__init__()
 
         self.device = device

@@ -1,8 +1,8 @@
 import torch.optim as optim
-from omegaconf import OmegaConf
+from omegaconf import DictConfig
 
 
-def get_optimizer(model, optimizer_config: OmegaConf):
+def get_optimizer(model, optimizer_config: DictConfig):
     optimizer_name = optimizer_config.name
 
     if optimizer_name == 'adam':

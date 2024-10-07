@@ -1,7 +1,7 @@
 import os
 import torch
 import pickle
-from omegaconf import OmegaConf
+from omegaconf import OmegaConf, DictConfig
 import numpy as np
 from sklearn.model_selection import StratifiedKFold, KFold, train_test_split
 from torch.utils.data import DataLoader
@@ -11,7 +11,7 @@ TOKENS = 'ACGT().BEHIMSX'
 
 
 class RNADataset(torch.utils.data.Dataset):
-    def __init__(self, config: OmegaConf, fold: int, train: bool = True):
+    def __init__(self, config: DictConfig, fold: int, train: bool = True):
         self.rna_data = None
         self.tissue_ids = None
         self.targets = None
@@ -71,7 +71,7 @@ def _pad_sequences(batch):
     return [rna_data_padded, tissue_ids, seq_lengths], torch.tensor(targets)
 
 
-def get_data_loaders(config: OmegaConf, fold: int):
+def get_data_loaders(config: DictConfig, fold: int):
     train_dataset = RNADataset(config, fold, train=True)
     val_dataset = RNADataset(config, fold, train=False)
 
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     # for debugging
     from utils import set_project_path, set_log_file
 
-    dev_config = Box({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
+    dev_config = OmegaConf({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
                   "batch_size": 32, "num_workers": 4, "folding_algorithm": "viennarna", "seed": 42, "nr_folds": 5})
     set_project_path(dev_config)
     set_log_file(dev_config)

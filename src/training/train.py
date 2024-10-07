@@ -5,7 +5,7 @@ import aim  # https://aimstack.io/#demos
 import pandas as pd
 from tqdm import tqdm
 from log.logger import setup_logger
-from omegaconf import OmegaConf
+from omegaconf import OmegaConf, DictConfig
 
 from utils import save_checkpoint, mkdir, check_path_exists, get_device
 from models.get_model import get_model
@@ -14,7 +14,7 @@ from training.optimizer import get_optimizer
 from evaluation.predict import predict_and_evaluate
 
 
-def train_fold(config: OmegaConf, fold: int = 0):
+def train_fold(config: DictConfig, fold: int = 0):
     logger = setup_logger()
 
     # Initialize Aim run
@@ -99,7 +99,7 @@ def train_fold(config: OmegaConf, fold: int = 0):
     aim_run.close()
 
 
-def train(config: OmegaConf):
+def train(config: DictConfig):
     # TODO possibility of parallelization across folds!
     for fold in range(config.nr_folds):
         train_fold(config, fold)

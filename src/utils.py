@@ -5,14 +5,14 @@ import torch
 import random
 import numpy as np
 from log.logger import setup_logger
-from omegaconf import OmegaConf
+from omegaconf import DictConfig
 
 
 def mkdir(path: str):
     os.makedirs(path, exist_ok=True)
 
 
-def set_log_file(config: OmegaConf, predict=False):
+def set_log_file(config: DictConfig, predict=False):
     if predict:
         log_file_name = f"log_predict_{get_timestamp()}.log"
     else:
@@ -26,7 +26,7 @@ def set_log_file(config: OmegaConf, predict=False):
         mkdir(config.log_file_path)
 
 
-def set_project_path(config: OmegaConf):
+def set_project_path(config: DictConfig):
     if config.project_path:
         project_path = config.project_path
     elif platform.node() == "Felix-PC":
@@ -96,7 +96,7 @@ def save_checkpoint(state, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
 
 
-def get_device(config: OmegaConf, logger=None):
+def get_device(config: DictConfig, logger=None):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(config.gpu_id)
     if logger:
         logger.info(f"Devices found for training: "
