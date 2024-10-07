@@ -11,6 +11,7 @@ from utils import save_checkpoint, mkdir, check_path_exists, get_device
 from models.get_model import get_model
 from data_handling.data_loader import get_data_loaders
 from training.optimizer import get_optimizer
+from evaluation.predict import predict_and_evaluate
 
 
 def train_fold(config: OmegaConf, fold: int = 0):
@@ -93,6 +94,7 @@ def train_fold(config: OmegaConf, fold: int = 0):
     # Save losses to a CSV file
     pd.DataFrame(losses).T.to_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
     logger.info(f"Training process completed. Training time: {round((end_time - start_time)/60, 4)} mins.")
+    if config.final_evaluation: predict_and_evaluate(config, logger)
     logger.info(f"Weights path: {checkpoint_path}")
     aim_run.close()
 

@@ -17,6 +17,7 @@ val_freq: 3
 warmup: 0
 batch_size: 32
 num_workers: 1
+final_evaluation: True
 
 # Model
 model: "dummy" # dummy, baseline, gru, lstm, xlstm, mamba, transformer, best
