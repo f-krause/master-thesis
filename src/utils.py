@@ -2,6 +2,8 @@ import os
 import datetime
 import platform
 import torch
+import random
+import numpy as np
 from log.logger import setup_logger
 from omegaconf import OmegaConf
 
@@ -106,3 +108,13 @@ def get_device(config: OmegaConf, logger=None):
         if device.type == 'cuda':
             logger.info("Using GPU: " + str(config.gpu_id))
     return device
+
+
+def set_seed(seed):
+    """ Set seed for reproducibility """
+    random.seed(seed + 1)
+    np.random.seed(seed + 2)
+    torch.manual_seed(seed + 3)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed + 4)
+        torch.cuda.manual_seed_all(seed + 5)

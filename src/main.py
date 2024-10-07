@@ -4,7 +4,7 @@ from omegaconf import OmegaConf
 
 from training import train, tuning
 from log.logger import setup_logger
-from utils import set_log_file, set_project_path, get_config
+from utils import set_log_file, set_project_path, get_config, set_seed
 
 parser = argparse.ArgumentParser(prog='main.py', description='Trains DL models on mRNA data to predict PTR ratios.')
 
@@ -28,6 +28,7 @@ if __name__ == "__main__":
 
     set_project_path(config)
     set_log_file(config)
+    set_seed(config.seed)
 
     logger = setup_logger()
     logger.info(f"Project path: {os.path.join(os.environ['PROJECT_PATH'], os.environ['SUBPROJECT'])}")
