@@ -16,7 +16,7 @@ save_freq: 25
 val_freq: 10
 warmup: 0
 batch_size: 32
-num_workers: 1
+num_workers: 1  # set 0 for mamba2
 final_evaluation: True
 
 # Model
@@ -31,7 +31,7 @@ output: 1
 d_state: 64   # SSM state expansion factor
 d_conv: 4     # Local convolution width
 expand: 2     # Block expansion factor
-headdim: 32   # for mamba-2
+headdim: 32   # only for mamba2
 
 # Optimizer
 optimizer:
