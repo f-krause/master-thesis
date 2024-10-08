@@ -5,7 +5,7 @@ from omegaconf import DictConfig
 from knowledge_db import TISSUES, CODON_MAP_DNA
 
 from models.predictor import Predictor
-from mamba_ssm import Mamba2, Mamba
+from mamba_ssm import Mamba, Mamba2
 
 
 class ModelMamba(nn.Module):
@@ -25,13 +25,13 @@ class ModelMamba(nn.Module):
                                         max_norm=self.max_norm)
 
         # Mamba model
-        # TODO Mamba2 throws: "Triton Error [CUDA]: device kernel image is invalid"
         self.mamba = Mamba(
+            # This module uses roughly 3 * expand * d_model^2 parameters
             d_model=self.embedding_dim,  # Model dimension d_model
             d_state=config.d_state,  # SSM state expansion factor
             d_conv=config.d_conv,  # Local convolution width
             expand=config.expand,  # Block expansion factor
-            # headdim=config.headdim  #  only for mamba-2
+            # headdim=config.headdim  # TODO only for mamba-2
         ).to(self.device)
 
         # Predictor network
@@ -43,13 +43,11 @@ class ModelMamba(nn.Module):
         tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, tissue_embedding_dim)
         seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, seq_len, dim_embedding_token)
 
-        # Expand tissue embedding to match sequence length
-        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).repeat(1, seq_embedding.size(1),
-                                                                         1)  # (batch_size, seq_len, tissue_embedding_dim)
+        # Expand tissue embedding to match sequence length (batch_size, seq_len, tissue_embedding_dim)
+        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).repeat(1, seq_embedding.size(1), 1)
 
-        # Concatenate sequence embedding and tissue embedding
-        combined_embedding = torch.cat((seq_embedding, tissue_embedding_expanded),
-                                       dim=2)  # (batch_size, seq_len, embedding_dim)
+        # Concat embeddings (batch_size, seq_len, embedding_dim)
+        combined_embedding = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)
 
         # Create attention mask for padding positions
         attention_mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
@@ -58,6 +56,7 @@ class ModelMamba(nn.Module):
         # Apply Mamba2 model
         x = combined_embedding.to(self.device)
         out = self.mamba(x)  # (batch_size, seq_len, embedding_dim)
+        # out = self.mamba(x, cu_seqlens=seq_lengths)  # (batch_size, seq_len, embedding_dim) # TODO for mamba2
 
         # Extract outputs corresponding to the last valid time step
         idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, out.size(2)))  # (batch_size, 1, embedding_dim)
