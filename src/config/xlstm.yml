@@ -13,21 +13,20 @@ seed: 2024
 max_seq_length: 3000  # Should match context_length in xLSTMBlockStack
 
 # Training
-epochs: 150
+epochs: 100
 save_freq: 10
 val_freq: 5
 warmup: 0
 batch_size: 32
 num_workers: 1
 final_evaluation: True
-clean_up_weights: False
+clean_up_weights: True
 
 # Model
 model: "xlstm"
 dim_embedding_token: 32  # Embedding dimension for tokens
 tissue_embedding_dim: 32  # Embedding dimension for tissues
 out_hidden_size: 64
-output: 1
 
 # xLSTM Config
 conv1d_kernel_size: 4

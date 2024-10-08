@@ -12,21 +12,20 @@ seed: 2024
 max_seq_length: 3000  # Should match context_length in Mamba2
 
 # Training
-epochs: 150
-save_freq: 25
-val_freq: 10
+epochs: 100
+save_freq: 10
+val_freq: 5
 warmup: 0
 batch_size: 32
-num_workers: 1  # set 0 for mamba2
+num_workers: 0  # TODO seems faster than 1
 final_evaluation: True
-clean_up_weights: False
+clean_up_weights: True
 
 # Model
 model: "mamba"
 dim_embedding_token: 64  # Embedding dimension for tokens
 tissue_embedding_dim: 64  # Embedding dimension for tissues
 out_hidden_size: 64
-output: 1
 
 # Mamba2 Config
 # Requirement: (dim_embedding_token + tissue_embedding_dim) * expand / headdim = multiple of 8
