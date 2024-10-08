@@ -12,8 +12,16 @@ from log.logger import setup_logger
 from data_handling.data_loader import get_data_loaders
 
 
-def load_model(config: DictConfig, device, logger, full_output=False):
-    checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], "runs", config.subproject, weights_folder)
+def clean_model_weights(best_epoch, fold, checkpoint_path, logger):
+    # Remove all weights except the best one
+    for file in os.listdir(checkpoint_path):
+        if f"checkpoint_{best_epoch}_fold-{fold}" not in file:
+            os.remove(os.path.join(checkpoint_path, file))
+    logger.info(f"Removed all checkpoint weights except the best one: checkpoint_{best_epoch}_fold-{fold}")
+
+
+def load_model(config: DictConfig, subproject, device, logger, full_output=False):
+    checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], subproject, "weights")
 
     model = get_model(config, device, logger)
     model.eval()
@@ -26,6 +34,8 @@ def load_model(config: DictConfig, device, logger, full_output=False):
         best_epoch = int(losses.loc[losses.val_loss.idxmin(), "epoch"])
         train_loss = losses.loc[losses.val_loss.idxmin(), "train_loss"]
         data = torch.load(os.path.join(checkpoint_path, f'checkpoint_{best_epoch}_fold-{fold}.pth.tar'))
+        if config.clean_up_weights:
+            clean_model_weights(best_epoch, fold, checkpoint_path, logger)
         model.load_state_dict(data['state_dict'])
 
     if full_output:
@@ -41,12 +51,12 @@ def evaluate(target, prediction):
     return mae, mse, rmse, r2
 
 
-def predict(config: DictConfig, logger, full_output=False):
+def predict(config: DictConfig, subproject, logger, full_output=False):
     # get test data
     _, data_loader = get_data_loaders(config, 1)  # FIXME later test data loader
 
     device = get_device(config, logger)
-    avg_model, train_loss, best_epoch = load_model(config, device, logger, full_output=True)
+    avg_model, train_loss, best_epoch = load_model(config, subproject, device, logger, full_output=True)
 
     # predict
     predictions = []
@@ -71,11 +81,11 @@ def predict(config: DictConfig, logger, full_output=False):
     return df
 
 
-def predict_and_evaluate(config: DictConfig, logger):
-    prediction_path = os.path.join(os.environ["PROJECT_PATH"], "runs", config.subproject, "predictions")
+def predict_and_evaluate(config: DictConfig, subproject, logger):
+    prediction_path = os.path.join(os.environ["PROJECT_PATH"], subproject, "predictions")
     mkdir(prediction_path)
 
-    preds_df, train_loss, best_epoch = predict(config, logger, full_output=True)
+    preds_df, train_loss, best_epoch = predict(config, subproject, logger, full_output=True)
     preds_df.to_csv(os.path.join(prediction_path, "predictions.csv"))
     logger.info(f"Predictions stored at {prediction_path}")
 
@@ -94,7 +104,6 @@ def predict_and_evaluate(config: DictConfig, logger):
 
 if __name__ == "__main__":
     CONFIG_PATH = "config/mamba.yml"
-    weights_folder = "weights"
 
     custom_config = OmegaConf.load(CONFIG_PATH)
 
@@ -104,4 +113,4 @@ if __name__ == "__main__":
     os.environ["LOG_FILE"] = os.path.join(predictions_path, "log_predict.log")
     custom_logger = setup_logger()
 
-    predict_and_evaluate(custom_config, custom_logger)
+    predict_and_evaluate(custom_config, os.path.join("runs", custom_config.subproject), custom_logger)

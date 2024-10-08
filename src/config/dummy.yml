@@ -19,6 +19,7 @@ warmup: 0
 batch_size: 32
 num_workers: 1
 final_evaluation: False
+clean_up_weights: False
 
 # Model
 model: "dummy" # dummy, baseline, gru, lstm, xlstm, mamba, transformer, best

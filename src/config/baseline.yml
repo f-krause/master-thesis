@@ -19,6 +19,7 @@ warmup: 25
 batch_size: 32
 num_workers: 1
 final_evaluation: True
+clean_up_weights: True
 
 # Model
 model: "baseline"

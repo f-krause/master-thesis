@@ -18,7 +18,8 @@ val_freq: 3
 warmup: 0
 batch_size: 32
 num_workers: 1
-final_evaluation: True
+final_evaluation: True  # if True, will predict and evaluate on the val set after training
+clean_up_weights: False  # if True, will remove weights after training, except for the best checkpoint acc to val loss
 
 # Model
 model: "dummy" # dummy, baseline, gru, lstm, xlstm, mamba, transformer, best
