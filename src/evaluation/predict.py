@@ -33,7 +33,8 @@ def load_model(config: DictConfig, subproject, device, logger, full_output=False
         losses = losses[~losses.stored.isna()]
         best_epoch = int(losses.loc[losses.val_loss.idxmin(), "epoch"])
         train_loss = losses.loc[losses.val_loss.idxmin(), "train_loss"]
-        data = torch.load(os.path.join(checkpoint_path, f'checkpoint_{best_epoch}_fold-{fold}.pth.tar'))
+        data = torch.load(os.path.join(checkpoint_path, f'checkpoint_{best_epoch}_fold-{fold}.pth.tar'),
+                          weights_only=False)
         if config.clean_up_weights:
             clean_model_weights(best_epoch, fold, checkpoint_path, logger)
         model.load_state_dict(data['state_dict'])
