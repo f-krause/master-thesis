@@ -28,4 +28,3 @@ dim_embedding_token: 32  # 64 codons or 4 nucleotides/
 optimizer:
   name: adam
   lr: 0.001
-  momentum: 0.9

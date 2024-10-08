@@ -26,4 +26,3 @@ model: "dummy" # dummy, baseline, gru, lstm, xlstm, mamba, transformer, best
 optimizer:
   name: adam
   lr: 0.001
-  momentum: 0.9

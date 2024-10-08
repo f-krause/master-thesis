@@ -41,4 +41,3 @@ num_experts_per_token: 2
 optimizer:
   name: adam
   lr: 0.0001
-  momentum: 0.9
