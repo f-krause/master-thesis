@@ -11,11 +11,8 @@ from models.get_model import get_model
 from log.logger import setup_logger
 from data_handling.data_loader import get_data_loaders
 
-CONFIG_PATH = "config/baseline.yml"
-weights_folder = "weights"
 
-
-def load_model(config: DictConfig, device, full_output=False):
+def load_model(config: DictConfig, device, logger, full_output=False):
     checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], "runs", config.subproject, weights_folder)
 
     model = get_model(config, device, logger)
@@ -23,6 +20,7 @@ def load_model(config: DictConfig, device, full_output=False):
 
     # later average models: https://git01lab.cs.univie.ac.at/a1142469/dap/-/blob/main/RNAdegformer/src/OpenVaccine/predict.py#L98
     for fold in range(config.nr_folds):
+        # FIXME currently only returning last train_loss and best_epoch
         losses = pd.read_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
         losses = losses[~losses.stored.isna()]
         best_epoch = int(losses.loc[losses.val_loss.idxmin(), "epoch"])
@@ -48,7 +46,7 @@ def predict(config: DictConfig, logger, full_output=False):
     _, data_loader = get_data_loaders(config, 1)  # FIXME later test data loader
 
     device = get_device(config, logger)
-    avg_model, train_loss, best_epoch = load_model(config, device, full_output=True)
+    avg_model, train_loss, best_epoch = load_model(config, device, logger, full_output=True)
 
     # predict
     predictions = []
@@ -74,7 +72,6 @@ def predict(config: DictConfig, logger, full_output=False):
 
 
 def predict_and_evaluate(config: DictConfig, logger):
-
     prediction_path = os.path.join(os.environ["PROJECT_PATH"], "runs", config.subproject, "predictions")
     mkdir(prediction_path)
 
@@ -96,11 +93,15 @@ def predict_and_evaluate(config: DictConfig, logger):
 
 
 if __name__ == "__main__":
-    config = OmegaConf.load(CONFIG_PATH)
+    CONFIG_PATH = "config/mamba.yml"
+    weights_folder = "weights"
 
-    set_project_path(config)
-    predictions_path = os.path.join(os.environ["PROJECT_PATH"], "runs", config.subproject, "predictions")
+    custom_config = OmegaConf.load(CONFIG_PATH)
+
+    set_project_path(custom_config)
+    predictions_path = os.path.join(os.environ["PROJECT_PATH"], "runs", custom_config.subproject, "predictions")
+    mkdir(predictions_path)
     os.environ["LOG_FILE"] = os.path.join(predictions_path, "log_predict.log")
-    logger = setup_logger()
+    custom_logger = setup_logger()
 
-    predict_and_evaluate(config, logger)
+    predict_and_evaluate(custom_config, custom_logger)
