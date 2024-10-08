@@ -60,6 +60,8 @@ class ModelXLSTM(nn.Module):
             num_blocks=config.num_blocks,
             embedding_dim=self.embedding_dim,
             slstm_at=config.slstm_at,
+            bias=config.bias,
+            dropout=config.dropout,
         )
 
         self.xlstm_stack = xLSTMBlockStack(cfg)

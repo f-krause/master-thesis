@@ -37,6 +37,8 @@ proj_factor: 1.3
 act_fn: "gelu"
 num_blocks: 7
 slstm_at: [1]
+bias: True
+dropout: 0.1
 
 # Optimizer
 optimizer:
