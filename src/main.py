@@ -39,6 +39,7 @@ if __name__ == "__main__":
         train.train(config)
     except Exception as e:
         logger.error(f"Error during training: {e}")
+        print("Log file saved at:", os.environ["LOG_FILE"])
         raise e
 
     logger.info("COMPLETED")
