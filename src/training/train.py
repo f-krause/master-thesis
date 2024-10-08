@@ -94,7 +94,9 @@ def train_fold(config: DictConfig, fold: int = 0):
     # Save losses to a CSV file
     pd.DataFrame(losses).T.to_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
     logger.info(f"Training process completed. Training time: {round((end_time - start_time)/60, 4)} mins.")
-    if config.final_evaluation: predict_and_evaluate(config, os.environ["SUBPROJECT"], logger)
+    if config.final_evaluation:
+        logger.info("Starting prediction and evaluation")
+        predict_and_evaluate(config, os.environ["SUBPROJECT"], logger)
     logger.info(f"Weights path: {checkpoint_path}")
     aim_run.close()
 
