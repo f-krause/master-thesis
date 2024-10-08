@@ -6,6 +6,7 @@ import random
 import numpy as np
 from log.logger import setup_logger
 from omegaconf import DictConfig
+from fvcore.nn import FlopCountAnalysis, flop_count_table
 
 
 def mkdir(path: str):
@@ -118,3 +119,17 @@ def set_seed(seed):
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed + 4)
         torch.cuda.manual_seed_all(seed + 5)
+
+
+def get_model_stats(config: DictConfig, model, device, logger):
+    logger.info("Computing model statistics, assuming max_seq_length + tissue.")
+    sample_input = [
+        torch.randint(1, 64, (1, config.max_seq_length)),  # rna_data_padded (batch_size x max_seq_length)
+        torch.randint(29, (1,)),  # tissue_ids (batch_size x 1)
+        torch.randint(1, config.max_seq_length + 1, (1,))  # seq_lengths (batch_size x 1)
+    ]
+    sample_input = [x.to(device) for x in sample_input]
+    flops = FlopCountAnalysis(model, sample_input)
+    logger.info(f"Model: Total parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
+    logger.info(f"Model: FLOPs: {flops.total():.2f}")
+    logger.info(f"Model: FLOPs table: \n{flop_count_table(flops)}")
