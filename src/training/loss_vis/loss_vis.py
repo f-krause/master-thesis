@@ -1,13 +1,14 @@
 import datetime
+import os.path
+
 import pandas as pd
 import matplotlib.pyplot as plt
 
 
-LOSS_FILE = '/export/share/krausef99dm/runs/dev_baseline/test_run_300/weights/losses_fold-0.csv'
+def plot_loss(subproject, run, ylim=1):
+    log_path = os.path.join("/export/share/krausef99dm/runs/", SUBPROJECT, RUN, "weights/losses_fold-0.csv")
 
-
-def plot_loss(log_path, ylim=1):
-    loss_df = pd.read_csv(log_path)
+    loss_df = pd.read_csv(log_path, index_col=0)
     loss_df.columns = ['epoch', 'train_loss', 'val_loss', 'stored']
     val_loss_subset = loss_df[loss_df['val_loss'].notnull()]
 
@@ -25,8 +26,12 @@ def plot_loss(log_path, ylim=1):
 
     now = datetime.datetime.now()
     timestamp = now.strftime("%Y-%m-%d_%H-%M-%S")
-    plt.savefig(f'training/loss_vis/plots/loss_plot_{timestamp}.png')
+    plt.savefig(f'training/loss_vis/plots/loss_plot_{SUBPROJECT}_{RUN}_{timestamp}.png')
 
 
 if __name__ == '__main__':
-    plot_loss(LOSS_FILE, 1)
+    SUBPROJECT = 'dev_xlstm'
+    RUN = '2_test_150'
+    YLIM = 2
+
+    plot_loss(SUBPROJECT, RUN, YLIM)
