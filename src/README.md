@@ -21,7 +21,7 @@ With the possible flags:
 - `-g` or `--gru` to use the GRU config
 - `-x` or `--xlstm` to use the xLSTM config
 - `-m` or `--mamba` to use the Mamba config
-- `-j` or `--jamba` to use the Jamba config
+- `-j` or `--jamba` to use the Jamba config (TODO not working, cuda OOM)
 - `-t` or `--transformer` to use the transformer config
 
 

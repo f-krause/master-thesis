@@ -68,7 +68,7 @@ mamba env export -n master-env > environment_files/environment_linux_py3.10.yml
 
 Update environment dependencies
 ```shell
-mamba env update -n master-env -f environment_files/environment_linux_py3.9.yml
+mamba env update -n master-env -f environment_files/environment_linux_py3.10.yml
 ```
 
 ### use AIM logging
