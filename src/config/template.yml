@@ -1,5 +1,6 @@
 # Paths
 subproject: "dev/run"
+train_data_file: "dev_train_data_1000.pkl" # dev_train_data_1000.pkl or dev_train_data_1000_full_length.pkl
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 
