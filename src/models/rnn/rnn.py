@@ -48,7 +48,7 @@ class ModelRNN(nn.Module):
         c0 = torch.zeros_like(h0)  # (1, batch_size, hidden_dim)
 
         # Packing the sequence
-        x_packed = torch.nn.utils.rnn.pack_padded_sequence(seq_embedding, seq_lengths, batch_first=True,
+        x_packed = torch.nn.utils.rnn.pack_padded_sequence(seq_embedding, seq_lengths.to('cpu'), batch_first=True,
                                                            enforce_sorted=False)
 
         if isinstance(self.rnn, nn.LSTM):
@@ -61,7 +61,6 @@ class ModelRNN(nn.Module):
         h_unpacked, _ = torch.nn.utils.rnn.pad_packed_sequence(h, batch_first=True, padding_value=0)
 
         # Extract outputs corresponding to the last valid time step
-        seq_lengths = torch.tensor(seq_lengths).to(self.device)
         idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, h_unpacked.size(2)))  # wtf is going on here
         h_last = h_unpacked.gather(1, idx).squeeze(1)
 
