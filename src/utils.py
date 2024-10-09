@@ -122,14 +122,19 @@ def set_seed(seed):
 
 
 def get_model_stats(config: DictConfig, model, device, logger):
-    logger.info("Computing model statistics, assuming max_seq_length + tissue.")
+    logger.info("Computing model statistics, assuming input is max codon sequence and tissue type (only).")
     sample_input = [
-        torch.randint(1, 64, (1, config.max_seq_length)),  # rna_data_padded (batch_size x max_seq_length)
+        # rna_data_padded (batch_size x max_seq_length)
+        torch.nn.utils.rnn.pad_sequence(torch.randint(1, 64, (1, config.max_seq_length)), batch_first=True),
         torch.randint(29, (1,)),  # tissue_ids (batch_size x 1)
-        torch.randint(1, config.max_seq_length + 1, (1,))  # seq_lengths (batch_size x 1)
+        torch.tensor([config.max_seq_length], dtype=torch.int64)  # seq_lengths (batch_size x 1)
     ]
+
     sample_input = [x.to(device) for x in sample_input]
     flops = FlopCountAnalysis(model, sample_input)
-    logger.info(f"Model: Total parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
-    logger.info(f"Model: FLOPs: {flops.total():.2f}")
+    nr_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    flops_nr = round(flops.total())
+
+    logger.info(f"Model: Total parameters: {nr_params}")
+    logger.info(f"Model: FLOPs: {flops_nr}")
     logger.info(f"Model: FLOPs table: \n{flop_count_table(flops)}")

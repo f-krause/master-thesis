@@ -7,7 +7,7 @@ from tqdm import tqdm
 from log.logger import setup_logger
 from omegaconf import OmegaConf, DictConfig
 
-from utils import save_checkpoint, mkdir, check_path_exists, get_device
+from utils import save_checkpoint, mkdir, check_path_exists, get_device, get_model_stats
 from models.get_model import get_model
 from data_handling.data_loader import get_data_loaders
 from training.optimizer import get_optimizer
@@ -94,6 +94,8 @@ def train_fold(config: DictConfig, fold: int = 0):
     # Save losses to a CSV file
     pd.DataFrame(losses).T.to_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
     logger.info(f"Training process completed. Training time: {round((end_time - start_time)/60, 4)} mins.")
+    if config.model != "dummy" and config.model != "best":
+        get_model_stats(config, model, device, logger)
     if config.final_evaluation:
         logger.info("Starting prediction and evaluation")
         predict_and_evaluate(config, os.environ["SUBPROJECT"], logger)
