@@ -53,7 +53,8 @@ class ModelXLSTM(nn.Module):
                     bias_init="powerlaw_blockdependent",
                 ),
                 feedforward=FeedForwardConfig(
-                    proj_factor=config.proj_factor, act_fn=config.act_fn
+                    proj_factor=config.proj_factor,
+                    act_fn=config.act_fn
                 ),
             ),
             context_length=config.max_seq_length,
@@ -89,7 +90,7 @@ class ModelXLSTM(nn.Module):
         out = self.xlstm_stack(x)
 
         # Extract outputs corresponding to the last valid time step
-        idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, out.size(2)))  # wtf is going on here
+        idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, out.size(2)))
         out_last = out.gather(1, idx).squeeze(1)
 
         y_pred = self.predictor(out_last)

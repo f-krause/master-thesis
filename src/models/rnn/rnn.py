@@ -61,7 +61,7 @@ class ModelRNN(nn.Module):
         h_unpacked, _ = torch.nn.utils.rnn.pad_packed_sequence(h, batch_first=True, padding_value=0)
 
         # Extract outputs corresponding to the last valid time step
-        idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, h_unpacked.size(2)))  # wtf is going on here
+        idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, h_unpacked.size(2)))
         h_last = h_unpacked.gather(1, idx).squeeze(1)
 
         y_pred = self.predictor(h_last)
