@@ -3,6 +3,7 @@ from omegaconf import DictConfig
 
 
 def get_model(config: DictConfig, device: torch.device, logger=None):
+    # TODO rewrite as match case
     if config.model == "dummy":
         if logger: logger.warning("Using dummy model")
         from models.dummy.dummy import ModelDummy
