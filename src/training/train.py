@@ -9,7 +9,7 @@ from omegaconf import OmegaConf, DictConfig
 
 from utils import save_checkpoint, mkdir, check_path_exists, get_device, get_model_stats
 from models.get_model import get_model
-from data_handling.data_loader import get_data_loaders
+from data_handling.data_loader import get_train_data_loaders
 from training.optimizer import get_optimizer
 from evaluation.predict import predict_and_evaluate
 
@@ -34,7 +34,7 @@ def train_fold(config: DictConfig, fold: int = 0):
     optimizer = get_optimizer(model, config.optimizer)
 
     criterion = torch.nn.MSELoss()  # Define your loss function
-    train_loader, val_loader = get_data_loaders(config, fold=fold)
+    train_loader, val_loader = get_train_data_loaders(config, fold=fold)
 
     losses = {}
 

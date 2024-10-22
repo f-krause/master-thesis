@@ -9,7 +9,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, root_mean_s
 from utils import mkdir, set_project_path, get_device
 from models.get_model import get_model
 from log.logger import setup_logger
-from data_handling.data_loader import get_data_loaders
+from data_handling.data_loader import get_train_data_loaders, get_val_data_loader, get_test_data_loader
 
 
 def clean_model_weights(best_epoch, fold, checkpoint_path, logger):
@@ -52,9 +52,13 @@ def evaluate(target, prediction):
     return mae, mse, rmse, r2
 
 
-def predict(config: DictConfig, subproject, logger, full_output=False):
-    # get test data
-    _, data_loader = get_data_loaders(config, 1)  # FIXME later test data loader
+def predict(config: DictConfig, subproject, logger, val=False, test=False, full_output=False):
+    if val:
+        data_loader = get_val_data_loader(config)
+    elif test:
+        data_loader = get_test_data_loader(config)
+    else:
+        _, data_loader = get_train_data_loaders(config, 1)
 
     device = get_device(config, logger)
     avg_model, train_loss, best_epoch = load_model(config, subproject, device, logger, full_output=True)
