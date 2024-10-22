@@ -90,6 +90,7 @@ def train_fold(config: DictConfig, fold: int = 0):
             aim_run.track(1, name='stored', epoch=epoch)
 
     end_time = time.time()
+    aim_run.track(1, name='training_successful')
 
     # Save losses to a CSV file
     pd.DataFrame(losses).T.to_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
