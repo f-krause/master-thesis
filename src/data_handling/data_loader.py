@@ -45,7 +45,7 @@ class RNADataset(torch.utils.data.Dataset):
                     logger.info(f"Loading data from: {config.train_data_file}")
                     rna_data_full, tissue_ids_full, targets_full = pickle.load(f)  # n x 3, n, n
                     if len(rna_data_full) < 10000:
-                        logger.warning(f"DATASET HAS ONLY {len(rna_data_full)} SAMPLES")  # TODO
+                        logger.warning(f"DATASET HAS ONLY {len(rna_data_full)} SAMPLES")
 
             train_indices, val_indices = self._get_train_val_indices(rna_data_full, targets_full, fold, config.seed,
                                                                      config.nr_folds)
