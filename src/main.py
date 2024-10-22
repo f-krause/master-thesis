@@ -24,7 +24,9 @@ args = parser.parse_args()
 if __name__ == "__main__":
     config_path = get_config(args)
 
-    config = OmegaConf.load(config_path)
+    general_config = OmegaConf.load("config/general.yml")
+    model_config = OmegaConf.load(config_path)
+    config = OmegaConf.merge(general_config, model_config)
 
     set_project_path(config)
     set_log_file(config)

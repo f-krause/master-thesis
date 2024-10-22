@@ -1,18 +1,7 @@
 # FIXME Cuda out of memory error!
 
-# Paths
-subproject: "dev_jamba/test_150"
-#subproject: "dev_jamba/delete_me"
-train_data_file: "dev_train_data_1000_full_length.pkl" # dev_train_data_1000.pkl or dev_train_data_1000_full_length.pkl
-project_path: ""  # optional, project path with data and model weights
-log_file_path: "" # optional
-
-# General
-folding_algorithm: "viennarna"  # options: viennarna, linearfold
-nr_folds: 1  # if 1, will take 20% of the data as validation set
-gpu_id: 0
-seed: 2024
-max_seq_length: 3000  # Should match context_length in Mamba2
+#subproject: "dev_jamba/test_150"
+subproject: "dev_jamba/delete_me"
 
 # Training
 epochs: 150
@@ -21,8 +10,6 @@ val_freq: 10
 warmup: 0
 batch_size: 16
 num_workers: 1
-final_evaluation: True
-clean_up_weights: True
 
 # Model
 model: "jamba"

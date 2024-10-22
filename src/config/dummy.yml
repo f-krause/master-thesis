@@ -1,15 +1,4 @@
-# Paths
 subproject: "dev_dummy/dummy"
-train_data_file: "dev_train_data_1000_full_length.pkl" # dev_train_data_1000.pkl or dev_train_data_1000_full_length.pkl
-project_path: ""  # optional, project path with data and model weights
-log_file_path: "" # optional
-
-# General
-folding_algorithm: "viennarna" # viennarna, linearfold  # TODO allow for data augmentation, by using different folding algorithms?
-nr_folds: 1  # if 1, will take 20% of the data as validation set
-gpu_id: 0
-seed: 2024
-max_seq_length: 3000  # later to 8000
 
 # Training
 epochs: 6
@@ -18,8 +7,6 @@ val_freq: 3
 warmup: 0
 batch_size: 32
 num_workers: 1
-final_evaluation: False
-clean_up_weights: False
 
 # Model
 model: "dummy" # dummy, baseline, gru, lstm, xlstm, mamba, transformer, best
