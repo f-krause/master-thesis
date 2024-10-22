@@ -117,7 +117,7 @@ def get_test_data_loader(config: DictConfig):
 
 if __name__ == "__main__":
     # for debugging
-    from utils import set_project_path, set_log_file
+    from utils import set_project_path
 
     dev_config = OmegaConf.create(
         {"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
@@ -126,9 +126,6 @@ if __name__ == "__main__":
          "folding_algorithm": "viennarna", "seed": 42, "nr_folds": 5}
     )
     set_project_path(dev_config)
-    set_log_file(dev_config)
-    # train_dataloader = RNADataset(config, train=True)
-    # print(len(train_dataloader))
 
     print("Testing train and train_val data loaders")
     train_loader_test, train_val_loader_test = get_train_data_loaders(dev_config, fold=1)
@@ -141,7 +138,7 @@ if __name__ == "__main__":
     val_loader_test = get_val_data_loader(dev_config)
     data_iter = iter(val_loader_test)
     x, y = next(data_iter)
-    print(y)
+    print(x)
 
     print("Testing test data loader")
     test_loader_test = get_test_data_loader(dev_config)
