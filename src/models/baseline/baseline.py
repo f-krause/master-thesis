@@ -20,9 +20,11 @@ class ModelBaseline(nn.Module):
         self.fc = nn.Sequential(
             nn.Linear(config.dim_embedding_tissue + self.max_seq_length * config.dim_embedding_token,
                                  config.hidden_size),
-            nn.ReLU(),
+            nn.GELU(),
+            nn.Dropout(p=config.dropout),
             nn.Linear(config.hidden_size, config.hidden_size // 2),
-            nn.ReLU(),
+            nn.GELU(),
+            nn.Dropout(p=config.dropout),
             nn.Linear(config.hidden_size // 2, 1)
         )
 
