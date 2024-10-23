@@ -85,16 +85,18 @@ def train_fold(config: DictConfig, fold: int = 0):
                 'state_dict': model.state_dict(),
                 'optimizer': optimizer.state_dict(),
             }, filename=os.path.join(checkpoint_path, f'checkpoint_{epoch}_fold-{fold}.pth.tar'))
-            losses[epoch].update({"stored": 1})
+            losses[epoch].update({"checkpoint_stored": 1})
             logger.info(f'Checkpoint saved at epoch {epoch}')
-            aim_run.track(1, name='stored', epoch=epoch)
+            aim_run.track(1, name='checkpoint_stored', epoch=epoch)
 
     end_time = time.time()
     aim_run.track(1, name='training_successful')
 
     # Save losses to a CSV file
     pd.DataFrame(losses).T.to_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
-    logger.info(f"Training process completed. Training time: {round((end_time - start_time)/60, 4)} mins.")
+    training_time = round((end_time - start_time)/60, 4)
+    logger.info(f"Training process completed. Training time: {training_time} mins.")
+    aim_run.track(training_time, name='training_time_min')
     if config.model != "dummy" and config.model != "best":
         get_model_stats(config, model, device, logger)
     if config.final_evaluation:
