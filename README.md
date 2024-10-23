@@ -4,9 +4,9 @@ Main Repository for Data Science Master Thesis at University of Vienna 2024
 
 ## Link selection
 
-[command collection](https://git01lab.cs.univie.ac.at/a1142469/dap/-/blob/main/RNAdegformer/command_collection.md?ref_type=heads) 
-used in DAP 2024 on university servers
-
+- [command collection](https://git01lab.cs.univie.ac.at/a1142469/dap/-/blob/main/RNAdegformer/command_collection.md?ref_type=heads) used in DAP 2024 on university servers
+- [GENCODE glossary](https://www.gencodegenes.org/pages/data_format.html) - Format description
+- [PTR ratios source](https://figshare.com/articles/dataset/Additional_file_2_Protein-to-mRNA_ratios_among_tissues/21379197?file=37938894)
 
 ## Set up environment
 Create virtual environment with mamba/conda
