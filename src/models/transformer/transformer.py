@@ -35,16 +35,15 @@ class ModelTransformer(nn.Module):
         super(ModelTransformer, self).__init__()
 
         self.device = device
-        self.max_norm = 2
         self.max_seq_length = config.max_seq_length
         self.dim_embedding_token = config.dim_embedding_token
         self.tissue_embedding_dim = config.tissue_embedding_dim
         self.embedding_dim = self.dim_embedding_token + self.tissue_embedding_dim
 
         # Embedding layers
-        self.tissue_encoder = nn.Embedding(len(TISSUES), self.tissue_embedding_dim, max_norm=self.max_norm)
+        self.tissue_encoder = nn.Embedding(len(TISSUES), self.tissue_embedding_dim, max_norm=config.embedding_max_norm)
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, self.dim_embedding_token, padding_idx=0,
-                                        max_norm=self.max_norm)
+                                        max_norm=config.embedding_max_norm)
 
         # Positional Encoding
         self.positional_encoding = PositionalEncoding(self.embedding_dim, max_len=self.max_seq_length)

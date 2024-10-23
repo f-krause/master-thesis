@@ -12,13 +12,12 @@ class ModelRNN(nn.Module):
         super(ModelRNN, self).__init__()
 
         self.device = device
-        self.max_norm = 2
         self.max_seq_length = config.max_seq_length
 
         self.tissue_encoder = nn.Embedding(len(TISSUES), config.rnn_hidden_size,
-                                           max_norm=self.max_norm)  # 29 tissues
+                                           max_norm=config.embedding_max_norm)  # 29 tissues
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, config.dim_embedding_token, padding_idx=0,
-                                        max_norm=self.max_norm)  # 64 codons + padding 0
+                                        max_norm=config.embedding_max_norm)  # 64 codons + padding 0
 
         # input_size = config.dim_embedding_tissue + config.dim_embedding_token
         input_size = config.dim_embedding_token

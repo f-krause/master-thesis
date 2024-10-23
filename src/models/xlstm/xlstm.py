@@ -23,14 +23,12 @@ class ModelXLSTM(nn.Module):
         super(ModelXLSTM, self).__init__()
 
         self.device = device
-        self.max_norm = 2
         self.max_seq_length = config.max_seq_length
 
         # Embedding layers
-        # TODO embedding layer norm?
-        self.tissue_encoder = nn.Embedding(len(TISSUES), config.tissue_embedding_dim, max_norm=self.max_norm)
+        self.tissue_encoder = nn.Embedding(len(TISSUES), config.tissue_embedding_dim, max_norm=config.embedding_max_norm)
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, config.dim_embedding_token, padding_idx=0,
-                                        max_norm=self.max_norm)
+                                        max_norm=config.embedding_max_norm)
 
         # Total embedding dimension after concatenation
         self.embedding_dim = config.dim_embedding_token + config.tissue_embedding_dim
