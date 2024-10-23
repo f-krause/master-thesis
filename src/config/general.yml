@@ -3,6 +3,7 @@ log_file_path: "" # optional
 
 seed: 2024
 gpu_id: 0
+embedding_max_norm: 2
 
 train_data_file: "codon_train_2.7k_data.pkl"  # dev_train_data_1000_full_length.pkl, dev_train_data_1000.pkl
 val_data_file: "codon_val_2.7k_data.pkl"
@@ -14,5 +15,3 @@ folding_algorithm: "viennarna" # viennarna, linearfold # TODO - currently not su
 
 final_evaluation: True  # if True, will evaluate the model on the train val set after training
 clean_up_weights: True  # if True, will remove the non-optimal model weights after training
-
-embedding_max_norm: 2

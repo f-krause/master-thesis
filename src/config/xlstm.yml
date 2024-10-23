@@ -2,7 +2,7 @@
 subproject: "dev_xlstm/delete_me"
 
 # Training
-epochs: 200
+epochs: 100
 save_freq: 20
 val_freq: 10
 warmup: 0
