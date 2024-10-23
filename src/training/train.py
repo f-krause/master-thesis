@@ -12,6 +12,7 @@ from models.get_model import get_model
 from data_handling.data_loader import get_train_data_loaders
 from training.optimizer import get_optimizer
 from evaluation.predict import predict_and_evaluate
+from training.early_stopper import EarlyStopper
 
 
 def train_fold(config: DictConfig, fold: int = 0):
@@ -34,6 +35,7 @@ def train_fold(config: DictConfig, fold: int = 0):
     optimizer = get_optimizer(model, config.optimizer)
 
     criterion = torch.nn.MSELoss()  # Define your loss function
+    early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
     train_loader, val_loader = get_train_data_loaders(config, fold=fold)
 
     losses = {}
@@ -59,6 +61,17 @@ def train_fold(config: DictConfig, fold: int = 0):
         logger.info(f'Epoch {epoch}, Loss: {train_loss}')
         aim_run.track(train_loss, name='train_loss', epoch=epoch)
 
+        # Save checkpoint
+        if (epoch % config.save_freq == 0 and epoch >= config.warmup) or epoch == config.epochs:
+            save_checkpoint({
+                'epoch': epoch,
+                'state_dict': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
+            }, filename=os.path.join(checkpoint_path, f'checkpoint_{epoch}_fold-{fold}.pth.tar'))
+            losses[epoch].update({"checkpoint_stored": 1})
+            logger.info(f'Checkpoint saved at epoch {epoch}')
+            aim_run.track(1, name='checkpoint_stored', epoch=epoch)
+
         # Validation
         if ((epoch % config.val_freq == 0 or epoch % config.save_freq == 0 or epoch == config.epochs)
                 and epoch >= config.warmup):  # ensure validation if stored
@@ -78,16 +91,10 @@ def train_fold(config: DictConfig, fold: int = 0):
             logger.info(f'Validation loss: {val_loss}')
             aim_run.track(val_loss, name='val_loss', epoch=epoch)
 
-        # Save checkpoint
-        if (epoch % config.save_freq == 0 and epoch >= config.warmup) or epoch == config.epochs:
-            save_checkpoint({
-                'epoch': epoch,
-                'state_dict': model.state_dict(),
-                'optimizer': optimizer.state_dict(),
-            }, filename=os.path.join(checkpoint_path, f'checkpoint_{epoch}_fold-{fold}.pth.tar'))
-            losses[epoch].update({"checkpoint_stored": 1})
-            logger.info(f'Checkpoint saved at epoch {epoch}')
-            aim_run.track(1, name='checkpoint_stored', epoch=epoch)
+            if early_stopper.early_stop(val_loss):
+                logger.info(f"Early stopping at epoch {epoch}")
+                aim_run.track(1, name='early_stopping', epoch=epoch)
+                break
 
     end_time = time.time()
     aim_run.track(1, name='training_successful')
