@@ -1,3 +1,4 @@
+# TODO implement as train_data_codons.py but for sequences
 import os
 import json
 import pickle
@@ -21,7 +22,6 @@ def get_train_data_file(config: DictConfig, return_dict=False):
     targets = []
     target_ids = []
 
-    counter = 0
     for identifier, content in raw_data.items():
         sec_struc, loop_type = _get_structure_pred(identifier, config)
         if sec_struc is None:
@@ -59,10 +59,10 @@ def get_train_data_file(config: DictConfig, return_dict=False):
         if len(rna_data) >= MAX_DATA:
             break
 
-    with open(os.path.join(os.environ["PROJECT_PATH"], "data/train_data/dev_train_data_small.pkl"), 'wb') as f:
-        pickle.dump([rna_data, torch.tensor(target_ids), torch.tensor(targets)], f)
-
-    # TODO: Implement test data creation
+    # full data
+    # TODO add train test split as for codons
+    # with open(os.path.join(os.environ["PROJECT_PATH"], "data/data_train/dev_train_data_small.pkl"), 'wb') as f:
+    #     pickle.dump([rna_data, torch.tensor(target_ids), torch.tensor(targets)], f)
 
 
 def _get_structure_pred(identifier: str, config: DictConfig):
@@ -78,7 +78,7 @@ def _get_structure_pred(identifier: str, config: DictConfig):
 if __name__ == '__main__':
     from utils import set_project_path, set_log_file
 
-    dev_config = OmegaConf({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
+    dev_config = OmegaConf.create({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
                   "batch_size": 32, "num_workers": 4, "folding_algorithm": FOLDING_ALG})
     set_project_path(dev_config)
     set_log_file(dev_config)
