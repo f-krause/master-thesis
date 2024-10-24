@@ -36,6 +36,9 @@ if __name__ == "__main__":
     logger.info(f"Project path: {os.path.join(os.environ['PROJECT_PATH'], os.environ['SUBPROJECT'])}")
     logger.info(f"Config: \n {config}")
 
+    if config.save_freq % config.val_freq != 0:
+        raise ValueError(f"save_freq ({config.save_freq}) should be a multiple of val_freq ({config.val_freq})")
+
     try:
         logger.info("TRAINING STARTED")
         train.train(config)
