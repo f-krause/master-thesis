@@ -30,7 +30,7 @@ def load_model(config: DictConfig, subproject, device, logger, full_output=False
     for fold in range(config.nr_folds):
         # FIXME currently only returning last train_loss and best_epoch
         losses = pd.read_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
-        losses = losses[~losses.stored.isna()]
+        losses = losses[~losses.checkpoint_stored.isna()]
         best_epoch = int(losses.loc[losses.val_loss.idxmin(), "epoch"])
         train_loss = losses.loc[losses.val_loss.idxmin(), "train_loss"]
         data = torch.load(os.path.join(checkpoint_path, f'checkpoint_{best_epoch}_fold-{fold}.pth.tar'),
