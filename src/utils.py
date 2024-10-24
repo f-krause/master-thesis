@@ -98,12 +98,16 @@ def save_checkpoint(state, filename='checkpoint.pth.tar'):
 
 
 def get_device(config: DictConfig, logger=None):
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(config.gpu_id)
+    # os.environ["CUDA_VISIBLE_DEVICES"] = str(config.gpu_id)  # removed as not working
     if logger:
         logger.info(f"Devices found for training: "
                     f"{[(i, torch.cuda.get_device_name(i)) for i in range(torch.cuda.device_count())]}")
-    
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    if torch.cuda.is_available():
+        device = torch.device(f"cuda:{config.gpu_id}")
+    else:
+        device = "cpu"
+
     if logger:
         logger.info(f"Using device: {device}")
         if device.type == 'cuda':
