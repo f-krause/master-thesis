@@ -110,7 +110,9 @@ def predict_and_evaluate(config: DictConfig, subproject, logger):
 if __name__ == "__main__":
     CONFIG_PATH = "config/mamba.yml"
 
-    custom_config = OmegaConf.load(CONFIG_PATH)
+    general_config = OmegaConf.load("config/general.yml")
+    model_config = OmegaConf.load(CONFIG_PATH)
+    custom_config = OmegaConf.merge(general_config, model_config)
 
     set_project_path(custom_config)
     predictions_path = os.path.join(os.environ["PROJECT_PATH"], "runs", custom_config.subproject, "predictions")
