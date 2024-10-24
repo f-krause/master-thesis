@@ -48,7 +48,7 @@ class RNADataset(torch.utils.data.Dataset):
                     if len(rna_data_full) < 10000:
                         logger.warning(f"DATASET HAS ONLY {len(rna_data_full)} SAMPLES")
 
-            mrna_sequences = ["".join(map(str, tensor.tolist())) for tensor in rna_data_full]
+            mrna_sequences = ["".join(map(str, tensor.tolist())) for tensor in rna_data_full]  # FIXME: mrna sequence length is now not fully identical with the original sequence length
             train_indices, val_indices = self._get_train_val_indices(mrna_sequences, fold, config.seed, config.nr_folds)
 
             # train_indices, val_indices = self._get_train_val_indices_naive(rna_data_full, targets_full, fold, config.seed,

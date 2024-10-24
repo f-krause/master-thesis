@@ -37,7 +37,7 @@ if __name__ == "__main__":
     logger.info(f"Config: \n {config}")
 
     try:
-        logger.info("TRAINING TEST")
+        logger.info("TRAINING STARTED")
         train.train(config)
     except Exception as e:
         logger.error(f"Error during training: {e}")
