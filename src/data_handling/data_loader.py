@@ -3,9 +3,10 @@ import torch
 import pickle
 from omegaconf import OmegaConf, DictConfig
 import numpy as np
-from sklearn.model_selection import StratifiedKFold, KFold, train_test_split
 from torch.utils.data import DataLoader
 from log.logger import setup_logger
+
+from data_handling.train_val_test_indices import get_train_val_test_indices
 
 TOKENS = 'ACGT().BEHIMSX'
 
@@ -47,8 +48,12 @@ class RNADataset(torch.utils.data.Dataset):
                     if len(rna_data_full) < 10000:
                         logger.warning(f"DATASET HAS ONLY {len(rna_data_full)} SAMPLES")
 
-            train_indices, val_indices = self._get_train_val_indices(rna_data_full, targets_full, fold, config.seed,
-                                                                     config.nr_folds)
+            mrna_sequences = ["".join(map(str, tensor.tolist())) for tensor in rna_data_full]
+            train_indices, val_indices = self._get_train_val_indices(mrna_sequences, fold, config.seed, config.nr_folds)
+
+            # train_indices, val_indices = self._get_train_val_indices_naive(rna_data_full, targets_full, fold, config.seed,
+            #                                                                config.nr_folds)  # legacy
+
             if train_val:
                 self.rna_data = [rna_data_full[i] for i in val_indices]
                 self.tissue_ids = tissue_ids_full[val_indices]
@@ -60,17 +65,27 @@ class RNADataset(torch.utils.data.Dataset):
                 self.targets = targets_full[train_indices]
                 logger.info(f"Train dataset with {len(self.rna_data)} samples loaded")
 
-    @staticmethod
-    def _get_train_val_indices(X, y, fold, seed=42, nr_folds=5):
+    def _get_train_val_indices(self, mrna_sequences, fold, random_state=42, nr_folds=3):
         if nr_folds == 1:
-            return train_test_split(range(len(X)), test_size=0.2, random_state=seed)
+            train_indices, val_indices, _ = get_train_val_test_indices(mrna_sequences, val_frac=0.15, test_frac=0,
+                                                                       random_state=random_state)
+            # return train_test_split(range(len(X)), test_size=0.2, random_state=seed)
+        elif nr_folds == 3:
+            train_indices, val_indices = self._get_3_fold_indices(mrna_sequences, fold, random_state=random_state)
         else:
-            # splits = StratifiedKFold(n_splits=nr_folds, random_state=seed, shuffle=True)
-            splits = KFold(n_splits=nr_folds, random_state=seed, shuffle=True)
-            splits = list(splits.split(X))
-            train_indices = splits[fold][0]
-            val_indices = splits[fold][1]
-            return train_indices.tolist(), val_indices.tolist()
+            raise ValueError("Only 1 and 3 folds are currently supported")
+        return train_indices, val_indices
+
+    @staticmethod
+    def _get_3_fold_indices(mrna_sequences, fold, random_state=42):
+        # TODO test this!
+        indices_triple = get_train_val_test_indices(mrna_sequences, val_frac=0.33, test_frac=0.33,
+                                                    random_state=random_state)
+
+        val_indices = indices_triple.pop(fold)
+        train_indices = np.concatenate(indices_triple)
+
+        return train_indices.tolist(), val_indices
 
     def __len__(self):
         return len(self.rna_data)
@@ -117,15 +132,16 @@ def get_test_data_loader(config: DictConfig):
 
 if __name__ == "__main__":
     # for debugging
-    from utils import set_project_path
+    from utils import set_project_path, set_log_file
 
     dev_config = OmegaConf.create(
-        {"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
+        {"project_path": None, "log_file_path": None, "subproject": "dev/delete_me", "model": "baseline",
          "train_data_file": "codon_train_2.7k_data.pkl", "val_data_file": "codon_val_2.7k_data.pkl",
          "test_data_file": "codon_test_2.7k_data.pkl", "batch_size": 4, "num_workers": 4,
          "folding_algorithm": "viennarna", "seed": 42, "nr_folds": 5}
     )
     set_project_path(dev_config)
+    set_log_file(dev_config)
 
     print("Testing train and train_val data loaders")
     train_loader_test, train_val_loader_test = get_train_data_loaders(dev_config, fold=1)
