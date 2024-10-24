@@ -58,8 +58,11 @@ def get_train_val_test_indices(mrna_sequences, val_frac=0.15, test_frac=0.15, nu
 
         # Desired counts for each set in this bin
         bin_desired_train_count = bin_total_count * train_frac
-        bin_desired_val_count = bin_total_count * val_frac
-        bin_desired_test_count = bin_total_count * test_frac
+        if test_frac > 0:
+            bin_desired_val_count = bin_total_count * val_frac
+        else:
+            # If no test set, assign all remaining sequences to validation set
+            bin_desired_val_count = bin_total_count
 
         # Shuffle sequences in the bin
         temp_random_state += 1
