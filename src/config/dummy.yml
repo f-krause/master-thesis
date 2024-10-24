@@ -1,6 +1,7 @@
 subproject: "dev_dummy/dummy"
 
 # Training
+gpu_id: 0
 epochs: 6
 save_freq: 3
 val_freq: 3

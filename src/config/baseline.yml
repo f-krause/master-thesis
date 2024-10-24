@@ -2,6 +2,7 @@
 subproject: "dev_baseline/delete_me"
 
 # Training
+gpu_id: 1
 epochs: 200
 save_freq: 10
 val_freq: 10

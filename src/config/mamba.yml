@@ -2,6 +2,7 @@
 subproject: "dev_mamba/delete_me"
 
 # Training
+gpu_id: 0
 epochs: 100
 save_freq: 10
 val_freq: 10
