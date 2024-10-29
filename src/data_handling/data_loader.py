@@ -6,6 +6,7 @@ import numpy as np
 from torch.utils.data import DataLoader
 from log.logger import setup_logger
 
+from sklearn.model_selection import train_test_split
 from data_handling.train_val_test_indices import get_train_val_test_indices
 
 TOKENS = 'ACGT().BEHIMSX'
@@ -64,9 +65,10 @@ class RNADataset(torch.utils.data.Dataset):
 
     def _get_train_val_indices(self, mrna_sequences, fold, random_state=42, nr_folds=3):
         if nr_folds == 1:
+            # train_indices, val_indices = train_test_split(range(len(mrna_sequences)), test_size=0.2,
+            #                                               random_state=random_state)  # legacy
             train_indices, val_indices, _ = get_train_val_test_indices(mrna_sequences, val_frac=0.15, test_frac=0,
                                                                        random_state=random_state)
-            # return train_test_split(range(len(X)), test_size=0.2, random_state=seed)
         elif nr_folds == 3:
             train_indices, val_indices = self._get_3_fold_indices(mrna_sequences, fold, random_state=random_state)
         else:
