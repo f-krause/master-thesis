@@ -51,13 +51,13 @@ def get_train_data_file(file_name: str, check_reproduce=False, return_dict=False
     identifiers = []
     rna_data = []
     targets = []
-    target_ids = []
+    tissue_ids = []
     sequences = []
 
     for identifier, content in raw_data.items():
         sequence = content['fasta']
-
         bed_annotation = content['bed_annotation']
+
         coding_sequence = [nucleotide for nucleotide, annotation in zip(list(sequence), bed_annotation) if
                            annotation not in [5, 3]]  # CDS, drop 5' and 3' UTR
         encoded_sequence = [CODON_MAP_DNA.get(''.join(coding_sequence[i:i + 3]), -1) for i in
@@ -66,24 +66,15 @@ def get_train_data_file(file_name: str, check_reproduce=False, return_dict=False
         if len(coding_sequence) > MAX_SEQ_LENGTH:
             continue
         else:
-            for target_id, target in enumerate(content['targets']):
+            for tissue_id, target in enumerate(content['targets']):
                 if np.isnan(target):
                     continue
 
-                sequences.append("".join(coding_sequence))
                 identifiers.append(identifier)
-                numeric_data = {
-                    'codons': encoded_sequence,
-                    'target_id': target_id,
-                }
-
-                if return_dict:
-                    rna_data.append(numeric_data)
-                    targets.append(target)
-                else:
-                    rna_data.append(torch.tensor(numeric_data["codons"]))
-                    target_ids.append(target_id)
-                    targets.append(target)
+                sequences.append("".join(coding_sequence))
+                rna_data.append(torch.tensor(encoded_sequence))
+                tissue_ids.append(tissue_id)
+                targets.append(target)
 
                 if len(rna_data) >= MAX_DATA:
                     break
@@ -99,17 +90,17 @@ def get_train_data_file(file_name: str, check_reproduce=False, return_dict=False
     max_seq_len_logging = str(MAX_SEQ_LENGTH / 1000) + "k"
 
     if check_reproduce:
-        _check_identical(train_indices, identifiers, target_ids, f"data/data_train/{file_name}_train_{max_seq_len_logging}")
-        _check_identical(val_indices, identifiers, target_ids, f"data/data_test/{file_name}_val_{max_seq_len_logging}")
-        _check_identical(test_indices, identifiers, target_ids, f"data/data_test/{file_name}_test_{max_seq_len_logging}")
+        _check_identical(train_indices, identifiers, tissue_ids, f"data/data_train/{file_name}_train_{max_seq_len_logging}")
+        _check_identical(val_indices, identifiers, tissue_ids, f"data/data_test/{file_name}_val_{max_seq_len_logging}")
+        _check_identical(test_indices, identifiers, tissue_ids, f"data/data_test/{file_name}_test_{max_seq_len_logging}")
     else:
-        _store_data(identifiers, rna_data, target_ids, targets, train_indices,
+        _store_data(identifiers, rna_data, tissue_ids, targets, train_indices,
                     f"data/data_train/{file_name}_train_{max_seq_len_logging}")
 
-        _store_data(identifiers, rna_data, target_ids, targets, val_indices,
+        _store_data(identifiers, rna_data, tissue_ids, targets, val_indices,
                     f"data/data_test/{file_name}_val_{max_seq_len_logging}")
 
-        _store_data(identifiers, rna_data, target_ids, targets, test_indices,
+        _store_data(identifiers, rna_data, tissue_ids, targets, test_indices,
                     f"data/data_test/{file_name}_test_{max_seq_len_logging}")
 
         print("Data successfully created")
