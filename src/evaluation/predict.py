@@ -106,6 +106,8 @@ def predict_and_evaluate(config: DictConfig, subproject, logger):
                 f"R2:         {r2}\n"
                 f"Best epoch: {best_epoch}\n")
 
+    return preds_df.target, preds_df.prediction
+
 
 if __name__ == "__main__":
     CONFIG_PATH = "config/mamba.yml"

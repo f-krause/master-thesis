@@ -7,7 +7,7 @@ from tqdm import tqdm
 from log.logger import setup_logger
 from omegaconf import OmegaConf, DictConfig
 
-from utils import save_checkpoint, mkdir, check_path_exists, get_device, get_model_stats
+from utils import save_checkpoint, mkdir, get_device, get_model_stats, log_pred_true_scatter
 from models.get_model import get_model
 from data_handling.data_loader import get_train_data_loaders
 from training.optimizer import get_optimizer
@@ -108,7 +108,9 @@ def train_fold(config: DictConfig, fold: int = 0):
         get_model_stats(config, model, device, logger)
     if config.final_evaluation:
         logger.info("Starting prediction and evaluation")
-        predict_and_evaluate(config, os.environ["SUBPROJECT"], logger)
+        y_true, y_pred = predict_and_evaluate(config, os.environ["SUBPROJECT"], logger)
+        img_buffer = log_pred_true_scatter(y_true, y_pred)
+        aim_run.track(aim.Image(img_buffer), name="pred_true_scatter")
     logger.info(f"Weights path: {checkpoint_path}")
     aim_run.close()
 

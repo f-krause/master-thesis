@@ -1,9 +1,12 @@
 import os
+import io
 import datetime
 import platform
 import torch
 import random
 import numpy as np
+from PIL import Image
+import matplotlib.pyplot as plt
 from log.logger import setup_logger
 from omegaconf import DictConfig
 from fvcore.nn import FlopCountAnalysis, flop_count_table
@@ -142,3 +145,23 @@ def get_model_stats(config: DictConfig, model, device, logger):
     logger.info(f"Model: Total parameters: {nr_params}")
     logger.info(f"Model: FLOPs: {flops_nr}")
     logger.info(f"Model: FLOPs table: \n{flop_count_table(flops)}")
+
+
+def log_pred_true_scatter(y_true, y_pred):
+    plt.figure(figsize=(10, 10))
+    plt.scatter(y_true, y_pred, alpha=0.5, s=10)
+    plt.xlabel('True Values')
+    plt.ylabel('Predicted Values')
+    plt.title('y_true vs y_pred')
+
+    min_val = min(min(y_true), min(y_pred))
+    max_val = max(max(y_true), max(y_pred))
+    plt.plot([min_val, max_val], [min_val, max_val], color='grey', linestyle='--')
+
+    # Save the plot to an in-memory buffer
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    plt.close()
+
+    return Image.open(buffer)
