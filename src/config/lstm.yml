@@ -23,3 +23,4 @@ num_layers: 2
 optimizer:
   name: adam
   lr: 0.0001
+  weight_decay: 0.1  # ranger only

@@ -4,7 +4,7 @@ log_file_path: "" # optional
 seed: 2024
 embedding_max_norm: 2
 
-train_data_file: "codon_train_2.7k_data.pkl"  # dev_train_data_1000_full_length.pkl, dev_train_data_1000.pkl
+train_data_file: "codon_train_2.7k_data.pkl"  # codon_train_2.7k_data.pkl, dev_train_data_1000_full_length.pkl, dev_train_data_1000.pkl
 val_data_file: "codon_val_2.7k_data.pkl"
 test_data_file: "codon_test_2.7k_data.pkl"
 max_seq_length: 2700
@@ -12,8 +12,8 @@ max_seq_length: 2700
 nr_folds: 1  # if 1, will take 20% of the train data as validation set during training ("train val")
 folding_algorithm: "viennarna" # viennarna, linearfold # TODO - currently not supported
 
-early_stopper_patience: 5
-early_stopper_delta: 0.01
+early_stopper_patience: 7  # disabled if < 0
+early_stopper_delta: 0.02
 
 final_evaluation: True  # if True, will evaluate the model on the train val set after training
 clean_up_weights: True  # if True, will remove the non-optimal model weights after training

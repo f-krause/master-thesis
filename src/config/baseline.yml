@@ -1,11 +1,12 @@
 #subproject: "dev_baseline/v3_full_seq_length_200"
+#subproject: "v1_codon_full_data_replica_tissue12"
 subproject: "dev_baseline/delete_me"
 
 # Training
 gpu_id: 1
-epochs: 200
+epochs: 2
 save_freq: 10
-val_freq: 10
+val_freq: 1
 warmup: 0
 batch_size: 32
 num_workers: 1
@@ -15,9 +16,10 @@ model: "baseline"
 dim_embedding_tissue: 16  # max 29 tissues
 dim_embedding_token: 32  # 64 codons or 4 nucleotides/
 hidden_size: 1024
-dropout: 0.1
+dropout: 0.2
 
 # Optimizer
 optimizer:
   name: adam
   lr: 0.001
+  weight_decay: 0.1  # ranger only
