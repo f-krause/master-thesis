@@ -15,6 +15,14 @@ mamba env create -f environment_files/environment_linux_py3.10.yml
 mamba activate master-env
 ```
 
+Set up Ranger Optimizer
+```shell
+git clone https://github.com/lessw2020/Ranger-Deep-Learning-Optimizer
+cd Ranger-Deep-Learning-Optimizer
+pip install -e . 
+```
+
+## Create project folder structure
 Create project structure, and specify project path and subproject in ``main.py``
 ```
 root
