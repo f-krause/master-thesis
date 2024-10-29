@@ -10,6 +10,7 @@ def get_model(config: DictConfig, device: torch.device, logger=None):
         return ModelDummy(device).to(device)
     elif config.model == "baseline":
         if logger: logger.info("Using baseline model")
+        # from models.baseline.baseline_freq import ModelBaseline  # super small model + codon frequencies
         from models.baseline.baseline import ModelBaseline
         return ModelBaseline(config, device).to(device)
     elif config.model == "gru":
@@ -34,6 +35,7 @@ def get_model(config: DictConfig, device: torch.device, logger=None):
         return ModelJamba(config, device).to(device)
     elif config.model == "transformer":
         if logger: logger.info("Using Transformer model")
+        # from models.transformer.transformer_freq import ModelTransformer  # codon frequencies
         from models.transformer.transformer import ModelTransformer
         return ModelTransformer(config, device).to(device)
     elif config.model == "best":
