@@ -3,7 +3,6 @@ from omegaconf import DictConfig
 
 
 def get_model(config: DictConfig, device: torch.device, logger=None):
-    # TODO rewrite as match case
     if config.model == "dummy":
         if logger: logger.warning("Using dummy model")
         from models.dummy.dummy import ModelDummy
@@ -13,6 +12,9 @@ def get_model(config: DictConfig, device: torch.device, logger=None):
         # from models.baseline.baseline_freq import ModelBaseline  # super small model + codon frequencies
         from models.baseline.baseline import ModelBaseline
         return ModelBaseline(config, device).to(device)
+    elif config.model == "cnn":
+        from models.cnn.cnn import ModelCNN
+        return ModelCNN(config, device).to(device)
     elif config.model == "gru":
         if logger: logger.info("Using GRU model")
         from models.rnn.rnn import ModelRNN
@@ -44,4 +46,4 @@ def get_model(config: DictConfig, device: torch.device, logger=None):
         raise NotImplementedError("Best model not implemented yet")
     else:
         raise ValueError(f"Model {config.model} not implemented! Choose from: "
-                         f"dummy, baseline, gru, lstm, xlstm, mamba, transformer, best")
+                         f"dummy, baseline, cnn, gru, lstm, xlstm, mamba, transformer, best")  # TODO update

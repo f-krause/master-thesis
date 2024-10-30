@@ -8,9 +8,10 @@ from utils import set_log_file, set_project_path, get_config, set_seed
 
 parser = argparse.ArgumentParser(prog='main.py', description='Trains DL models on mRNA data to predict PTR ratios.')
 
-parser.add_argument('-c', '--custom_path', help="Path to config file", type=str, default=None)
+parser.add_argument('-s', '--custom_path', help="Path to config file", type=str, default=None)
 parser.add_argument('-d', "--dummy", help="Use dummy config for test", action="store_true")
 parser.add_argument('-b', "--baseline", help="Use baseline config", action="store_true")
+parser.add_argument('-c', "--cnn", help="Use cnn config", action="store_true")
 parser.add_argument('-l', "--lstm", help="Use lstm config", action="store_true")
 parser.add_argument('-g', "--gru", help="Use gru config", action="store_true")
 parser.add_argument('-x', "--xlstm", help="Use xlstm config", action="store_true")

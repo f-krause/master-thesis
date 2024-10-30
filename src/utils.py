@@ -64,6 +64,8 @@ def get_config(args):
         return "config/dummy.yml"
     elif args.baseline:
         return "config/baseline.yml"
+    elif args.cnn:
+        return "config/cnn.yml"
     elif args.gru:
         return "config/gru.yml"
     elif args.lstm:
