@@ -33,7 +33,6 @@ class ModelMamba(nn.Module):
             # headdim=config.headdim  # TODO only for mamba-2
         ).to(self.device)
 
-        # Predictor network
         self.predictor = Predictor(self.embedding_dim, config.out_hidden_size).to(self.device)
 
     def forward(self, inputs: Tensor) -> Tensor:
@@ -48,14 +47,9 @@ class ModelMamba(nn.Module):
         # Concat embeddings (batch_size, seq_len, embedding_dim)
         combined_embedding = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)
 
-        # Create attention mask for padding positions
-        attention_mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
-        combined_embedding = combined_embedding * attention_mask
-
-        # Apply Mamba2 model
-        x = combined_embedding.to(self.device)
-        out = self.mamba(x)  # (batch_size, seq_len, embedding_dim)
-        # out = self.mamba(x, cu_seqlens=seq_lengths)  # (batch_size, seq_len, embedding_dim) # TODO for mamba2
+        # Apply Mamba model
+        out = self.mamba(combined_embedding)  # (batch_size, seq_len, embedding_dim)
+        # out = self.mamba(combined_embedding, cu_seqlens=seq_lengths) # TODO for mamba2
 
         # Extract outputs corresponding to the last valid time step
         idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, out.size(2)))  # (batch_size, 1, embedding_dim)
