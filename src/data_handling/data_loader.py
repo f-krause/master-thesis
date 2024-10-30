@@ -56,11 +56,29 @@ class RNADataset(torch.utils.data.Dataset):
                 self.rna_data = [rna_data_full[i] for i in val_indices]
                 self.tissue_ids = tissue_ids_full[val_indices]
                 self.targets = targets_full[val_indices]
+
+                # FIXME
+                # only keep data for tissue_id == 12
+                # tissue_id_12_indices = np.where(self.tissue_ids == 12)[0]
+                # self.rna_data = [self.rna_data[i] for i in tissue_id_12_indices]
+                # self.tissue_ids = self.tissue_ids[tissue_id_12_indices]
+                # self.targets = self.targets[tissue_id_12_indices]
+                # logger.warning("DEV: Only keeping data for tissue_id == 12")
+
                 logger.info(f"Train validation dataset with {len(self.rna_data)} samples loaded")
             else:
                 self.rna_data = [rna_data_full[i] for i in train_indices]
                 self.tissue_ids = tissue_ids_full[train_indices]
                 self.targets = targets_full[train_indices]
+
+                # FIXME
+                # only keep data for tissue_id == 12
+                # tissue_id_12_indices = np.where(self.tissue_ids == 12)[0]
+                # self.rna_data = [self.rna_data[i] for i in tissue_id_12_indices]
+                # self.tissue_ids = self.tissue_ids[tissue_id_12_indices]
+                # self.targets = self.targets[tissue_id_12_indices]
+                # logger.warning("DEV: Only keeping data for tissue_id == 12")
+
                 logger.info(f"Train dataset with {len(self.rna_data)} samples loaded")
 
     def _get_train_val_indices(self, mrna_sequences, fold, random_state=42, nr_folds=3):
