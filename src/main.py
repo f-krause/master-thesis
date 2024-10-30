@@ -18,6 +18,7 @@ parser.add_argument('-x', "--xlstm", help="Use xlstm config", action="store_true
 parser.add_argument('-m', "--mamba", help="Use mamba config", action="store_true")
 parser.add_argument('-j', "--jamba", help="Use jamba config", action="store_true")
 parser.add_argument('-t', "--transformer", help="Use transformer config", action="store_true")
+parser.add_argument('-p', "--ptrnet", help="Use PTRNet config", action="store_true")
 
 args = parser.parse_args()
 
@@ -25,7 +26,11 @@ args = parser.parse_args()
 if __name__ == "__main__":
     config_path = get_config(args)
 
-    general_config = OmegaConf.load("config/general.yml")
+    if args.ptrnet:
+        general_config = OmegaConf.load("config/general_base.yml")
+    else:
+        general_config = OmegaConf.load("config/general_codon.yml")
+
     model_config = OmegaConf.load(config_path)
     config = OmegaConf.merge(general_config, model_config)
 
