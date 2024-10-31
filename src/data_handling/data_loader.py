@@ -26,12 +26,12 @@ class RNADataset(torch.utils.data.Dataset):
         if val:
             with open(os.path.join(os.environ["PROJECT_PATH"], "data/data_test", config.val_data_file), 'rb') as f:
                 logger.info(f"Loading data from: {config.val_data_file}")
-                self.rna_data, self.tissue_ids, self.targets = pickle.load(f)
+                self.rna_data, self.tissue_ids, self.targets, self.targets_bin = pickle.load(f)
             logger.info(f"Validation dataset with {len(self.rna_data)} samples loaded")
         elif test:
             with open(os.path.join(os.environ["PROJECT_PATH"], "data/data_test", config.test_data_file), 'rb') as f:
                 logger.info(f"Loading data from: {config.test_data_file}")
-                self.rna_data, self.tissue_ids, self.targets = pickle.load(f)
+                self.rna_data, self.tissue_ids, self.targets, self.targets_bin = pickle.load(f)
             logger.info(f"Test dataset with {len(self.rna_data)} samples loaded")
         else:
             if config.model == "dummy":
@@ -45,7 +45,7 @@ class RNADataset(torch.utils.data.Dataset):
                 with open(os.path.join(os.environ["PROJECT_PATH"], "data/data_train", config.train_data_file),
                           'rb') as f:
                     logger.info(f"Loading data from: {config.train_data_file}")
-                    rna_data_full, tissue_ids_full, targets_full = pickle.load(f)  # n x 3, n, n
+                    rna_data_full, tissue_ids_full, targets_full, targets_bin_full = pickle.load(f)  # n x 3, n, n
                     if len(rna_data_full) < 10000:
                         logger.warning(f"DATASET HAS ONLY {len(rna_data_full)} SAMPLES")
 
@@ -108,17 +108,18 @@ class RNADataset(torch.utils.data.Dataset):
         return len(self.rna_data)
 
     def __getitem__(self, index):
-        return [self.rna_data[index], self.tissue_ids[index]], self.targets[index]
+        return [self.rna_data[index], self.tissue_ids[index]], self.targets[index], self.targets_bin[index]
 
 
 def _pad_sequences(batch):
-    data, targets = zip(*batch)
+    data, targets, targets_bin = zip(*batch)
     rna_data, tissue_ids = zip(*data)
     tissue_ids = torch.tensor(tissue_ids)
     seq_lengths = torch.tensor([seq.size(0) for seq in rna_data])
     rna_data_padded = torch.nn.utils.rnn.pad_sequence(rna_data, batch_first=True)
 
     return [rna_data_padded, tissue_ids, seq_lengths], torch.tensor(targets)
+    return [rna_data_padded, tissue_ids, seq_lengths], torch.tensor(targets), torch.tensor(targets_bin)
 
 
 def get_train_data_loaders(config: DictConfig, fold: int):
@@ -126,8 +127,7 @@ def get_train_data_loaders(config: DictConfig, fold: int):
     val_dataset = RNADataset(config, fold, train_val=True)
 
     train_loader = DataLoader(dataset=train_dataset, batch_size=config.batch_size, shuffle=True,
-                              num_workers=config.num_workers,
-                              collate_fn=_pad_sequences)
+                              num_workers=config.num_workers, collate_fn=_pad_sequences)
     val_loader = DataLoader(dataset=val_dataset, batch_size=config.batch_size, shuffle=False,
                             num_workers=config.num_workers, collate_fn=_pad_sequences)
     return train_loader, val_loader

@@ -38,7 +38,6 @@ def get_train_val_test_indices(mrna_sequences, val_frac=0.15, test_frac=0.15, nu
     # Stratify sequences based on length with histogram function for balanced bins
     bins = np.histogram(seq_lengths, bins=num_bins)[1]
     bins = bins[:-1]
-    print("LOG: Counts per bin:", np.histogram(seq_lengths, bins=10))
     seq_length_bins = np.digitize(seq_lengths, bins)
 
     train_seqs = []

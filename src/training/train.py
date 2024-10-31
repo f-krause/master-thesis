@@ -45,7 +45,7 @@ def train_fold(config: DictConfig, fold: int = 0):
     for epoch in range(1, config.epochs + 1):
         model.train()
         running_loss = 0.0
-        for batch_idx, (data, target) in enumerate(tqdm(train_loader)):
+        for batch_idx, (data, target, target_bin) in enumerate(tqdm(train_loader)):
             data = [d.to(device) for d in data]
             target = target.to(device)
             optimizer.zero_grad()
@@ -78,7 +78,7 @@ def train_fold(config: DictConfig, fold: int = 0):
             model.eval()
             val_loss = 0.0
             with torch.no_grad():
-                for data, target in val_loader:
+                for data, target, target_bin in val_loader:
                     data = [d.to(device) for d in data]
                     target = target.to(device)
                     output = model(data)

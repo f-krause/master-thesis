@@ -67,7 +67,7 @@ def predict(config: DictConfig, subproject, logger, val=False, test=False, full_
     predictions = []
     targets = []
     with torch.no_grad():
-        for data, target in tqdm(data_loader):
+        for data, target, target_bin in tqdm(data_loader):
             data = [d.to(device) for d in data]
             target = target.to(device)
             output = avg_model(data)
