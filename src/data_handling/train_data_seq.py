@@ -6,7 +6,7 @@ import torch
 import numpy as np
 from omegaconf import OmegaConf, DictConfig
 
-MAX_SEQ_LENGTH = 1000  # Maximum sequence length (nr of bases of whole mRNA)
+MAX_SEQ_LENGTH = 8100  # Maximum sequence length (nr of bases of whole mRNA)
 MAX_DATA = 1000
 FOLDING_ALG = "viennarna"
 TOKENS_BASES = 'ACGT'
