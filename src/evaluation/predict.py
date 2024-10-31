@@ -127,7 +127,7 @@ def predict_and_evaluate(config: DictConfig, subproject, logger):
 if __name__ == "__main__":
     CONFIG_PATH = "config/mamba.yml"
 
-    general_config = OmegaConf.load("config/general.yml")
+    general_config = OmegaConf.load("config/general_codon.yml")
     model_config = OmegaConf.load(CONFIG_PATH)
     custom_config = OmegaConf.merge(general_config, model_config)
 
