@@ -80,8 +80,7 @@ def train_fold(config: DictConfig, fold: int = 0):
             aim_run.track(1, name='checkpoint_stored', epoch=epoch)
 
         # Validation
-        if ((epoch % config.val_freq == 0 or epoch % config.save_freq == 0 or epoch == config.epochs)
-                and epoch >= config.warmup):  # ensure validation if stored
+        if epoch % config.val_freq == 0 or epoch % config.save_freq == 0 or epoch == config.epochs:
             model.eval()
             val_loss = 0.0
             with torch.no_grad():
