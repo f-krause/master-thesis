@@ -5,9 +5,11 @@ from omegaconf import OmegaConf, DictConfig
 import numpy as np
 from torch.utils.data import DataLoader
 from log.logger import setup_logger
+from itertools import compress
 
 from sklearn.model_selection import train_test_split
 from data_handling.train_val_test_indices import get_train_val_test_indices
+from knowledge_db import CODON_MAP_DNA, TISSUES
 
 TOKENS = 'ACGT().BEHIMSX'
 
@@ -49,13 +51,31 @@ class RNADataset(torch.utils.data.Dataset):
                     if len(rna_data_full) < 10000:
                         logger.warning(f"DATASET HAS ONLY {len(rna_data_full)} SAMPLES")
 
-            mrna_sequences = ["".join(map(str, tensor.tolist())) for tensor in rna_data_full]  # FIXME: mrna sequence length is now not fully identical with the original sequence length
+            mask = torch.ones((len(rna_data_full)), dtype=torch.bool)
+
+            if config.tissue_id in range(len(TISSUES)):
+                mask = tissue_ids_full == config.tissue_id
+                logger.warning(f"Only keeping data for tissue {TISSUES[config.tissue_id]}")
+
+            if config.binary_class:
+                mask_bin = targets_bin_full > 0  # only keep low-/high-PTR samples
+                mask = mask_bin & mask
+                targets_bin_full -= 1  # make binary class 0/1 encoded
+                logger.warning("Only keeping data for binary CLASSIFICATION")
+
+            rna_data_full = list(compress(rna_data_full, mask))
+            tissue_ids_full, targets_full, targets_bin_full = \
+                [tensor[mask] for tensor in [tissue_ids_full, targets_full, targets_bin_full]]
+
+            mrna_sequences = ["".join(map(str, tensor.tolist())) for tensor in
+                              rna_data_full]  # FIXME: mrna sequence length is now not fully identical with the original sequence length
             train_indices, val_indices = self._get_train_val_indices(mrna_sequences, fold, config.seed, config.nr_folds)
 
             if train_val:
                 self.rna_data = [rna_data_full[i] for i in val_indices]
                 self.tissue_ids = tissue_ids_full[val_indices]
                 self.targets = targets_full[val_indices]
+                self.targets_bin = targets_bin_full[val_indices]
 
                 # FIXME
                 # only keep data for tissue_id == 12
@@ -70,6 +90,7 @@ class RNADataset(torch.utils.data.Dataset):
                 self.rna_data = [rna_data_full[i] for i in train_indices]
                 self.tissue_ids = tissue_ids_full[train_indices]
                 self.targets = targets_full[train_indices]
+                self.targets_bin = targets_bin_full[train_indices]
 
                 # FIXME
                 # only keep data for tissue_id == 12
@@ -118,7 +139,6 @@ def _pad_sequences(batch):
     seq_lengths = torch.tensor([seq.size(0) for seq in rna_data])
     rna_data_padded = torch.nn.utils.rnn.pad_sequence(rna_data, batch_first=True)
 
-    return [rna_data_padded, tissue_ids, seq_lengths], torch.tensor(targets)
     return [rna_data_padded, tissue_ids, seq_lengths], torch.tensor(targets), torch.tensor(targets_bin)
 
 
@@ -153,9 +173,11 @@ if __name__ == "__main__":
 
     dev_config = OmegaConf.create(
         {"project_path": None, "log_file_path": None, "subproject": "dev/delete_me", "model": "baseline",
-         "train_data_file": "codon_train_2.7k_data.pkl", "val_data_file": "codon_val_2.7k_data.pkl",
-         "test_data_file": "codon_test_2.7k_data.pkl", "batch_size": 4, "num_workers": 4,
-         "folding_algorithm": "viennarna", "seed": 42, "nr_folds": 5}
+         "train_data_file": "bin_codon_train_2.7k_data.pkl", "val_data_file": "bin_codon_val_2.7k_data.pkl",
+         "test_data_file": "bin_codon_test_2.7k_data.pkl", "batch_size": 4, "num_workers": 4,
+         "folding_algorithm": "viennarna", "seed": 42, "nr_folds": 1,
+         "tissue_id": 28,
+         "binary_class": False}
     )
     set_project_path(dev_config)
     set_log_file(dev_config)
@@ -163,18 +185,18 @@ if __name__ == "__main__":
     print("Testing train and train_val data loaders")
     train_loader_test, train_val_loader_test = get_train_data_loaders(dev_config, fold=1)
     data_iter = iter(train_loader_test)
-    x, y = next(data_iter)
-    print(x)
-    print(y)
+    x, y, y2 = next(data_iter)
+    print(x.size())
+    print(y, y2)
 
     print("Testing val data loader")
     val_loader_test = get_val_data_loader(dev_config)
     data_iter = iter(val_loader_test)
-    x, y = next(data_iter)
-    print(x)
+    x, _, _ = next(data_iter)
+    print(x.size())
 
     print("Testing test data loader")
     test_loader_test = get_test_data_loader(dev_config)
     data_iter = iter(test_loader_test)
-    x, y = next(data_iter)
-    print(x)
+    x, _, _ = next(data_iter)
+    print(x.size())

@@ -34,7 +34,11 @@ def train_fold(config: DictConfig, fold: int = 0):
     model = get_model(config, device, logger)
     optimizer = get_optimizer(model, config.optimizer)
 
-    criterion = torch.nn.MSELoss()  # Define your loss function
+    if config.binary_class:
+        criterion = torch.nn.BCELoss()
+    else:
+        criterion = torch.nn.MSELoss()  # Define your loss function
+
     early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
     train_loader, val_loader = get_train_data_loaders(config, fold=fold)
 
@@ -47,7 +51,10 @@ def train_fold(config: DictConfig, fold: int = 0):
         running_loss = 0.0
         for batch_idx, (data, target, target_bin) in enumerate(tqdm(train_loader)):
             data = [d.to(device) for d in data]
+            if config.binary_class:
+                target = target_bin
             target = target.to(device)
+
             optimizer.zero_grad()
             output = model(data)
             loss = criterion(output.squeeze().float(), target.float())
@@ -80,10 +87,12 @@ def train_fold(config: DictConfig, fold: int = 0):
             with torch.no_grad():
                 for data, target, target_bin in val_loader:
                     data = [d.to(device) for d in data]
+                    if config.binary_class:
+                        target = target_bin
                     target = target.to(device)
+
                     output = model(data)
-                    output, target = output.squeeze().float(), target.float()
-                    loss = criterion(output, target)
+                    loss = criterion(output.squeeze().float(), target.float())
                     val_loss += loss.item()
             val_loss /= len(val_loader)
             losses[epoch].update({"val_loss": val_loss})

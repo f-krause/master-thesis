@@ -17,7 +17,7 @@ class ModelBaseline(nn.Module):
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, config.dim_embedding_token, padding_idx=0,
                                         max_norm=config.embedding_max_norm)  # 64 codons + padding 0
 
-        self.fc = nn.Sequential(
+        layers = [
             nn.Linear(config.dim_embedding_tissue + self.max_seq_length * config.dim_embedding_token,
                       config.hidden_size),
             nn.GELU(),
@@ -26,7 +26,12 @@ class ModelBaseline(nn.Module):
             nn.GELU(),
             nn.Dropout(p=config.dropout),
             nn.Linear(config.hidden_size // 2, 1)
-        )
+        ]
+
+        if config.binary_class:
+            layers.append(nn.Sigmoid())
+
+        self.fc = nn.Sequential(*layers)
 
         # DOC POOLING
         # self.pooling_dim = pooling_dim
