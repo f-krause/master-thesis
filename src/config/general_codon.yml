@@ -1,6 +1,5 @@
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
-
 seed: 2024
 
 binary_class: True
@@ -11,8 +10,8 @@ embedding_max_norm: 2
 train_data_file: "bin_codon_train_2.7k_data.pkl"
 #train_data_file: "bin_codon_dev_train_2.7k_data.pkl"  # codon_dev_1k_data.pkl
 
-val_data_file: "codon_val_2.7k_data.pkl"
-test_data_file: "codon_test_2.7k_data.pkl"
+val_data_file: "bin_codon_val_2.7k_data.pkl"
+test_data_file: "bin_codon_test_2.7k_data.pkl"
 max_seq_length: 2700
 
 nr_folds: 1  # if 1, will take 20% of the train data as validation set during training ("train val")
