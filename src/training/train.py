@@ -38,7 +38,7 @@ def train_fold(config: DictConfig, fold: int = 0):
     if config.binary_class:
         criterion = torch.nn.BCELoss()
     else:
-        criterion = torch.nn.MSELoss()  # Define your loss function
+        criterion = torch.nn.MSELoss()
 
     early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
     train_loader, val_loader = get_train_data_loaders(config, fold=fold)
