@@ -13,10 +13,12 @@ num_workers: 1
 # Model
 model: "lstm"
 dim_embedding_token: 32
+predictor_hidden_dim: 64
+predictor_dropout: 0.1
+
 dropout: 0.3
 bidirectional: False
 rnn_hidden_size: 512
-out_hidden_size: 64
 num_layers: 2
 
 # Optimizer

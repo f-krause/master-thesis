@@ -64,7 +64,7 @@ class ModelTransformer(nn.Module):
             norm=nn.LayerNorm(self.input_dim),
         )
 
-        self.predictor = Predictor(self.input_dim, config.out_hidden_size).to(self.device)
+        self.predictor = Predictor(config, self.input_dim).to(self.device)
 
     @staticmethod
     def _compute_frequencies(rna_data):

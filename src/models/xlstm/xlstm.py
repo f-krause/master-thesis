@@ -65,7 +65,7 @@ class ModelXLSTM(nn.Module):
 
         self.xlstm_stack = xLSTMBlockStack(cfg)
 
-        self.predictor = Predictor(self.embedding_dim, config.out_hidden_size).to(self.device)
+        self.predictor = Predictor(config, self.embedding_dim).to(self.device)
 
     def forward(self, inputs: Tensor) -> Tensor:
         rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]

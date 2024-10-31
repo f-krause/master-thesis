@@ -14,7 +14,8 @@ num_workers: 1
 model: "cnn"
 dim_embedding_tissue: 16  # max 29 tissues
 dim_embedding_token: 32  # 64 codons or 4 nucleotides
-out_hidden_size: 64  # hidden size of the output layer
+predictor_hidden_dim: 64
+predictor_dropout: 0.1
 
 # Convolutional Layer Parameters
 numFiltersConv1: 128

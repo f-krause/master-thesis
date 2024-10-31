@@ -14,7 +14,8 @@ num_workers: 1
 model: "xlstm"
 dim_embedding_token: 32
 tissue_embedding_dim: 32
-out_hidden_size: 64
+predictor_hidden_dim: 64
+predictor_dropout: 0.1
 
 # xLSTM Config
 conv1d_kernel_size: 4

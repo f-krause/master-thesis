@@ -46,8 +46,8 @@ class ModelCNN(nn.Module):
         length_after_conv2 = length_after_pool1  # Since padding='same'
         length_after_pool2 = length_after_conv2 // config.maxPool2
 
-        self.predictor = Predictor(length_after_pool2 * config.numFiltersConv2 + config.dim_embedding_tissue,
-                                   config.out_hidden_size).to(self.device)
+        predictor = Predictor(config, length_after_pool2 * config.numFiltersConv2 + config.dim_embedding_tissue)
+        self.predictor = predictor.to(self.device)
 
     def forward(self, inputs):
         rna_data, tissue_id = inputs[0], inputs[1]

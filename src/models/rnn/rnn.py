@@ -31,8 +31,7 @@ class ModelRNN(nn.Module):
         else:
             raise ValueError(f"Model {model} not supported: either 'lstm' or 'gru'")
 
-        predictor = Predictor((int(config.bidirectional) + 1) * config.rnn_hidden_size, config.out_hidden_size)
-        self.predictor = predictor.to(self.device)
+        self.predictor = Predictor(config, (int(config.bidirectional) + 1) * config.rnn_hidden_size).to(self.device)
 
     def forward(self, inputs: Tensor) -> Tensor:
         rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]

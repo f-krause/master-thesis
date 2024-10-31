@@ -14,7 +14,8 @@ num_workers: 0  # TODO seems faster than 1
 model: "mamba"
 dim_embedding_token: 64  # Embedding dimension for tokens
 tissue_embedding_dim: 64  # Embedding dimension for tissues
-out_hidden_size: 64
+predictor_hidden_dim: 64
+predictor_dropout: 0.1
 
 # Mamba2 Config
 # Requirement: (dim_embedding_token + tissue_embedding_dim) * expand / headdim = multiple of 8
