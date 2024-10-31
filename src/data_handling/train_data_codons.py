@@ -61,7 +61,10 @@ def get_train_data_file(file_name: str, check_reproduce=False, return_dict=False
     for identifier, content in raw_data.items():
         sequence = content['fasta']
         bed_annotation = content['bed_annotation']
-        data_targets_bin = np.nan_to_num(content['targets_bin'] + 1, nan=0)  # nan: 0, low-PTR: 1, high-PTR: 2
+
+        # value: 0, low-PTR: 1, high-PTR: 2
+        data_targets_bin = (np.where(np.isnan(content["targets"]), np.nan, 0) +
+                            np.where(np.isnan(content["targets_bin"]), 0, content["targets_bin"] + 1))
 
         coding_sequence = [nucleotide for nucleotide, annotation in zip(list(sequence), bed_annotation) if
                            annotation not in [5, 3]]  # CDS, drop 5' and 3' UTR
