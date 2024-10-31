@@ -7,7 +7,8 @@ from tqdm import tqdm
 from log.logger import setup_logger
 from omegaconf import OmegaConf, DictConfig
 
-from utils import save_checkpoint, mkdir, get_device, get_model_stats, log_pred_true_scatter
+from utils import save_checkpoint, mkdir, get_device, get_model_stats, log_pred_true_scatter, log_confusion_matrix, \
+    log_roc_curve
 from models.get_model import get_model
 from data_handling.data_loader import get_train_data_loaders
 from training.optimizer import get_optimizer
@@ -109,16 +110,25 @@ def train_fold(config: DictConfig, fold: int = 0):
 
     # Save losses to a CSV file
     pd.DataFrame(losses).T.to_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
-    training_time = round((end_time - start_time)/60, 4)
+    training_time = round((end_time - start_time) / 60, 4)
     logger.info(f"Training process completed. Training time: {training_time} mins.")
     aim_run.track(training_time, name='training_time_min')
+
     if config.model != "dummy" and config.model != "best":
         get_model_stats(config, model, device, logger)
+
     if config.final_evaluation:
         logger.info("Starting prediction and evaluation")
         y_true, y_pred = predict_and_evaluate(config, os.environ["SUBPROJECT"], logger)
-        img_buffer = log_pred_true_scatter(y_true, y_pred)
+        img_buffer = log_pred_true_scatter(y_true, y_pred, config.binary_class)
         aim_run.track(aim.Image(img_buffer), name="pred_true_scatter")
+
+        if config.binary_class:
+            img_buffer = log_confusion_matrix(y_true, y_pred)
+            aim_run.track(aim.Image(img_buffer), name="confusion_matrix")
+            img_buffer = log_roc_curve(y_true, y_pred)
+            aim_run.track(aim.Image(img_buffer), name="roc_curve")
+
     logger.info(f"Weights path: {checkpoint_path}")
     aim_run.close()
 
