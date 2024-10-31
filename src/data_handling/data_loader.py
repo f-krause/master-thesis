@@ -72,19 +72,20 @@ class RNADataset(torch.utils.data.Dataset):
                               rna_data_full]  # FIXME: mrna sequence length is now not fully identical with the original sequence length
             train_indices, val_indices = self._get_train_val_indices(mrna_sequences, fold, config.seed, config.nr_folds)
 
+            # SANITY CHECK DISTRIBUTION
+            logger.info(
+                f"Distribution seq lens - full data: {np.histogram([len(seq) for seq in mrna_sequences], bins=10)}")
+
             if train_val:
                 self.rna_data = [rna_data_full[i] for i in val_indices]
                 self.tissue_ids = tissue_ids_full[val_indices]
                 self.targets = targets_full[val_indices]
                 self.targets_bin = targets_bin_full[val_indices]
 
-                # FIXME
-                # only keep data for tissue_id == 12
-                # tissue_id_12_indices = np.where(self.tissue_ids == 12)[0]
-                # self.rna_data = [self.rna_data[i] for i in tissue_id_12_indices]
-                # self.tissue_ids = self.tissue_ids[tissue_id_12_indices]
-                # self.targets = self.targets[tissue_id_12_indices]
-                # logger.warning("DEV: Only keeping data for tissue_id == 12")
+                # SANITY CHECK DISTRIBUTION
+                mrna_sequences = [mrna_sequences[i] for i in val_indices]
+                logger.info(
+                    f"Distribution seq len - train val set: {np.histogram([len(seq) for seq in mrna_sequences], bins=10)}")
 
                 logger.info(f"Train validation dataset with {len(self.rna_data)} samples loaded")
             else:
@@ -93,13 +94,10 @@ class RNADataset(torch.utils.data.Dataset):
                 self.targets = targets_full[train_indices]
                 self.targets_bin = targets_bin_full[train_indices]
 
-                # FIXME
-                # only keep data for tissue_id == 12
-                # tissue_id_12_indices = np.where(self.tissue_ids == 12)[0]
-                # self.rna_data = [self.rna_data[i] for i in tissue_id_12_indices]
-                # self.tissue_ids = self.tissue_ids[tissue_id_12_indices]
-                # self.targets = self.targets[tissue_id_12_indices]
-                # logger.warning("DEV: Only keeping data for tissue_id == 12")
+                # SANITY CHECK DISTRIBUTION
+                mrna_sequences = [mrna_sequences[i] for i in train_indices]
+                logger.info(
+                    f"Distribution seq len - train set: {np.histogram([len(seq) for seq in mrna_sequences], bins=10)}")
 
                 logger.info(f"Train dataset with {len(self.rna_data)} samples loaded")
 
