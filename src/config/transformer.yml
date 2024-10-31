@@ -1,5 +1,6 @@
+#subproject: "dev_transformer/delete_me"
 #subproject: "dev_transformer/v3_full_seq_length_100"
-subproject: "dev_transformer/delete_me"
+subproject: "bin/dev_transformer/codon_freq_v1"
 
 # Training
 gpu_id: 0
@@ -7,20 +8,20 @@ epochs: 50
 save_freq: 10
 val_freq: 1
 warmup: 0
-batch_size: 32
+batch_size: 64
 num_workers: 1
 
 # Model
 model: "transformer"
-dim_embedding_token: 32  # Embedding dimension for tokens
-tissue_embedding_dim: 32  # Embedding dimension for tissues
+dim_embedding_tissue: 16  # max 29 tissues
+dim_embedding_token: 32  # 64 codons or 4 nucleotides/
 predictor_hidden_dim: 64
 predictor_dropout: 0.1
 
 # Transformer Config
 num_heads: 8
 num_layers: 6
-dim_feedforward: 512
+dim_feedforward: 256
 dropout: 0.1
 activation: "gelu"
 

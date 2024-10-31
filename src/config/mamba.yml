@@ -1,11 +1,12 @@
-#subproject: "dev_mamba/v2_test_150"
+#subproject: "mamba/v1_codon_full_data"
+#subproject: "bin/dev_mamba/v1_codon_full_data"
 subproject: "dev_mamba/delete_me"
 
 # Training
-gpu_id: 0
-epochs: 100
-save_freq: 10
-val_freq: 10
+gpu_id: 1
+epochs: 50
+save_freq: 5
+val_freq: 1
 warmup: 0
 batch_size: 32
 num_workers: 0  # TODO seems faster than 1

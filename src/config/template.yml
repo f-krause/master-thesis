@@ -3,8 +3,8 @@ subproject: "dev/run"
 # Training
 gpu_id: 0
 epochs: 6
-save_freq: 3
-val_freq: 3
+save_freq: 5
+val_freq: 1
 warmup: 0
 batch_size: 32
 num_workers: 1

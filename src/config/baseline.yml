@@ -8,14 +8,15 @@ epochs: 2
 save_freq: 10
 val_freq: 1
 warmup: 0
-batch_size: 32
+batch_size: 64
 num_workers: 1
 
 # Model
 model: "baseline"
 dim_embedding_tissue: 16  # max 29 tissues
-dim_embedding_token: 32  # 64 codons or 4 nucleotides/
-hidden_size: 1024
+dim_embedding_token: 32  # 64 codons or 4 nucleotides
+
+hidden_size: 256
 dropout: 0.2
 
 # Optimizer
