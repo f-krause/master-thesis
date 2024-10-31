@@ -132,7 +132,7 @@ if __name__ == '__main__':
     from utils import set_project_path
 
     FILE_NAME = "bin_codon"
-    CHECK_REPRODUCTION = False
+    CHECK_REPRODUCTION = True
 
     dev_config = OmegaConf.create(
         {"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
