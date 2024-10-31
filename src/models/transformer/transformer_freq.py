@@ -43,23 +43,14 @@ class ModelTransformer(nn.Module):
         super(ModelTransformer, self).__init__()
 
         self.device = device
-        self.max_seq_length = config.max_seq_length
-        self.dim_embedding_token = config.dim_embedding_token
-        self.tissue_embedding_dim = config.tissue_embedding_dim
-        self.embedding_dim = self.dim_embedding_token + len(CODON_MAP_DNA)
-
-        # Embedding layers
-        self.tissue_encoder = nn.Embedding(len(TISSUES), self.tissue_embedding_dim, max_norm=config.embedding_max_norm)
-        self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, self.dim_embedding_token, padding_idx=0,
-                                        max_norm=config.embedding_max_norm)
-
-        # Positional Encoding
-        self.positional_encoding = PositionalEncoding(self.embedding_dim, max_len=self.max_seq_length)
+        self.input_dim = config.dim_embedding_tissue + len(CODON_MAP_DNA)
+        self.tissue_encoder = nn.Embedding(len(TISSUES), config.dim_embedding_tissue, max_norm=config.embedding_max_norm)
+        self.positional_encoding = PositionalEncoding(self.input_dim, max_len=config.max_seq_length)
 
         # Transformer Encoder
         # https://pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html#torch.nn.TransformerEncoderLayer
         encoder_layer = nn.TransformerEncoderLayer(
-            d_model=self.embedding_dim,  # input size
+            d_model=self.input_dim,  # input size
             nhead=config.num_heads,
             dim_feedforward=config.dim_feedforward,
             dropout=config.dropout,
@@ -70,10 +61,10 @@ class ModelTransformer(nn.Module):
         self.transformer_encoder = nn.TransformerEncoder(
             encoder_layer,
             num_layers=config.num_layers,
-            norm=nn.LayerNorm(self.embedding_dim),
+            norm=nn.LayerNorm(self.input_dim),
         )
 
-        self.predictor = Predictor(self.embedding_dim, config.out_hidden_size).to(self.device)
+        self.predictor = Predictor(self.input_dim, config.out_hidden_size).to(self.device)
 
     @staticmethod
     def _compute_frequencies(rna_data):
@@ -87,29 +78,13 @@ class ModelTransformer(nn.Module):
     def forward(self, inputs: Tensor) -> Tensor:
         rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
 
-        # Embedding layers
         tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, tissue_embedding_dim)
-        # seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, seq_len, dim_embedding_token)
         seq_embedding = self._compute_frequencies(rna_data_pad)
+        combined_embedding = torch.cat((seq_embedding, tissue_embedding), dim=1).unsqueeze(1)
 
-        # Expand tissue embedding to match sequence length
-        # tissue_embedding_expanded = tissue_embedding.unsqueeze(1).repeat(1, seq_embedding.size(1), 1)  # (batch_size, seq_len, tissue_embedding_dim)
-
-        # Concatenate sequence embedding and tissue embedding
-        combined_embedding = torch.cat((seq_embedding, tissue_embedding), dim=1).unsqueeze(1)  # (batch_size, seq_len, embedding_dim)
-
-        # Apply positional encoding
         combined_embedding = self.positional_encoding(combined_embedding)  # (batch_size, seq_len, embedding_dim)
 
-        # Create attention mask (batch_size, seq_len)
-        attention_mask = (seq_embedding == 0)
-
-        # Pass through Transformer Encoder: (seq_len, batch_size, embedding_dim)
-        out = self.transformer_encoder(combined_embedding)#, src_key_padding_mask=attention_mask)
-
-        # Extract outputs corresponding to the last valid time step
-        # idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, out.size(2)))  # (batch_size, 1, embedding_dim)
-        # out_last = out.gather(1, idx).squeeze(1)  # (batch_size, embedding_dim)
+        out = self.transformer_encoder(combined_embedding)
 
         y_pred = self.predictor(out)
 
