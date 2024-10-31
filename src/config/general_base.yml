@@ -1,7 +1,9 @@
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
-
 seed: 2024
+
+binary_class: True
+tissue_id: -1  # 0-28 or -1 for all tissues
 embedding_max_norm: 2
 
 train_data_file: "TODO.pkl"

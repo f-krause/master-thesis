@@ -4,7 +4,8 @@ import pandas as pd
 import numpy as np
 from omegaconf import OmegaConf, DictConfig
 from tqdm import tqdm
-from sklearn.metrics import mean_absolute_error, mean_squared_error, root_mean_squared_error, r2_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error, root_mean_squared_error, r2_score, roc_auc_score, \
+    confusion_matrix
 
 from utils import mkdir, set_project_path, get_device
 from models.get_model import get_model
@@ -67,9 +68,12 @@ def predict(config: DictConfig, subproject, logger, val=False, test=False, full_
     predictions = []
     targets = []
     with torch.no_grad():
-        for data, target in tqdm(data_loader):
+        for data, target, target_bin in tqdm(data_loader):
             data = [d.to(device) for d in data]
+            if config.binary_class:
+                target = target_bin
             target = target.to(device)
+
             output = avg_model(data)
             output, target = output.float(), target.float()
 
@@ -94,17 +98,28 @@ def predict_and_evaluate(config: DictConfig, subproject, logger):
     preds_df.to_csv(os.path.join(prediction_path, "predictions.csv"))
     logger.info(f"Predictions stored at {prediction_path}")
 
-    mae, mse, rmse, r2 = evaluate(preds_df.target, preds_df.prediction)
+    if config.binary_class:
+        bin_preds = [1 if target > 0.5 else 0 for target in preds_df.prediction]  # make target binary, tau = 0.5
+        roc = roc_auc_score(preds_df.target, bin_preds)
+        logger.info(confusion_matrix(preds_df.target, bin_preds))
+        logger.info(f"AUC: {roc}, Best epoch: {best_epoch}")
 
-    logger.info(f"MAE: {mae}, MSE: {mse}, RMSE: {rmse}, RMSE_train: {train_loss}, R2: {r2}, best epoch: {best_epoch}")
+        with open(os.path.join(prediction_path, "evaluation_metrics.txt"), "w") as f:
+            f.write(f"AUC: {roc},\n"
+                    f"Best epoch: {best_epoch}")
+    else:
+        mae, mse, rmse, r2 = evaluate(preds_df.target, preds_df.prediction)
 
-    with open(os.path.join(prediction_path, "evaluation_metrics.txt"), "w") as f:
-        f.write(f"MAE:        {mae}\n"
-                f"MSE:        {mse}\n"
-                f"RMSE:       {rmse}\n"
-                f"RMSE_train: {train_loss}\n"
-                f"R2:         {r2}\n"
-                f"Best epoch: {best_epoch}\n")
+        logger.info(
+            f"MAE: {mae}, MSE: {mse}, RMSE: {rmse}, RMSE_train: {train_loss}, R2: {r2}, best epoch: {best_epoch}")
+
+        with open(os.path.join(prediction_path, "evaluation_metrics.txt"), "w") as f:
+            f.write(f"MAE:        {mae}\n"
+                    f"MSE:        {mse}\n"
+                    f"RMSE:       {rmse}\n"
+                    f"RMSE_train: {train_loss}\n"
+                    f"R2:         {r2}\n"
+                    f"Best epoch: {best_epoch}\n")
 
     return preds_df.target, preds_df.prediction
 
@@ -112,7 +127,7 @@ def predict_and_evaluate(config: DictConfig, subproject, logger):
 if __name__ == "__main__":
     CONFIG_PATH = "config/mamba.yml"
 
-    general_config = OmegaConf.load("config/general.yml")
+    general_config = OmegaConf.load("config/general_codon.yml")
     model_config = OmegaConf.load(CONFIG_PATH)
     custom_config = OmegaConf.merge(general_config, model_config)
 

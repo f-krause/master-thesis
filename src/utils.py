@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from log.logger import setup_logger
 from omegaconf import DictConfig
 from fvcore.nn import FlopCountAnalysis, flop_count_table
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, roc_curve, auc, RocCurveDisplay
 
 
 def mkdir(path: str):
@@ -149,9 +150,13 @@ def get_model_stats(config: DictConfig, model, device, logger):
     logger.info(f"Model: FLOPs table: \n{flop_count_table(flops)}")
 
 
-def log_pred_true_scatter(y_true, y_pred):
+def log_pred_true_scatter(y_true, y_pred, binary_class=False):
     plt.figure(figsize=(10, 10))
+    if binary_class:
+        # add small random variation to scatter plot to make it more readable
+        y_true = y_true + np.random.normal(0, 0.02, len(y_true))
     plt.scatter(y_true, y_pred, alpha=0.5, s=10)
+
     plt.xlabel('True Values')
     plt.ylabel('Predicted Values')
     plt.title('y_true vs y_pred')
@@ -159,6 +164,40 @@ def log_pred_true_scatter(y_true, y_pred):
     min_val = min(min(y_true), min(y_pred))
     max_val = max(max(y_true), max(y_pred))
     plt.plot([min_val, max_val], [min_val, max_val], color='grey', linestyle='--')
+
+    # Save the plot to an in-memory buffer
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    plt.close()
+
+    return Image.open(buffer)
+
+
+def log_confusion_matrix(y_true, y_pred):
+    y_pred = [1 if target > 0.5 else 0 for target in y_pred]  # make target binary, tau = 0.5
+
+    plt.figure(figsize=(10, 10))
+    cm = confusion_matrix(y_true, y_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+    disp.plot()
+
+    # Save the plot to an in-memory buffer
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    plt.close()
+
+    return Image.open(buffer)
+
+
+def log_roc_curve(y_true, y_pred):
+    plt.figure(figsize=(10, 10))
+    fpr, tpr, thresholds = roc_curve(y_true, y_pred)
+    roc_auc = auc(fpr, tpr)
+    disp = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='estimator')
+    disp.plot()
+    plt.plot([0, 1], [0, 1], 'k--', label='No Skill')
 
     # Save the plot to an in-memory buffer
     buffer = io.BytesIO()

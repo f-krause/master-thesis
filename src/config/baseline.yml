@@ -1,6 +1,6 @@
-#subproject: "dev_baseline/v3_full_seq_length_200"
-#subproject: "v1_codon_full_data_replica_tissue12"
 subproject: "dev_baseline/delete_me"
+#subproject: "dev_baseline/v1_codon_full_data_replica_tissue12"
+#subproject: "bin/dev_baseline/codon_freq_v1"
 
 # Training
 gpu_id: 1

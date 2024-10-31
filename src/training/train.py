@@ -7,7 +7,8 @@ from tqdm import tqdm
 from log.logger import setup_logger
 from omegaconf import OmegaConf, DictConfig
 
-from utils import save_checkpoint, mkdir, get_device, get_model_stats, log_pred_true_scatter
+from utils import save_checkpoint, mkdir, get_device, get_model_stats, log_pred_true_scatter, log_confusion_matrix, \
+    log_roc_curve
 from models.get_model import get_model
 from data_handling.data_loader import get_train_data_loaders
 from training.optimizer import get_optimizer
@@ -34,7 +35,11 @@ def train_fold(config: DictConfig, fold: int = 0):
     model = get_model(config, device, logger)
     optimizer = get_optimizer(model, config.optimizer)
 
-    criterion = torch.nn.MSELoss()  # Define your loss function
+    if config.binary_class:
+        criterion = torch.nn.BCELoss()
+    else:
+        criterion = torch.nn.MSELoss()
+
     early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
     train_loader, val_loader = get_train_data_loaders(config, fold=fold)
 
@@ -45,9 +50,12 @@ def train_fold(config: DictConfig, fold: int = 0):
     for epoch in range(1, config.epochs + 1):
         model.train()
         running_loss = 0.0
-        for batch_idx, (data, target) in enumerate(tqdm(train_loader)):
+        for batch_idx, (data, target, target_bin) in enumerate(tqdm(train_loader)):
             data = [d.to(device) for d in data]
+            if config.binary_class:
+                target = target_bin
             target = target.to(device)
+
             optimizer.zero_grad()
             output = model(data)
             loss = criterion(output.squeeze().float(), target.float())
@@ -73,17 +81,18 @@ def train_fold(config: DictConfig, fold: int = 0):
             aim_run.track(1, name='checkpoint_stored', epoch=epoch)
 
         # Validation
-        if ((epoch % config.val_freq == 0 or epoch % config.save_freq == 0 or epoch == config.epochs)
-                and epoch >= config.warmup):  # ensure validation if stored
+        if epoch % config.val_freq == 0 or epoch % config.save_freq == 0 or epoch == config.epochs:
             model.eval()
             val_loss = 0.0
             with torch.no_grad():
-                for data, target in val_loader:
+                for data, target, target_bin in val_loader:
                     data = [d.to(device) for d in data]
+                    if config.binary_class:
+                        target = target_bin
                     target = target.to(device)
+
                     output = model(data)
-                    output, target = output.squeeze().float(), target.float()
-                    loss = criterion(output, target)
+                    loss = criterion(output.squeeze().float(), target.float())
                     val_loss += loss.item()
             val_loss /= len(val_loader)
             losses[epoch].update({"val_loss": val_loss})
@@ -101,16 +110,25 @@ def train_fold(config: DictConfig, fold: int = 0):
 
     # Save losses to a CSV file
     pd.DataFrame(losses).T.to_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
-    training_time = round((end_time - start_time)/60, 4)
+    training_time = round((end_time - start_time) / 60, 4)
     logger.info(f"Training process completed. Training time: {training_time} mins.")
     aim_run.track(training_time, name='training_time_min')
+
     if config.model != "dummy" and config.model != "best":
         get_model_stats(config, model, device, logger)
+
     if config.final_evaluation:
         logger.info("Starting prediction and evaluation")
         y_true, y_pred = predict_and_evaluate(config, os.environ["SUBPROJECT"], logger)
-        img_buffer = log_pred_true_scatter(y_true, y_pred)
+        img_buffer = log_pred_true_scatter(y_true, y_pred, config.binary_class)
         aim_run.track(aim.Image(img_buffer), name="pred_true_scatter")
+
+        if config.binary_class:
+            img_buffer = log_confusion_matrix(y_true, y_pred)
+            aim_run.track(aim.Image(img_buffer), name="confusion_matrix")
+            img_buffer = log_roc_curve(y_true, y_pred)
+            aim_run.track(aim.Image(img_buffer), name="roc_curve")
+
     logger.info(f"Weights path: {checkpoint_path}")
     aim_run.close()
 

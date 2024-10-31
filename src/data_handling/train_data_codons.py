@@ -15,13 +15,16 @@ MAX_DATA = 300_000  # 182_625 seq-tuple pairs in total
 SEED = 1192  # randomly drawn with np.random.randint(0,2024) on 22.10.2024, 15:00
 
 
-def _store_data(identifiers: list, rna_data: list, target_ids: list, targets: list, indices: list, path: str):
+def _store_data(identifiers: list, rna_data: list, target_ids: list, targets: list, targets_bin: list, indices: list,
+                path: str):
     identifiers_selected = [identifiers[i] for i in indices]
     rna_data_selected = [rna_data[i] for i in indices]
     target_ids_selected = [target_ids[i] for i in indices]
     targets_selected = [targets[i] for i in indices]
+    targets_bin_selected = [targets_bin[i] for i in indices]
     with open(os.path.join(os.environ["PROJECT_PATH"], path + "_data.pkl"), 'wb') as f:
-        pickle.dump([rna_data_selected, torch.tensor(target_ids_selected), torch.tensor(targets_selected)], f)
+        pickle.dump([rna_data_selected, torch.tensor(target_ids_selected), torch.tensor(targets_selected),
+                     torch.tensor(targets_bin_selected)], f)
     pd.DataFrame({"identifier": identifiers_selected, "target_id": target_ids_selected, "index": indices}).to_csv(
         os.path.join(os.environ["PROJECT_PATH"], path + "_indices.csv"), index=False)
 
@@ -51,12 +54,17 @@ def get_train_data_file(file_name: str, check_reproduce=False, return_dict=False
     identifiers = []
     rna_data = []
     targets = []
+    targets_bin = []
     tissue_ids = []
     sequences = []
 
     for identifier, content in raw_data.items():
         sequence = content['fasta']
         bed_annotation = content['bed_annotation']
+
+        # value: 0, low-PTR: 1, high-PTR: 2
+        data_targets_bin = (np.where(np.isnan(content["targets"]), np.nan, 0) +
+                            np.where(np.isnan(content["targets_bin"]), 0, content["targets_bin"] + 1))
 
         coding_sequence = [nucleotide for nucleotide, annotation in zip(list(sequence), bed_annotation) if
                            annotation not in [5, 3]]  # CDS, drop 5' and 3' UTR
@@ -75,6 +83,7 @@ def get_train_data_file(file_name: str, check_reproduce=False, return_dict=False
                 rna_data.append(torch.tensor(encoded_sequence))
                 tissue_ids.append(tissue_id)
                 targets.append(target)
+                targets_bin.append(int(data_targets_bin[tissue_id]))
 
                 if len(rna_data) >= MAX_DATA:
                     break
@@ -90,17 +99,20 @@ def get_train_data_file(file_name: str, check_reproduce=False, return_dict=False
     max_seq_len_logging = str(MAX_SEQ_LENGTH / 1000) + "k"
 
     if check_reproduce:
-        _check_identical(train_indices, identifiers, tissue_ids, f"data/data_train/{file_name}_train_{max_seq_len_logging}")
-        _check_identical(val_indices, identifiers, tissue_ids, f"data/data_test/{file_name}_val_{max_seq_len_logging}")
-        _check_identical(test_indices, identifiers, tissue_ids, f"data/data_test/{file_name}_test_{max_seq_len_logging}")
+        _check_identical(train_indices, identifiers, tissue_ids,
+                         f"data/data_train/{file_name}_train_{max_seq_len_logging}")
+        _check_identical(val_indices, identifiers, tissue_ids,
+                         f"data/data_test/{file_name}_val_{max_seq_len_logging}")
+        _check_identical(test_indices, identifiers, tissue_ids,
+                         f"data/data_test/{file_name}_test_{max_seq_len_logging}")
     else:
-        _store_data(identifiers, rna_data, tissue_ids, targets, train_indices,
+        _store_data(identifiers, rna_data, tissue_ids, targets, targets_bin, train_indices,
                     f"data/data_train/{file_name}_train_{max_seq_len_logging}")
 
-        _store_data(identifiers, rna_data, tissue_ids, targets, val_indices,
+        _store_data(identifiers, rna_data, tissue_ids, targets, targets_bin, val_indices,
                     f"data/data_test/{file_name}_val_{max_seq_len_logging}")
 
-        _store_data(identifiers, rna_data, tissue_ids, targets, test_indices,
+        _store_data(identifiers, rna_data, tissue_ids, targets, targets_bin, test_indices,
                     f"data/data_test/{file_name}_test_{max_seq_len_logging}")
 
         print("Data successfully created")
@@ -119,7 +131,7 @@ def _get_structure_pred(identifier: str, config: DictConfig):
 if __name__ == '__main__':
     from utils import set_project_path
 
-    FILE_NAME = "codon"
+    FILE_NAME = "bin_codon"
     CHECK_REPRODUCTION = True
 
     dev_config = OmegaConf.create(

@@ -14,15 +14,17 @@ class ModelBaseline(nn.Module):
         self.tissue_encoder = nn.Embedding(len(TISSUES), config.dim_embedding_tissue,
                                            max_norm=config.embedding_max_norm)  # 29 tissues
 
-        self.fc = nn.Sequential(
-            # nn.Linear(config.dim_embedding_tissue + self.max_seq_length * config.dim_embedding_token,
-            #           config.hidden_size),
-            # nn.Linear(len(CODON_MAP_DNA), 1),
+        layers = [
             nn.Linear(config.dim_embedding_tissue + len(CODON_MAP_DNA), config.hidden_size),
             nn.GELU(),
             nn.Dropout(p=config.dropout),
-            nn.Linear(config.hidden_size, 1),
-        )
+            nn.Linear(config.hidden_size, 1)
+        ]
+
+        if config.binary_class:
+            layers.append(nn.Sigmoid())
+
+        self.fc = nn.Sequential(*layers)
 
     @staticmethod
     def _compute_frequencies(rna_data):
