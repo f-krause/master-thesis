@@ -120,9 +120,10 @@ def train_fold(config: DictConfig, fold: int = 0):
 
     if config.final_evaluation:
         logger.info("Starting prediction and evaluation")
-        y_true, y_pred = predict_and_evaluate(config, os.environ["SUBPROJECT"], logger)
+        y_true, y_pred, metric = predict_and_evaluate(config, os.environ["SUBPROJECT"], logger)
         img_buffer = log_pred_true_scatter(y_true, y_pred, config.binary_class)
         aim_run.track(aim.Image(img_buffer), name="pred_true_scatter")
+        aim_run.track(metric, name='metric (AUC/R2)')
 
         if config.binary_class:
             img_buffer = log_confusion_matrix(y_true, y_pred)

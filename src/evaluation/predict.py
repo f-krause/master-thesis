@@ -100,12 +100,12 @@ def predict_and_evaluate(config: DictConfig, subproject, logger):
 
     if config.binary_class:
         bin_preds = [1 if target > 0.5 else 0 for target in preds_df.prediction]  # make target binary, tau = 0.5
-        roc = roc_auc_score(preds_df.target, bin_preds)
+        metric = roc_auc_score(preds_df.target, bin_preds)
         logger.info(confusion_matrix(preds_df.target, bin_preds))
-        logger.info(f"AUC: {roc}, Best epoch: {best_epoch}")
+        logger.info(f"AUC: {metric}, Best epoch: {best_epoch}")
 
         with open(os.path.join(prediction_path, "evaluation_metrics.txt"), "w") as f:
-            f.write(f"AUC: {roc},\n"
+            f.write(f"AUC: {metric},\n"
                     f"Best epoch: {best_epoch}")
     else:
         mae, mse, rmse, r2 = evaluate(preds_df.target, preds_df.prediction)
@@ -120,8 +120,9 @@ def predict_and_evaluate(config: DictConfig, subproject, logger):
                     f"RMSE_train: {train_loss}\n"
                     f"R2:         {r2}\n"
                     f"Best epoch: {best_epoch}\n")
+        metric = r2
 
-    return preds_df.target, preds_df.prediction
+    return preds_df.target, preds_df.prediction, metric
 
 
 if __name__ == "__main__":
