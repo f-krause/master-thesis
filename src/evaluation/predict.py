@@ -99,9 +99,8 @@ def predict_and_evaluate(config: DictConfig, subproject, logger):
     logger.info(f"Predictions stored at {prediction_path}")
 
     if config.binary_class:
-        bin_preds = [1 if target > 0.5 else 0 for target in preds_df.prediction]  # make target binary, tau = 0.5
-        metric = roc_auc_score(preds_df.target, bin_preds)
-        logger.info(confusion_matrix(preds_df.target, bin_preds))
+        metric = roc_auc_score(preds_df.target, preds_df.prediction)
+        logger.info(confusion_matrix(preds_df.target, [1 if target > 0.5 else 0 for target in preds_df.prediction]))
         logger.info(f"AUC: {metric}, Best epoch: {best_epoch}")
 
         with open(os.path.join(prediction_path, "evaluation_metrics.txt"), "w") as f:
