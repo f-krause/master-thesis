@@ -31,6 +31,32 @@ def set_log_file(config: DictConfig, predict=False):
         mkdir(config.log_file_path)
 
 
+def get_run_path(config, project_path, runs_folder="runs"):
+    path_components = [runs_folder]
+
+    if "dev" in config.train_data_file or config.dev:
+        path_components.append("dev")
+
+    if config.binary_class:
+        path_components.append("binary")
+    else:
+        path_components.append("regr")
+
+    model_part = config.model
+    path_components.append(model_part)
+
+    run_path = os.path.join(*path_components)
+
+    if config.frequency_features:
+        model_part += "_freq"
+
+    version = 1
+    while os.path.isdir(os.path.join(project_path, run_path, f"{version}_{model_part}")):
+        version += 1
+
+    return os.path.join(run_path, f"{version}_{model_part}")
+
+
 def set_project_path(config: DictConfig):
     if config.project_path:
         project_path = config.project_path
@@ -45,11 +71,8 @@ def set_project_path(config: DictConfig):
 
     os.environ["PROJECT_PATH"] = project_path
 
-    subproject_path = os.path.join(project_path, "runs",  config.subproject)
-    if os.path.isdir(subproject_path):
-        os.environ["SUBPROJECT"] = os.path.join("runs", config.subproject + "_" + get_timestamp())
-    else:
-        os.environ["SUBPROJECT"] = os.path.join("runs", config.subproject)
+    subproject_path = get_run_path(config, project_path, runs_folder="runs")
+    os.environ["SUBPROJECT"] = subproject_path
 
     return project_path
 
