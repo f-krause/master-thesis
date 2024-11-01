@@ -1,2 +1,2 @@
-python main.py -b
-python main.py -c "config/custom.yml"
+python main.py --gpu_id 0 --transformer
+python main.py --gpu_id 0 --mamba
