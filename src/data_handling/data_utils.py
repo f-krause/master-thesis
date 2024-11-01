@@ -1,15 +1,16 @@
 import torch
 from sklearn.model_selection import cross_validate
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 from knowledge_db import CODON_MAP_DNA, TISSUES
 
 
-def fit_evaluate_simple_models(train_dataset, val_dataset):
+def fit_evaluate_simple_models(train_dataset, val_dataset, binary_class=False):
     """ FOR DEVELOPMENT ONLY """
-    clf1 = LogisticRegression(random_state=42)
-    clf2 = RandomForestClassifier(n_estimators=100, max_depth=2, random_state=42)
+    if binary_class:
+        clf1 = RandomForestClassifier(random_state=42)
+    else:
+        clf1 = RandomForestRegressor(random_state=42)
 
     x, y = [], []
     for dataset in [train_dataset, val_dataset]:
@@ -21,8 +22,14 @@ def fit_evaluate_simple_models(train_dataset, val_dataset):
         y.append(dataset.targets_bin.tolist())
     y = y[0] + y[1]
 
-    for clf in [clf1, clf2]:
-        cv_scores = cross_validate(clf, x, y, cv=5, scoring=['roc_auc'], return_train_score=True)
-        print(type(clf).__name__)
-        print("Mean Test ROC:", cv_scores['test_roc_auc'].mean())
+    for clf in [clf1]:
+        if binary_class:
+            cv_scores = cross_validate(clf, x, y, cv=5, scoring=['roc_auc'], return_train_score=True)
+            print(type(clf).__name__)
+            print("Mean Test ROC:", cv_scores['test_roc_auc'].mean())
+        else:
+            cv_scores = cross_validate(clf, x, y, cv=5, scoring=['neg_root_mean_squared_error'],
+                                       return_train_score=True)
+            print(type(clf).__name__)
+            print("Mean Test RMSE:", cv_scores['test_neg_root_mean_squared_error'].mean())
         print(cv_scores)
