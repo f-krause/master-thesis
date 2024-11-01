@@ -3,6 +3,7 @@ import torch
 import time
 import aim  # https://aimstack.io/#demos
 import pandas as pd
+import numpy as np
 from tqdm import tqdm
 from log.logger import setup_logger
 from omegaconf import OmegaConf, DictConfig
@@ -14,6 +15,7 @@ from data_handling.data_loader import get_train_data_loaders
 from training.optimizer import get_optimizer
 from evaluation.predict import predict_and_evaluate
 from training.early_stopper import EarlyStopper
+from sklearn.metrics import roc_auc_score
 
 
 def train_fold(config: DictConfig, fold: int = 0):
@@ -82,6 +84,7 @@ def train_fold(config: DictConfig, fold: int = 0):
             aim_run.track(1, name='checkpoint_stored', epoch=epoch)
 
         # Validation
+        targets, predictions = [], []
         if epoch % config.val_freq == 0 or epoch % config.save_freq == 0 or epoch == config.epochs:
             model.eval()
             val_loss = 0.0
@@ -95,11 +98,21 @@ def train_fold(config: DictConfig, fold: int = 0):
                     output = model(data)
                     loss = criterion(output.squeeze().float(), target.float())
                     val_loss += loss.item()
+
+                    predictions.append(output.cpu().numpy())
+                    targets.append(target.unsqueeze(1).cpu().numpy())
             val_loss /= len(val_loader)
             losses[epoch].update({"val_loss": val_loss})
+            predictions = np.vstack(predictions)
+            targets = np.vstack(targets)
 
             logger.info(f'Validation loss: {val_loss}')
             aim_run.track(val_loss, name='val_loss', epoch=epoch)
+            if config.binary_class:
+                auc = roc_auc_score(targets, predictions)
+                losses[epoch].update({"val_loss": val_loss, "val_auc": auc})
+                logger.info(f'Validation AUC:  {auc}')
+                aim_run.track(auc, name="val_auc", epoch=epoch)
 
             if early_stopper.early_stop(val_loss):
                 logger.info(f"Early stopping at epoch {epoch}")
