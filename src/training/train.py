@@ -109,10 +109,11 @@ def train_fold(config: DictConfig, fold: int = 0):
             logger.info(f'Validation loss: {val_loss}')
             aim_run.track(val_loss, name='val_loss', epoch=epoch)
             if config.binary_class:
-                auc = roc_auc_score(targets, predictions)
-                losses[epoch].update({"val_loss": val_loss, "val_auc": auc})
-                logger.info(f'Validation AUC:  {auc}')
-                aim_run.track(auc, name="val_auc", epoch=epoch)
+                neg_auc = -roc_auc_score(targets, predictions)
+                losses[epoch].update({"val_loss": val_loss, "val_neg_auc": neg_auc})
+                logger.info(f'Validation neg AUC:  {neg_auc}')
+                aim_run.track(neg_auc, name="val_neg_auc", epoch=epoch)
+                val_loss = neg_auc
 
             if early_stopper.early_stop(val_loss):
                 logger.info(f"Early stopping at epoch {epoch}")
