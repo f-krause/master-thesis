@@ -1,10 +1,6 @@
-subproject: "dev_baseline/delete_me"
-#subproject: "dev_baseline/v1_codon_full_data_replica_tissue12"
-#subproject: "bin/dev_baseline/codon_freq_v1"
-
 # Training
-epochs: 2
-save_freq: 10
+epochs: 200
+save_freq: 3
 val_freq: 1
 warmup: 0
 batch_size: 64

@@ -1,8 +1,5 @@
 # FIXME Cuda out of memory error!
 
-#subproject: "dev_jamba/test_150"
-subproject: "dev_jamba/delete_me"
-
 # Training
 epochs: 150
 save_freq: 25

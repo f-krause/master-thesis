@@ -1,6 +1,3 @@
-#subproject: "xlstm/v1_codon_full_data"
-subproject: "dev_xlstm/delete_me"
-
 # Training
 epochs: 50
 save_freq: 10

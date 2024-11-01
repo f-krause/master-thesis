@@ -1,6 +1,3 @@
-subproject: "dev_cnn/v1_codon_full_data"
-#subproject: "dev_cnn/delete_me"
-
 # Training
 epochs: 100
 save_freq: 5

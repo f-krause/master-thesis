@@ -1,6 +1,3 @@
-#subproject: "dev_lstm/v2_test_150"
-subproject: "dev_lstm/delete_me"
-
 # Training
 epochs: 150
 save_freq: 25

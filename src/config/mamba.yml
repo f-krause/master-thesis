@@ -1,13 +1,9 @@
-#subproject: "mamba/v1_codon_full_data"
-#subproject: "bin/dev_mamba/v1_codon_full_data"
-subproject: "dev_mamba/delete_me"
-
 # Training
-epochs: 50
-save_freq: 5
+epochs: 200
+save_freq: 3
 val_freq: 1
 warmup: 0
-batch_size: 32
+batch_size: 64
 num_workers: 0  # TODO seems faster than 1
 
 # Model
