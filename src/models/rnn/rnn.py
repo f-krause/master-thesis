@@ -36,7 +36,7 @@ class ModelRNN(nn.Module):
     def forward(self, inputs: Tensor) -> Tensor:
         rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
 
-        tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, tissue_embedding_dim)
+        tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_token)
         seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, padded_seq_length, seq_embedding_dim)
 
         # Project tissue embedding to the LSTM hidden state dimension

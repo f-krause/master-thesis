@@ -78,7 +78,7 @@ class ModelTransformer(nn.Module):
     def forward(self, inputs: Tensor) -> Tensor:
         rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
 
-        tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, tissue_embedding_dim)
+        tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_token)
         seq_embedding = self._compute_frequencies(rna_data_pad)
         combined_embedding = torch.cat((seq_embedding, tissue_embedding), dim=1).unsqueeze(1)
 

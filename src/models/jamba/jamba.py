@@ -63,12 +63,12 @@ class ModelJamba(nn.Module):
         self.max_norm = 2
         self.max_seq_length = config.max_seq_length
         self.dim_embedding_token = config.dim_embedding_token
-        self.tissue_embedding_dim = config.tissue_embedding_dim
-        self.embedding_dim = self.dim_embedding_token + self.tissue_embedding_dim
+        self.dim_embedding_token = config.dim_embedding_token
+        self.embedding_dim = self.dim_embedding_token + self.dim_embedding_token
 
         # Embedding layers
         # TODO embedding layer norm?
-        self.tissue_encoder = nn.Embedding(len(TISSUES), config.tissue_embedding_dim, max_norm=self.max_norm)
+        self.tissue_encoder = nn.Embedding(len(TISSUES), config.dim_embedding_token, max_norm=self.max_norm)
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, config.dim_embedding_token, padding_idx=0,
                                         max_norm=self.max_norm)
 
@@ -104,12 +104,12 @@ class ModelJamba(nn.Module):
     def forward(self, inputs: Tensor) -> Tensor:
         rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
 
-        tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, tissue_embedding_dim)
+        tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_token)
         seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, seq_len, dim_embedding_token)
 
         # Expand tissue embedding to match sequence length
         tissue_embedding_expanded = tissue_embedding.unsqueeze(1).repeat(1, seq_embedding.size(1),
-                                                                         1)  # (batch_size, seq_len, tissue_embedding_dim)
+                                                                         1)  # (batch_size, seq_len, dim_embedding_token)
 
         # Concatenate sequence embedding and tissue embedding
         combined_embedding = torch.cat((seq_embedding, tissue_embedding_expanded),

@@ -26,12 +26,12 @@ class ModelXLSTM(nn.Module):
         self.max_seq_length = config.max_seq_length
 
         # Embedding layers
-        self.tissue_encoder = nn.Embedding(len(TISSUES), config.tissue_embedding_dim, max_norm=config.embedding_max_norm)
+        self.tissue_encoder = nn.Embedding(len(TISSUES), config.dim_embedding_token, max_norm=config.embedding_max_norm)
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, config.dim_embedding_token, padding_idx=0,
                                         max_norm=config.embedding_max_norm)
 
         # Total embedding dimension after concatenation
-        self.embedding_dim = config.dim_embedding_token + config.tissue_embedding_dim
+        self.embedding_dim = config.dim_embedding_token + config.dim_embedding_token
 
         # xLSTMBlockStack configuration
         cfg = xLSTMBlockStackConfig(
