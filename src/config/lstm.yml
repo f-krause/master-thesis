@@ -2,7 +2,6 @@
 subproject: "dev_lstm/delete_me"
 
 # Training
-gpu_id: 0
 epochs: 150
 save_freq: 25
 val_freq: 10

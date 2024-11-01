@@ -1,6 +1,7 @@
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 seed: 2024
+gpu_id: 1
 
 binary_class: True
 frequency_features: True

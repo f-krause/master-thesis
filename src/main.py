@@ -8,6 +8,7 @@ from utils import set_log_file, set_project_path, get_config, set_seed
 
 parser = argparse.ArgumentParser(prog='main.py', description='Trains DL models on mRNA data to predict PTR ratios.')
 
+parser.add_argument('-z', '--gpu_id', help="GPU to train on", type=int, default=None)
 parser.add_argument('-s', '--custom_path', help="Path to config file", type=str, default=None)
 parser.add_argument('-d', "--dummy", help="Use dummy config for test", action="store_true")
 parser.add_argument('-b', "--baseline", help="Use baseline config", action="store_true")
@@ -24,15 +25,7 @@ args = parser.parse_args()
 
 
 if __name__ == "__main__":
-    config_path = get_config(args)
-
-    if args.ptrnet:
-        general_config = OmegaConf.load("config/general_base.yml")
-    else:
-        general_config = OmegaConf.load("config/general_codon.yml")
-
-    model_config = OmegaConf.load(config_path)
-    config = OmegaConf.merge(general_config, model_config)
+    config = get_config(args)
 
     set_project_path(config)
     set_log_file(config)

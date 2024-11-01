@@ -2,7 +2,6 @@
 subproject: "dev_xlstm/delete_me"
 
 # Training
-gpu_id: 0
 epochs: 50
 save_freq: 10
 val_freq: 10

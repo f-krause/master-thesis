@@ -8,7 +8,7 @@ import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 from log.logger import setup_logger
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from fvcore.nn import FlopCountAnalysis, flop_count_table
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, roc_curve, auc, RocCurveDisplay
 
@@ -60,27 +60,41 @@ def get_timestamp():
 
 def get_config(args):
     if args.custom_path:
-        return args.custom_path
-    if args.dummy:
-        return "config/dummy.yml"
+        config_path = args.custom_path
+    elif args.dummy:
+        config_path = "config/dummy.yml"
     elif args.baseline:
-        return "config/baseline.yml"
+        config_path = "config/baseline.yml"
     elif args.cnn:
-        return "config/cnn.yml"
+        config_path = "config/cnn.yml"
     elif args.gru:
-        return "config/gru.yml"
+        config_path = "config/gru.yml"
     elif args.lstm:
-        return "config/lstm.yml"
+        config_path = "config/lstm.yml"
     elif args.xlstm:
-        return "config/xlstm.yml"
+        config_path = "config/xlstm.yml"
     elif args.mamba:
-        return "config/mamba.yml"
+        config_path = "config/mamba.yml"
     elif args.jamba:
-        return "config/jamba.yml"
+        config_path = "config/jamba.yml"
     elif args.transformer:
-        return "config/transformer.yml"
+        config_path = "config/transformer.yml"
     else:
         raise ValueError("No config file specified.")
+
+    model_config = OmegaConf.load(config_path)
+
+    if args.ptrnet:  # TODO add more cases
+        general_config = OmegaConf.load("config/general_base.yml")
+    else:
+        general_config = OmegaConf.load("config/general_codon.yml")
+
+    config = OmegaConf.merge(general_config, model_config)
+
+    if args.gpu_id is not None:
+        OmegaConf.update(config, "gpu_id", args.gpu_id)
+
+    return config
 
 
 def check_path_exists(file_path, create_unique=False):

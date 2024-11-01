@@ -3,7 +3,6 @@ subproject: "dev_baseline/delete_me"
 #subproject: "bin/dev_baseline/codon_freq_v1"
 
 # Training
-gpu_id: 1
 epochs: 2
 save_freq: 10
 val_freq: 1

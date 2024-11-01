@@ -3,7 +3,6 @@
 subproject: "bin/dev_transformer/codon_freq_v1"
 
 # Training
-gpu_id: 0
 epochs: 50
 save_freq: 10
 val_freq: 1
