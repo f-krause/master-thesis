@@ -1,8 +1,7 @@
 import os
 import argparse
-from omegaconf import OmegaConf
 
-from training import train, tuning
+from training import train
 from log.logger import setup_logger
 from utils import set_log_file, set_project_path, get_config, set_seed
 
