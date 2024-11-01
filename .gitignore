@@ -1,5 +1,6 @@
 .idea
 .aim
+.ipynb_checkpoints
 data
 __pycache__
 src/data_handling/folding_algorithms
