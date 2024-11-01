@@ -137,3 +137,6 @@ def train(config: DictConfig):
     # TODO possibility of parallelization across folds!
     for fold in range(config.nr_folds):
         train_fold(config, fold)
+
+# TODO include optuna wrapper?
+# https://github.com/optuna/optuna/blob/master/README.md#key-features
