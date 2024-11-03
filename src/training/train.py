@@ -137,13 +137,15 @@ def train_fold(config: DictConfig, fold: int = 0):
         y_true, y_pred, metric = predict_and_evaluate(config, os.environ["SUBPROJECT"], logger)
         img_buffer = log_pred_true_scatter(y_true, y_pred, config.binary_class)
         aim_run.track(aim.Image(img_buffer), name="pred_true_scatter")
-        aim_run.track(metric, name='metric (AUC/R2)')
 
         if config.binary_class:
+            aim_run.track(metric, name='metric_AUC')
             img_buffer = log_confusion_matrix(y_true, y_pred)
             aim_run.track(aim.Image(img_buffer), name="confusion_matrix")
             img_buffer = log_roc_curve(y_true, y_pred)
             aim_run.track(aim.Image(img_buffer), name="roc_curve")
+        else:
+            aim_run.track(metric, name='metric_R2')
 
     logger.info(f"Weights path: {checkpoint_path}")
     aim_run.close()
