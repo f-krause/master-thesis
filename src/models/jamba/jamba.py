@@ -62,13 +62,13 @@ class ModelJamba(nn.Module):
         self.device = device
         self.max_norm = 2
         self.max_seq_length = config.max_seq_length
+        self.dim_embedding_tissue = config.dim_embedding_tissue
         self.dim_embedding_token = config.dim_embedding_token
-        self.dim_embedding_token = config.dim_embedding_token
-        self.embedding_dim = self.dim_embedding_token + self.dim_embedding_token
+        self.embedding_dim = self.dim_embedding_tissue + self.dim_embedding_token
 
         # Embedding layers
         # TODO embedding layer norm?
-        self.tissue_encoder = nn.Embedding(len(TISSUES), config.dim_embedding_token, max_norm=self.max_norm)
+        self.tissue_encoder = nn.Embedding(len(TISSUES), config.dim_embedding_tissue, max_norm=self.max_norm)
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, config.dim_embedding_token, padding_idx=0,
                                         max_norm=self.max_norm)
 
