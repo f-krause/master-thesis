@@ -74,11 +74,11 @@ class ModelTransformer(nn.Module):
         tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_token)
         seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, seq_len, dim_embedding_token)
 
-        # Expand tissue embedding to match sequence length
-        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).repeat(1, seq_embedding.size(1), 1)  # (batch_size, seq_len, dim_embedding_token)
+        # Expand tissue embedding to match sequence length (batch_size, seq_len, dim_embedding_token)
+        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).repeat(1, seq_embedding.size(1), 1)
 
-        # Concatenate sequence embedding and tissue embedding
-        combined_embedding = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)  # (batch_size, seq_len, embedding_dim)
+        # Concatenate sequence embedding and tissue embedding (batch_size, seq_len, embedding_dim)
+        combined_embedding = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)
 
         # Apply positional encoding
         combined_embedding = self.positional_encoding(combined_embedding)  # (batch_size, seq_len, embedding_dim)

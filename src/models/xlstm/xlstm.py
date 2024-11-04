@@ -73,10 +73,13 @@ class ModelXLSTM(nn.Module):
         tissue_embedding = self.tissue_encoder(tissue_id)
         seq_embedding = self.seq_encoder(rna_data_pad)
 
+        # Expand tissue embedding to match sequence length (batch_size, seq_len, dim_embedding_token)
         tissue_embedding_expanded = tissue_embedding.unsqueeze(1).repeat(1, seq_embedding.size(1), 1)
 
+        # Concat embeddings (batch_size, seq_len, embedding_dim)
         combined_embedding = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)
 
+        # Remove tissue embeddings after the sequence ends
         attention_mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
         combined_embedding = combined_embedding * attention_mask
 
