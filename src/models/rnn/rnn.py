@@ -14,13 +14,12 @@ class ModelRNN(nn.Module):
         self.device = device
         self.max_seq_length = config.max_seq_length
 
-        self.tissue_encoder = nn.Embedding(len(TISSUES), config.rnn_hidden_size,
+        self.tissue_encoder = nn.Embedding(len(TISSUES), config.dim_embedding_tissue,
                                            max_norm=config.embedding_max_norm)  # 29 tissues
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, config.dim_embedding_token, padding_idx=0,
                                         max_norm=config.embedding_max_norm)  # 64 codons + padding 0
 
-        # input_size = config.dim_embedding_tissue + config.dim_embedding_token
-        input_size = config.dim_embedding_token
+        input_size = config.dim_embedding_tissue + config.dim_embedding_token
 
         if model.lower() == "lstm":
             self.rnn = nn.LSTM(input_size=input_size, hidden_size=config.rnn_hidden_size, num_layers=config.num_layers,
@@ -36,23 +35,21 @@ class ModelRNN(nn.Module):
     def forward(self, inputs: Tensor) -> Tensor:
         rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
 
-        tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_token)
-        seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, padded_seq_length, seq_embedding_dim)
+        tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_tissue)
+        seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, padded_seq_length, dim_embedding_token)
 
-        # Project tissue embedding to the LSTM hidden state dimension
-        h0 = tissue_embedding.unsqueeze(0).repeat(self.rnn.num_layers, 1, 1)  # (num_layers, batch_size, hidden_dim)
-        if self.rnn.bidirectional:
-            h0 = h0.repeat(2, 1, 1)
-        c0 = torch.zeros_like(h0)  # (1, batch_size, hidden_dim)
+        # Repeat tissue embedding across the sequence length and concatenate to seq_embedding at each timestep
+        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, seq_embedding.size(1), -1)  # (batch_size, padded_seq_length, dim_embedding_tissue)
+        rnn_input = torch.cat((tissue_embedding_expanded, seq_embedding), dim=2)  # (batch_size, padded_seq_length, input_size)
 
         # Packing the sequence
-        x_packed = torch.nn.utils.rnn.pack_padded_sequence(seq_embedding, seq_lengths.to('cpu'), batch_first=True,
+        x_packed = torch.nn.utils.rnn.pack_padded_sequence(rnn_input, seq_lengths.to('cpu'), batch_first=True,
                                                            enforce_sorted=False)
 
         if isinstance(self.rnn, nn.LSTM):
-            h, _ = self.rnn(x_packed, (h0, c0))  # RNN forward pass with tissue embedding as initial states
+            h, _ = self.rnn(x_packed)
         elif isinstance(self.rnn, nn.GRU):
-            h, _ = self.rnn(x_packed, h0)
+            h, _ = self.rnn(x_packed)
         else:
             raise ValueError(f"RNN type {type(self.rnn)} not supported")
 
