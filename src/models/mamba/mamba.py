@@ -58,6 +58,10 @@ class ModelMamba(nn.Module):
         # Concat embeddings (batch_size, seq_len, embedding_dim)
         combined_embedding = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)
 
+        # Remove tissue embeddings after the sequence ends
+        attention_mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
+        combined_embedding = combined_embedding * attention_mask
+
         # Apply Mamba model
         if isinstance(self.mamba, Mamba):
             out = self.mamba(combined_embedding)
