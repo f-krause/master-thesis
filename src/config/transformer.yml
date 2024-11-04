@@ -8,8 +8,8 @@ num_workers: 1
 
 # Model
 model: "transformer"
-dim_embedding_tissue: 16  # max 29 tissues
-dim_embedding_token: 32  # 64 codons or 4 nucleotides/
+dim_embedding_tissue: 8  # max 29 tissues
+dim_embedding_token: 16  # 64 codons or 4 nucleotides
 predictor_hidden_dim: 64
 predictor_dropout: 0.1
 

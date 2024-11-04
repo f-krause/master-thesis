@@ -1,15 +1,15 @@
 # Training
-epochs: 50
-save_freq: 10
-val_freq: 10
+epochs: 100
+save_freq: 3
+val_freq: 1
 warmup: 0
 batch_size: 16
 num_workers: 1
 
 # Model
 model: "xlstm"
-dim_embedding_token: 32
-tissue_embedding_dim: 32
+dim_embedding_tissue: 8  # max 29 tissues
+dim_embedding_token: 16  # 64 codons or 4 nucleotides
 predictor_hidden_dim: 64
 predictor_dropout: 0.1
 
@@ -22,10 +22,10 @@ act_fn: "gelu"
 num_blocks: 7
 slstm_at: [1]
 bias: True
-dropout: 0.1
+dropout: 0.2
 
 # Optimizer
 optimizer:
   name: adam
-  lr: 0.0001
+  lr: 0.001
   weight_decay: 0.1  # ranger only
