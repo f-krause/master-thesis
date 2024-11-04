@@ -1,6 +1,6 @@
 # Training
 epochs: 200
-save_freq: 3
+save_freq: 1
 val_freq: 1
 warmup: 0
 batch_size: 64
@@ -8,6 +8,7 @@ num_workers: 1
 
 # Model
 model: "lstm"
+dim_embedding_tissue: 8  # max 29 tissues
 dim_embedding_token: 16  # 64 codons or 4 nucleotides
 predictor_hidden_dim: 64
 predictor_dropout: 0.1

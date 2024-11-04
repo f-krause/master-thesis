@@ -1,6 +1,6 @@
 # Training
 epochs: 200
-save_freq: 3
+save_freq: 1
 val_freq: 1
 warmup: 0
 batch_size: 64
@@ -18,10 +18,10 @@ predictor_dropout: 0.1
 d_state: 64   # SSM state expansion factor
 d_conv: 4     # Local convolution width
 expand: 2     # Block expansion factor
-headdim: 32   # only for mamba2
+headdim: 8   # only for mamba2
 
 # Optimizer
 optimizer:
   name: adam
-  lr: 0.0001
+  lr: 0.001
   weight_decay: 0.1  # ranger only

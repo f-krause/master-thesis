@@ -11,7 +11,7 @@ num_workers: 1
 # Model
 model: "jamba"
 dim_embedding_token: 64  # Embedding dimension for tokens
-tissue_embedding_dim: 32  # Embedding dimension for tissues
+dim_embedding_tissue: 32  # Embedding dimension for tissues
 predictor_hidden_dim: 64
 predictor_dropout: 0.1
 

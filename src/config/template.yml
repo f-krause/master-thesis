@@ -1,6 +1,6 @@
 # Training
 epochs: 6
-save_freq: 5
+save_freq: 1
 val_freq: 1
 warmup: 0
 batch_size: 32
