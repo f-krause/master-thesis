@@ -130,7 +130,9 @@ def train_fold(config: DictConfig, fold: int = 0):
     aim_run.track(training_time, name='training_time_min')
 
     if config.model != "dummy" and config.model != "best":
-        get_model_stats(config, model, device, logger)
+        nr_params, nr_flops = get_model_stats(config, model, device, logger)
+        aim_run.track(nr_params, name='nr_params')
+        aim_run.track(nr_flops, name='nr_flops')
 
     if config.final_evaluation:
         logger.info("Starting prediction and evaluation")

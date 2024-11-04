@@ -186,6 +186,8 @@ def get_model_stats(config: DictConfig, model, device, logger):
     logger.info(f"Model: FLOPs: {flops_nr}")
     logger.info(f"Model: FLOPs table: \n{flop_count_table(flops)}")
 
+    return nr_params, flops_nr
+
 
 def log_pred_true_scatter(y_true, y_pred, binary_class=False):
     plt.figure(figsize=(10, 10))
