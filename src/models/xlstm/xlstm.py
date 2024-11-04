@@ -73,13 +73,10 @@ class ModelXLSTM(nn.Module):
         tissue_embedding = self.tissue_encoder(tissue_id)
         seq_embedding = self.seq_encoder(rna_data_pad)
 
-        # Expand tissue embedding to match sequence length
         tissue_embedding_expanded = tissue_embedding.unsqueeze(1).repeat(1, seq_embedding.size(1), 1)
 
-        # Concatenate sequence embedding and tissue embedding
         combined_embedding = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)
 
-        # Create attention mask for padding positions
         attention_mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
         combined_embedding = combined_embedding * attention_mask
 
