@@ -36,7 +36,11 @@ def get_model(config: DictConfig, device: torch.device, logger=None):
     elif config.model == "mamba":
         if logger: logger.info("Using Mamba model")
         from models.mamba.mamba import ModelMamba
-        return ModelMamba(config, device).to(device)
+        return ModelMamba(config, device, model="mamba").to(device)
+    elif config.model == "mamba2":
+        if logger: logger.info("Using Mamba2 model")
+        from models.mamba.mamba import ModelMamba
+        return ModelMamba(config, device, model="mamba2").to(device)
     elif config.model == "jamba":
         if logger: logger.info("Using Jamba model")
         from models.jamba.jamba import ModelJamba

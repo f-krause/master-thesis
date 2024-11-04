@@ -9,7 +9,7 @@ from mamba_ssm import Mamba, Mamba2
 
 
 class ModelMamba(nn.Module):
-    def __init__(self, config: DictConfig, device: torch.device):
+    def __init__(self, config: DictConfig, device: torch.device, model: str = "mamba"):
         super(ModelMamba, self).__init__()
 
         self.device = device
@@ -24,14 +24,25 @@ class ModelMamba(nn.Module):
                                         max_norm=config.embedding_max_norm)
 
         # Mamba model
-        self.mamba = Mamba(
-            # This module uses roughly 3 * expand * d_model^2 parameters
-            d_model=self.embedding_dim,  # Model dimension d_model
-            d_state=config.d_state,  # SSM state expansion factor
-            d_conv=config.d_conv,  # Local convolution width
-            expand=config.expand,  # Block expansion factor
-            # headdim=config.headdim  # TODO only for mamba-2
-        ).to(self.device)
+        if model.lower() == 'mamba':
+            self.mamba = Mamba(
+                # This module uses roughly 3 * expand * d_model^2 parameters
+                d_model=self.embedding_dim,  # Model dimension d_model
+                d_state=config.d_state,  # SSM state expansion factor
+                d_conv=config.d_conv,  # Local convolution width
+                expand=config.expand,  # Block expansion factor
+            ).to(self.device)
+        elif model.lower() == 'mamba2':
+            self.mamba = Mamba2(
+                # This module uses roughly 3 * expand * d_model^2 parameters
+                d_model=self.embedding_dim,  # Model dimension d_model
+                d_state=config.d_state,  # SSM state expansion factor
+                d_conv=config.d_conv,  # Local convolution width
+                expand=config.expand,  # Block expansion factor
+                headdim=config.headdim
+            ).to(self.device)
+        else:
+            raise ValueError(f"Mamba model {model} not supported")
 
         self.predictor = Predictor(config, self.embedding_dim).to(self.device)
 
@@ -48,8 +59,12 @@ class ModelMamba(nn.Module):
         combined_embedding = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)
 
         # Apply Mamba model
-        out = self.mamba(combined_embedding)  # (batch_size, seq_len, embedding_dim)
-        # out = self.mamba(combined_embedding, cu_seqlens=seq_lengths) # TODO for mamba2
+        if isinstance(self.mamba, Mamba):
+            out = self.mamba(combined_embedding)
+        elif isinstance(self.mamba, Mamba2):
+            out = self.mamba(combined_embedding, cu_seqlens=seq_lengths)
+        else:
+            raise ValueError(f"Model type {type(self.mamba)} not supported")
 
         # Extract outputs corresponding to the last valid time step
         idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, out.size(2)))  # (batch_size, 1, embedding_dim)
