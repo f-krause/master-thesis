@@ -15,7 +15,7 @@ predictor_dropout: 0.1
 
 # Mamba2 Config
 # Requirement: (dim_embedding_token + dim_embedding_tissue) * expand / headdim = multiple of 8
-d_state: 64   # SSM state expansion factor
+d_state: 128   # SSM state expansion factor
 d_conv: 4     # Local convolution width
 expand: 2     # Block expansion factor
 headdim: 8   # only for mamba2
