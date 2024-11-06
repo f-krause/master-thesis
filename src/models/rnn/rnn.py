@@ -38,9 +38,11 @@ class ModelRNN(nn.Module):
         tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_tissue)
         seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, padded_seq_length, dim_embedding_token)
 
-        # Repeat tissue embedding across the sequence length and concatenate to seq_embedding at each timestep
-        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, seq_embedding.size(1), -1)  # (batch_size, padded_seq_length, dim_embedding_tissue)
-        rnn_input = torch.cat((tissue_embedding_expanded, seq_embedding), dim=2)  # (batch_size, padded_seq_length, input_size)
+        # Expand tissue embedding to match sequence length (batch_size, seq_len, dim_embedding_token)
+        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, seq_embedding.size(1), -1)
+
+        # Concat embeddings (batch_size, padded_seq_length, input_size)
+        rnn_input = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)
 
         # Packing the sequence
         x_packed = torch.nn.utils.rnn.pack_padded_sequence(rnn_input, seq_lengths.to('cpu'), batch_first=True,
