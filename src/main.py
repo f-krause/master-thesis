@@ -18,6 +18,8 @@ parser.add_argument('-x', "--xlstm", help="Use xlstm config", action="store_true
 parser.add_argument('-m', "--mamba", help="Use mamba config", action="store_true")
 parser.add_argument('-j', "--jamba", help="Use jamba config", action="store_true")
 parser.add_argument('-t', "--transformer", help="Use transformer config", action="store_true")
+parser.add_argument("--tisnet", help="Use TISnet config", action="store_true")
+parser.add_argument("--legnet", help="Use LEGnet config", action="store_true")
 parser.add_argument('-p', "--ptrnet", help="Use PTRNet config", action="store_true")
 
 args = parser.parse_args()
