@@ -5,17 +5,18 @@ import aim  # https://aimstack.io/#demos
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-from log.logger import setup_logger
+from sklearn.metrics import roc_auc_score
 from omegaconf import OmegaConf, DictConfig
 
+from log.logger import setup_logger
 from utils import save_checkpoint, mkdir, get_device, get_model_stats, log_pred_true_scatter, log_confusion_matrix, \
     log_roc_curve
 from models.get_model import get_model
 from data_handling.data_loader import get_train_data_loaders
 from training.optimizer import get_optimizer
-from evaluation.predict import predict_and_evaluate
 from training.early_stopper import EarlyStopper
 from sklearn.metrics import roc_auc_score
+from evaluation.predict import predict_and_evaluate
 
 
 def train_fold(config: DictConfig, fold: int = 0):
@@ -50,7 +51,9 @@ def train_fold(config: DictConfig, fold: int = 0):
 
     logger.info("Starting training")
     start_time = time.time()
+    last_epoch = 0
     for epoch in range(1, config.epochs + 1):
+        last_epoch = epoch
         model.train()
         running_loss = 0.0
         for batch_idx, (data, target, target_bin) in enumerate(tqdm(train_loader)):
@@ -128,6 +131,7 @@ def train_fold(config: DictConfig, fold: int = 0):
     training_time = round((end_time - start_time) / 60, 4)
     logger.info(f"Training process completed. Training time: {training_time} mins.")
     aim_run.track(training_time, name='training_time_min')
+    aim_run.track(training_time / last_epoch, name='avg_epoch_time')
 
     if config.model != "dummy" and config.model != "best" and config.model != "mamba2":
         nr_params, nr_flops = get_model_stats(config, model, device, logger)
