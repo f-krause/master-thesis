@@ -22,7 +22,7 @@ cd Ranger-Deep-Learning-Optimizer
 pip install -e . 
 ```
 
-## Create project folder structure
+## Create project folder structure (OLD)
 Create project structure, and specify project path and subproject in ``main.py``
 ```
 root
@@ -79,7 +79,7 @@ Update environment dependencies
 mamba env update -n master-env -f environment_files/environment_linux_py3.10.yml
 ```
 
-### use AIM logging
+### Use AIM logging
 ```shell
 aim up
 ```

@@ -1,14 +1,17 @@
 # Source Code of Masters Thesis 
 
 ## Execute
-First configure config file and specify in ``main.py`` 
+First either 
+- configure existing config files (check `config` folder) and run as described below
+- create a custom config yml file and provide it as a flag to the main script
+  - to run custom models, you first need to create a new models folder and update the respective parts in `main.py` and the `get_model` function in [get_model.py](models/get_model.py)
 
 From within src
 ```shell
 python main.py
 ```
 
-With the flags of the respective models, see:
+With the flags of the respective models (below), can run model training:
 ```shell
 python main.py -f
 ```
