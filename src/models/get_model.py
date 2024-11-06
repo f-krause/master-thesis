@@ -53,6 +53,10 @@ def get_model(config: DictConfig, device: torch.device, logger=None):
             if logger: logger.info("Using Transformer model")
             from models.transformer.transformer import ModelTransformer
         return ModelTransformer(config, device).to(device)
+    elif config.model.lower() == "tisnet":
+        if logger: logger.info("Using TISnet model")
+        from models.TISnet.TISnet import TISnet
+        return TISnet(config, device).to(device)
     elif config.model == "best":
         if logger: logger.info("Using best model")
         # TODO

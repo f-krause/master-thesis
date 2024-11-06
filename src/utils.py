@@ -102,6 +102,8 @@ def get_config(args):
         config_path = "config/jamba.yml"
     elif args.transformer:
         config_path = "config/transformer.yml"
+    elif args.tisnet:
+        config_path = "config/TISnet.yml"
     else:
         raise ValueError("No config file specified.")
 

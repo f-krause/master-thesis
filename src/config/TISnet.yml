@@ -1,0 +1,24 @@
+# Training
+epochs: 100
+save_freq: 1
+val_freq: 1
+warmup: 0
+batch_size: 64
+num_workers: 1
+
+# Model
+model: "TISnet"
+dim_embedding_tissue: 16  # max 29 tissues
+dim_embedding_token: 32  # 64 codons or 4 nucleotides/
+#predictor_hidden_dim: 64  # hidden size of the output layer
+#predictor_dropout: 0.1  # dropout rate of the output layer
+
+# add model specific parameters here
+# TODO
+
+# Optimizer
+optimizer:
+  name: adam  # sgd, adam, ranger
+  lr: 0.001
+  momentum: 0.9  # sgd only
+  weight_decay: 0.1  # ranger only
