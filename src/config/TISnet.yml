@@ -14,7 +14,8 @@ dim_embedding_token: 32  # 64 codons or 4 nucleotides/
 #predictor_dropout: 0.1  # dropout rate of the output layer
 
 # add model specific parameters here
-# TODO
+mode: "pu"  # pu, seq, str
+kernel_size: 11
 
 # Optimizer
 optimizer:

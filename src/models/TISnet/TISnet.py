@@ -30,23 +30,23 @@ class Conv2d(nn.Module):
 
 
 class TISnet(nn.Module):
-    def __init__(self, config: DictConfig, device: torch.device, mode="pu"):
+    def __init__(self, config: DictConfig, device: torch.device):
         super(TISnet, self).__init__()
 
-        # FIXME vvv
-        self.mode = mode
         h_p, h_k = 2, 5
-        if mode == "pu":
+
+        self.mode = config.mode
+        # TODO necessary?
+        if self.mode == "pu":
             self.n_features = 5
-        elif mode == "seq":
+        elif self.mode == "seq":
             self.n_features = 4
             h_p, h_k = 1, 3
-        elif mode == "str":
+        elif self.mode == "str":
             self.n_features = 1
             h_p, h_k = 0, 1
         else:
             raise "mode error"
-        # FIXME ^^^
 
         self.device = device
         self.binary_class = config.binary_class
@@ -59,9 +59,9 @@ class TISnet(nn.Module):
         # TODO try OHE instead of Embedding!
 
         base_channel = 8
-        self.conv = Conv2d(1, base_channel, kernel_size=(11, h_k), bn=True, same_padding=True)
+        self.conv = Conv2d(1, base_channel, kernel_size=(config.kernel_size, h_k), bn=True, same_padding=True)
         self.se = SEBlock(base_channel)
-        self.res2d = ResidualBlock2D(base_channel, kernel_size=(11, h_k), padding=(5, h_p))
+        self.res2d = ResidualBlock2D(base_channel, kernel_size=(config.kernel_size, h_k), padding=(5, h_p))
         self.res1d = ResidualBlock1D(base_channel * 4)
         self.avgpool = nn.AvgPool2d((1, self.n_features))
         self.gpool = nn.AdaptiveAvgPool1d(1)
@@ -94,7 +94,7 @@ class TISnet(nn.Module):
         """[forward]
 
         Args:
-            input ([tensor],N,C,W,H): input features
+            inputs ([tensor],N,C,W,H): input features
             Batch x Channel x Width x Height ???
         """
 
