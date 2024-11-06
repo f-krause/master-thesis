@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from omegaconf import DictConfig
-from knowledge_db import TISSUES, CODON_MAP_DNA
 
+from knowledge_db import TISSUES, CODON_MAP_DNA
 from models.predictor import Predictor
 
 
@@ -18,7 +18,7 @@ class ModelCNN(nn.Module):
                                            max_norm=config.embedding_max_norm)  # 29 tissues
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, config.dim_embedding_token, padding_idx=0,
                                         max_norm=config.embedding_max_norm)  # 64 codons + padding 0
-        # TODO try OHE
+        # TODO try OHE instead of Embedding!
 
         # Convolutional layers
         self.conv1 = nn.Conv1d(

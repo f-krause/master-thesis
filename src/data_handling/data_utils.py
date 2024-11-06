@@ -6,7 +6,9 @@ from knowledge_db import CODON_MAP_DNA, TISSUES
 
 
 def fit_evaluate_simple_models(train_dataset, val_dataset, binary_class=False):
-    """ FOR DEVELOPMENT ONLY """
+    """ FOR DEVELOPMENT ONLY
+    Computes a cv score for baseline models (RandomForest) using the frequency of codons and tissue one-hot encoding
+    """
     if binary_class:
         clf1 = RandomForestClassifier(random_state=42)
     else:
