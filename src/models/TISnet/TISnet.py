@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 import torch.nn.functional as F
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 
 from knowledge_db import TISSUES, CODON_MAP_DNA
 from models.TISnet.resnet import ResidualBlock1D, ResidualBlock2D
@@ -137,14 +137,9 @@ class TISnet(nn.Module):
 
 if __name__ == "__main__":
     # Test model
-    config_dev = DictConfig({
-        "binary_class": True,
-        "max_seq_length": 2700,
-        "batch_size": 16,
-        "dim_embedding_tissue": 8,
-        "dim_embedding_token": 16,
-        "embedding_max_norm": 2
-    })
+    config_dev = OmegaConf.load("config/TISnet.yml")
+    config_dev = OmegaConf.merge(config_dev,
+                                 {"binary_class": True, "max_seq_length": 2700, "embedding_max_norm": 2})
     device_dev = torch.device("cpu")
 
     sample_batch = [
