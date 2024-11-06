@@ -57,6 +57,10 @@ def get_model(config: DictConfig, device: torch.device, logger=None):
         if logger: logger.info("Using TISnet model")
         from models.TISnet.TISnet import TISnet
         return TISnet(config, device).to(device)
+    elif config.model.lower() == "legnet":
+        if logger: logger.info("Using LEGnet model")
+        from models.LEGnet.LEGnet import LEGnet
+        return LEGnet(config, device).to(device)
     elif config.model == "best":
         if logger: logger.info("Using best model")
         # TODO

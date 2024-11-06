@@ -1,0 +1,32 @@
+# Training
+epochs: 100
+save_freq: 1
+val_freq: 1
+warmup: 0
+batch_size: 64
+num_workers: 1
+
+# Model
+model: "LEGnet"
+dim_embedding_tissue: 16  # max 29 tissues
+dim_embedding_token: 32  # 64 codons or 4 nucleotides/
+predictor_hidden_dim: 64  # hidden size of the output layer
+predictor_dropout: 0.1  # dropout rate of the output layer
+
+# add model specific parameters here
+block_sizes: [256, 256, 128, 128, 64, 64, 32, 32]
+kernel_size: 11
+resize_factor: 4
+se_reduction: 4
+final_ch: 18
+filter_per_group: 2
+bn_momentum: 0.1
+
+activation: "gelu" # TODO
+
+# Optimizer
+optimizer:
+  name: adam  # sgd, adam, ranger
+  lr: 0.001
+  momentum: 0.9  # sgd only
+  weight_decay: 0.1  # ranger only

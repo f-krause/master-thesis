@@ -104,6 +104,8 @@ def get_config(args):
         config_path = "config/transformer.yml"
     elif args.tisnet:
         config_path = "config/TISnet.yml"
+    elif args.legnet:
+        config_path = "config/LEGnet.yml"
     else:
         raise ValueError("No config file specified.")
 
