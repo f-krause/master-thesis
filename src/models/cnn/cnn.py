@@ -23,21 +23,21 @@ class ModelCNN(nn.Module):
         # Convolutional layers
         self.conv1 = nn.Conv1d(
             in_channels=config.dim_embedding_token,
-            out_channels=config.numFiltersConv1,
-            kernel_size=config.filterLenConv1,
-            dilation=config.dilRate1,
+            out_channels=config.num_filters_conv1,
+            kernel_size=config.filter_len_conv1,
+            stride=config.stride_conv1,
             padding='same'
         )
-        self.pool1 = nn.MaxPool1d(kernel_size=config.maxPool1)
+        self.pool1 = nn.MaxPool1d(kernel_size=config.max_pool1)
 
         self.conv2 = nn.Conv1d(
             in_channels=config.numFiltersConv1,
             out_channels=config.numFiltersConv2,
             kernel_size=config.filterLenConv2,
-            dilation=config.dilRate2,
+            stride=config.stride_conv2,
             padding='same'
         )
-        self.pool2 = nn.MaxPool1d(kernel_size=config.maxPool2)
+        self.pool2 = nn.MaxPool1d(kernel_size=config.max_pool2)
 
         # Calculate the size after convolution and pooling
         length_after_conv1 = self.max_seq_length  # Since padding='same'

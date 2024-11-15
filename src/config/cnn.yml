@@ -14,15 +14,15 @@ predictor_hidden_dim: 64
 predictor_dropout: 0.1
 
 # Convolutional Layer Parameters
-numFiltersConv1: 128
-filterLenConv1: 6
-dilRate1: 1
-maxPool1: 30
+num_filters_conv1: 128
+filter_len_conv1: 6
+stride_conv1: 2
+max_pool1: 30
 
-numFiltersConv2: 32
-filterLenConv2: 9
-dilRate2: 1
-maxPool2: 10
+num_filters_conv2: 32
+filter_len_conv2: 9
+stride_conv2: 1
+max_pool2: 10
 
 # Optimizer
 optimizer:
