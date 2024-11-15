@@ -13,6 +13,7 @@ Options:
 """
 
 import os
+import platform
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
@@ -20,9 +21,15 @@ import logging
 from collections import OrderedDict
 from Bio import SeqIO
 
-BED_FILES_FOLDER = "../../data/ptr_data/BED6__protein_coding_strict"
-FASTA_FILES_FOLDER = "../../data/ptr_data/FA_protein_coding_strict_mRNA"
-PTR_CSV_FILE = "../../data/ptr_data/ptr.csv"
+if platform.node() == "rey" or platform.node() == "jyn":
+    BED_FILES_FOLDER = "/export/share/krausef99dm/data/ptr_data/BED6__protein_coding_strict"
+    FASTA_FILES_FOLDER = "/export/share/krausef99dm/data/ptr_data/FA_protein_coding_strict_mRNA"
+    PTR_CSV_FILE = "/export/share/krausef99dm/data/ptr_data/ptr.csv"
+else:
+    BED_FILES_FOLDER = "../../data/ptr_data/BED6__protein_coding_strict"
+    FASTA_FILES_FOLDER = "../../data/ptr_data/FA_protein_coding_strict_mRNA"
+    PTR_CSV_FILE = "../../data/ptr_data/ptr.csv"
+
 TISSUES = ['Adrenal', 'Appendices', 'Brain', 'Colon', 'Duodenum', 'Uterus',
            'Esophagus', 'Fallopiantube', 'Fat', 'Gallbladder', 'Heart', 'Kidney',
            'Liver', 'Lung', 'Lymphnode', 'Ovary', 'Pancreas', 'Placenta',
