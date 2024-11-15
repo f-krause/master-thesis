@@ -4,7 +4,7 @@ import logging
 import pickle
 import json
 from tqdm import tqdm
-from ViennaRNA import fold
+# from ViennaRNA import fold
 import linearfold
 
 # FOLD_PACKAGE = 'viennarna'
@@ -12,21 +12,21 @@ FOLD_PACKAGE = 'linearfold'
 DATA_PATH = '/export/share/krausef99dm/data'
 
 OVERWRITE_FILES = False  # set True only for debugging!
-MAX_SEQ_LENGTH = 8000  # 3241 seq with len below 2000; 5697 below 3000; Skipped 818 above 8000
+MAX_SEQ_LENGTH = 8100  # 3241 seq with len below 2000; 5697 below 3000; Skipped 818 above 8000
 MAX_PRED_NR = 3000
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     handlers=[
                         # add time stamp to log file
-                        logging.FileHandler(f"logs/{FOLD_PACKAGE}_pred_sec_struc_{time.strftime('%Y%m%d-%H%M')}.log"),
+                        logging.FileHandler(f"data_handling/logs/{FOLD_PACKAGE}_pred_sec_struc_{time.strftime('%Y%m%d-%H%M')}.log"),
                         logging.StreamHandler()
                     ])
 logger = logging.getLogger()
 
 
 def _load_data():
-    with open(os.path.join(DATA_PATH, 'ptr_data.pkl'), 'rb') as f:
+    with open(os.path.join(DATA_PATH, 'ptr_data/ptr_data.pkl'), 'rb') as f:
         # TODO make sure to drop super long sequences from data!
         data = pickle.load(f)
     return data
@@ -49,7 +49,7 @@ def _store_preds(idx, preds):
 
 def _pred_loop_type(seq, structure, debug=False):
     # os.system("cd folding_algorithms/bpRNA")
-    os.chdir("folding_algorithms/bpRNA")
+    os.chdir("data_handling/folding_algorithms/bpRNA")
     os.system(f'echo {seq} > a.dbn')
     os.system('echo \"{}\" >> a.dbn'.format(structure))
     os.system('perl bpRNA.pl a.dbn')
@@ -58,7 +58,7 @@ def _pred_loop_type(seq, structure, debug=False):
         print(seq)
         print(structure)
         print(loop_type[5])
-    os.chdir("/export/home/krausef99dm/master-thesis/src/data_handling")
+    os.chdir("/export/home/krausef99dm/master-thesis/src")
     return loop_type
 
 
