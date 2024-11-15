@@ -1,86 +1,141 @@
-# TODO implement as train_data_codons.py but for sequences
 import os
 import json
 import pickle
+from tqdm import tqdm
 import torch
 import numpy as np
 from omegaconf import OmegaConf, DictConfig
 
-MAX_SEQ_LENGTH = 8100  # Maximum sequence length (nr of bases of whole mRNA)
-MAX_DATA = 1000
-FOLDING_ALG = "viennarna"
-TOKENS_BASES = 'ACGT'
-TOKENS_STRUC = '().'
-TOKENS_LOOP = 'BEHIMSX'
+from knowledge_db import CODON_MAP_DNA
+from train_val_test_indices import get_train_val_test_indices
+from data_utils import store_data, check_identical
+
+MAX_SEQ_LENGTH = 8100  # Maximum number of codons in CDS (note: 3' and 5' tails (UTR) are removed)
+MAX_DATA = 300_000  # 182_625 seq-tuple pairs in total
+FOLDING_ALG = "linearfold"
+# TOKENS_BASES = 'ACGT'
+# TOKENS_STRUC = '().'
+# TOKENS_LOOP = 'BEHIMSX'
+TOKENS = "01235ACGT().BEHIMSX"
+SEED = 1192  # randomly drawn with np.random.randint(0,2024) on 22.10.2024, 15:00
 
 
-def get_train_data_file(config: DictConfig, return_dict=False):
+def _get_structure_pred(identifier: str, folding_algorithm="linearfold"):
+    try:
+        with open(os.path.join(os.environ["PROJECT_PATH"],
+                               f"data/sec_struc/{identifier}-{folding_algorithm}.json"), 'r') as f:
+            struc_data = json.load(f)
+        return struc_data["structure"], struc_data["loop_type"], struc_data["MFE"]
+    except FileNotFoundError:
+        return None, None, None
+
+
+def get_train_data_file(file_name: str, check_reproduce=False):
+    """Store data for training, validation and testing"""
     with open(os.path.join(os.environ["PROJECT_PATH"], "data/ptr_data/ptr_data.pkl"), 'rb') as f:
         raw_data = pickle.load(f)
 
+    identifiers = []
+    sequences = []
+    tissue_ids = []
+    # mfes = []
     rna_data = []
     targets = []
-    target_ids = []
+    targets_bin = []
+    failed_sequences = []
 
     for identifier, content in raw_data.items():
         sec_struc, loop_type = _get_structure_pred(identifier, config)
+    for identifier, content in tqdm(raw_data.items()):
+        sec_struc, loop_type, mfe = _get_structure_pred(identifier, FOLDING_ALG)
         if sec_struc is None:
             # logger.warning(f"Skipping {identifier}: no structure prediction found")
             continue
 
         sequence = content['fasta']
+        coding_area = content['bed_annotation']
+
+        # value: 0, low-PTR: 1, high-PTR: 2
+        data_targets_bin = (np.where(np.isnan(content["targets"]), np.nan, 0) +
+                            np.where(np.isnan(content["targets_bin"]), 0, content["targets_bin"] + 1))
+
         if len(sequence) > MAX_SEQ_LENGTH:
             continue
+        else:
+            for tissue_id, target in enumerate(content['targets']):
+                if np.isnan(target):
+                    continue
 
-        for target_id, target in enumerate(content['targets']):
-            if np.isnan(target):
-                continue
+                sequence_ohe = [TOKENS.index(c) + 1 for c in sequence]
+                coding_area_ohe = [TOKENS.index(str(int(c))) + 1 for c in coding_area]  # original values: 0,1,2,3,5
+                sec_struc_ohe = [TOKENS.index(c) + 1 for c in sec_struc]
+                loop_type_ohe = [TOKENS.index(c) + 1 for c in loop_type]
 
-            numeric_data = {
-                'seq': [TOKENS_BASES.index(c) + 1 for c in sequence],  # label encoded, 0 is reserved for padding
-                'sec_struc': [TOKENS_STRUC.index(c) + 1 for c in sec_struc],
-                'loop_type': [TOKENS_LOOP.index(c) + 1 for c in loop_type],
-                'target_id': target_id,
-            }
+                # TODO note that 5' and 3' can have non-triplet length! add padding for convolution?
+                try:
+                    rna_data.append(torch.tensor([sequence_ohe, coding_area_ohe, sec_struc_ohe, loop_type_ohe]))  # 4 x n
+                except Exception as e:
+                    print(e)
+                    failed_sequences.append(identifier)
+                    break
+                    # expected sequence of length 8058 at dim 1 (got 6412)
+                    # Broken: too short loop type (bpRNA issue?): ENST00000392782, ENST00000619168, ENST00000389532
 
-            if return_dict:
-                rna_data.append(numeric_data)
+                identifiers.append(identifier)
+                sequences.append(sequence)
+                tissue_ids.append(tissue_id)
+                # mfes.append(mfe)
                 targets.append(target)
-            else:
-                # create matrix 3 x n: Seq, SecStruc, LoopType
-                tensor_data = torch.tensor([numeric_data["seq"], numeric_data["sec_struc"], numeric_data["loop_type"]])
-                tensor_data = tensor_data.permute(1, 0)
-                rna_data.append(tensor_data)
-                target_ids.append(target_id)
-                targets.append(target)
+                targets_bin.append(int(data_targets_bin[tissue_id]))
 
+                if len(rna_data) >= MAX_DATA:
+                    break
             if len(rna_data) >= MAX_DATA:
                 break
-        if len(rna_data) >= MAX_DATA:
-            break
 
-    # full data
-    # TODO add train test split as for codons
-    # with open(os.path.join(os.environ["PROJECT_PATH"], "data/data_train/dev_train_data_small.pkl"), 'wb') as f:
-    #     pickle.dump([rna_data, torch.tensor(target_ids), torch.tensor(targets)], f)
+    print(failed_sequences)
 
+    train_indices, val_indices, test_indices = get_train_val_test_indices(sequences, random_state=SEED)
 
-def _get_structure_pred(identifier: str, config: DictConfig):
-    try:
-        with open(os.path.join(os.environ["PROJECT_PATH"],
-                               f"data/sec_struc/{identifier}-{config.folding_algorithm}.json"), 'r') as f:
-            struc_data = json.load(f)
-        return struc_data["structure"], struc_data["loop_type"]
-    except FileNotFoundError:
-        return None, None
+    print("Num seq-tuple pairs TRAIN:", len(train_indices))
+    print("Num seq-tuple pairs VAL:", len(val_indices))
+    print("Num seq-tuple pairs TEST:", len(test_indices))
+
+    max_seq_len_logging = str(MAX_SEQ_LENGTH / 1000) + "k"
+
+    if check_reproduce:
+        check_identical(train_indices, identifiers, tissue_ids,
+                        f"data/data_train/{file_name}train_{max_seq_len_logging}")
+        check_identical(val_indices, identifiers, tissue_ids,
+                        f"data/data_test/{file_name}val_{max_seq_len_logging}")
+        check_identical(test_indices, identifiers, tissue_ids,
+                        f"data/data_test/{file_name}test_{max_seq_len_logging}")
+    else:
+        store_data(identifiers, rna_data, tissue_ids, targets, targets_bin, train_indices,
+                   f"data/data_train/{file_name}train_{max_seq_len_logging}")
+
+        store_data(identifiers, rna_data, tissue_ids, targets, targets_bin, val_indices,
+                   f"data/data_test/{file_name}val_{max_seq_len_logging}")
+
+        store_data(identifiers, rna_data, tissue_ids, targets, targets_bin, test_indices,
+                   f"data/data_test/{file_name}test_{max_seq_len_logging}")
+
+        print("Data successfully created")
 
 
 if __name__ == '__main__':
-    from utils import set_project_path, set_log_file
+    from utils import set_project_path
 
-    dev_config = OmegaConf.create({"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
-                  "batch_size": 32, "num_workers": 4, "folding_algorithm": FOLDING_ALG})
+    CHECK_REPRODUCTION = False
+    FILE_NAME = ""
+
+    if FILE_NAME:
+        FILE_NAME += "_"
+
+    dev_config = OmegaConf.create(
+        {"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
+         "batch_size": 32, "num_workers": 4, "train_data_file": "NONONONO", "dev": True, "binary_class": False,
+         "frequency_features": False})
     set_project_path(dev_config)
-    set_log_file(dev_config)
-    get_train_data_file(dev_config)
-    print("Data successfully created")
+
+    get_train_data_file(FILE_NAME, check_reproduce=CHECK_REPRODUCTION)
