@@ -12,6 +12,7 @@ FOLD_PACKAGE = 'linearfold'
 DATA_PATH = '/export/share/krausef99dm/data'
 
 OVERWRITE_FILES = False  # set True only for debugging!
+MIN_SEQ_LENGTH = 8000
 MAX_SEQ_LENGTH = 8100  # 3241 seq with len below 2000; 5697 below 3000; Skipped 818 above 8000
 MAX_PRED_NR = 3000
 
@@ -85,8 +86,8 @@ def main():
 
         seq = data[idx]['fasta']
 
-        if len(seq) > MAX_SEQ_LENGTH:
-            logging.warning(f"Skipping {idx}. Sequence longer than {MAX_SEQ_LENGTH}.")
+        if len(seq) > MAX_SEQ_LENGTH or len(seq) < MIN_SEQ_LENGTH:
+            logging.warning(f"Skipping {idx}. Sequence longer than {MAX_SEQ_LENGTH} or smaller than {MIN_SEQ_LENGTH}.")
             too_long_seq.append(idx)
             continue
 
