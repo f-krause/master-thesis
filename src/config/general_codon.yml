@@ -21,7 +21,7 @@ nr_folds: 1  # if 1, will take 20% of the train data as validation set during tr
 folding_algorithm: "viennarna" # viennarna, linearfold # TODO - currently not supported
 embedding_max_norm: 2
 
-early_stopper_patience: 8  # disabled if < 0
+early_stopper_patience: 7  # disabled if < 0
 early_stopper_delta: 0.01
 
 final_evaluation: True  # if True, will evaluate the model on the train val set after training
