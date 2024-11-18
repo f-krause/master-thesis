@@ -1,3 +1,6 @@
+# FAULTY PREDICTIONS ####
+bprna was not working! Hence predicted loop type is wrong
+
 2024-11-15 11:04:51,762 - root - INFO - Predicting secondary structure and loop type.
 2024-11-15 11:04:51,763 - root - INFO - MAX_SEQ_LENGTH: 8100
 2024-11-15 11:04:51,763 - root - INFO - MAX_PRED_NR: 3000
