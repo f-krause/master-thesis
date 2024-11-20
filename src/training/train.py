@@ -92,6 +92,7 @@ def train_fold(config: DictConfig, fold: int = 0):
             model.eval()
             val_loss = 0.0
             with torch.no_grad():
+                # TODO add loop for train data
                 for data, target, target_bin in val_loader:
                     data = [d.to(device) for d in data]
                     if config.binary_class:
@@ -116,7 +117,7 @@ def train_fold(config: DictConfig, fold: int = 0):
                 losses[epoch].update({"val_loss": val_loss, "val_neg_auc": neg_auc})
                 logger.info(f'Validation neg AUC:  {neg_auc}')
                 aim_run.track(neg_auc, name="val_neg_auc", epoch=epoch)
-                val_loss = neg_auc
+                val_loss = neg_auc  # for early stopping in classification setting
 
             if early_stopper.early_stop(val_loss):
                 logger.info(f"Early stopping at epoch {epoch}")
@@ -138,6 +139,7 @@ def train_fold(config: DictConfig, fold: int = 0):
         aim_run.track(nr_params, name='nr_params')
         aim_run.track(nr_flops, name='nr_flops')
 
+    # TODO refactor, evaluation basically already happens during training - no need to load data again and compute AUC!
     if config.final_evaluation:
         logger.info("Starting prediction and evaluation")
         y_true, y_pred, metric = predict_and_evaluate(config, os.environ["SUBPROJECT"], logger)

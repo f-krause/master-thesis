@@ -44,6 +44,11 @@ class ModelRNN(nn.Module):
         # Concat embeddings (batch_size, padded_seq_length, input_size)
         rnn_input = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)
 
+        # Remove tissue embeddings after the sequence ends
+        # FIXME seems to decrease performance of GRU
+        # attention_mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
+        # rnn_input = rnn_input * attention_mask
+
         # Packing the sequence
         x_packed = torch.nn.utils.rnn.pack_padded_sequence(rnn_input, seq_lengths.to('cpu'), batch_first=True,
                                                            enforce_sorted=False)
