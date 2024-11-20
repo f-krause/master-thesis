@@ -4,18 +4,14 @@ import pickle
 from tqdm import tqdm
 import torch
 import numpy as np
-from omegaconf import OmegaConf, DictConfig
+from omegaconf import OmegaConf
 
-from knowledge_db import CODON_MAP_DNA
 from train_val_test_indices import get_train_val_test_indices
 from data_utils import store_data, check_identical
 
 MAX_SEQ_LENGTH = 8100  # Maximum number of codons in CDS (note: 3' and 5' tails (UTR) are removed)
 MAX_DATA = 300_000  # 182_625 seq-tuple pairs in total
 FOLDING_ALG = "linearfold"
-# TOKENS_BASES = 'ACGT'
-# TOKENS_STRUC = '().'
-# TOKENS_LOOP = 'BEHIMSX'
 TOKENS = "01235ACGT().BEHIMSX"
 SEED = 1192  # randomly drawn with np.random.randint(0,2024) on 22.10.2024, 15:00
 
@@ -44,8 +40,6 @@ def get_train_data_file(file_name: str, check_reproduce=False):
     targets_bin = []
     failed_sequences = []
 
-    for identifier, content in raw_data.items():
-        sec_struc, loop_type = _get_structure_pred(identifier, config)
     for identifier, content in tqdm(raw_data.items()):
         sec_struc, loop_type, mfe = _get_structure_pred(identifier, FOLDING_ALG)
         if sec_struc is None:
@@ -66,6 +60,7 @@ def get_train_data_file(file_name: str, check_reproduce=False):
                 if np.isnan(target):
                     continue
 
+                # add 1 to each index to have 0 as encoding for padding
                 sequence_ohe = [TOKENS.index(c) + 1 for c in sequence]
                 coding_area_ohe = [TOKENS.index(str(int(c))) + 1 for c in coding_area]  # original values: 0,1,2,3,5
                 sec_struc_ohe = [TOKENS.index(c) + 1 for c in sec_struc]
