@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torch import Tensor
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from knowledge_db import TISSUES, CODON_MAP_DNA
 
 from models.predictor import Predictor
@@ -19,7 +19,7 @@ class ModelRNN(nn.Module):
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, config.dim_embedding_token, padding_idx=0,
                                         max_norm=config.embedding_max_norm)  # 64 codons + padding 0
 
-        input_size = config.dim_embedding_tissue + config.dim_embedding_token
+        input_size = config.dim_embedding_token
 
         if model.lower() == "lstm":
             self.rnn = nn.LSTM(input_size=input_size, hidden_size=config.rnn_hidden_size, num_layers=config.num_layers,
@@ -41,13 +41,12 @@ class ModelRNN(nn.Module):
         # Expand tissue embedding to match sequence length (batch_size, seq_len, dim_embedding_token)
         tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, seq_embedding.size(1), -1)
 
-        # Concat embeddings (batch_size, padded_seq_length, input_size)
-        rnn_input = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)
+        rnn_input = tissue_embedding_expanded + seq_embedding
 
         # Remove tissue embeddings after the sequence ends
         # FIXME seems to decrease performance of GRU
-        # attention_mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
-        # rnn_input = rnn_input * attention_mask
+        # mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
+        # rnn_input = rnn_input * mask
 
         # Packing the sequence
         x_packed = torch.nn.utils.rnn.pack_padded_sequence(rnn_input, seq_lengths.to('cpu'), batch_first=True,
@@ -69,3 +68,24 @@ class ModelRNN(nn.Module):
         y_pred = self.predictor(h_last)
 
         return y_pred
+
+
+if __name__ == "__main__":
+    # Test model
+    config_dev = OmegaConf.load("config/gru.yml")
+    config_dev = OmegaConf.merge(config_dev,
+                                 {"binary_class": True, "max_seq_length": 2700, "embedding_max_norm": 2})
+    device_dev = torch.device("cpu")
+
+    sample_batch = [
+        # rna_data_padded (batch_size x max_seq_length)
+        torch.nn.utils.rnn.pad_sequence(torch.randint(1, 64, (config_dev.batch_size, config_dev.max_seq_length)),
+                                        batch_first=True),
+        torch.randint(29, (config_dev.batch_size,)),  # tissue_ids (batch_size x 1)
+        torch.tensor([config_dev.max_seq_length] * config_dev.batch_size, dtype=torch.int64)
+        # seq_lengths (batch_size x 1)
+    ]
+
+    model = ModelRNN(config_dev, device_dev)
+
+    print(model(sample_batch))

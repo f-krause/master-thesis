@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torch import Tensor
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from knowledge_db import TISSUES, CODON_MAP_DNA
 
 from models.predictor import Predictor
@@ -16,7 +16,6 @@ class ModelMamba(nn.Module):
         self.max_seq_length = config.max_seq_length
         self.dim_embedding_tissue = config.dim_embedding_tissue
         self.dim_embedding_token = config.dim_embedding_token
-        self.embedding_dim = self.dim_embedding_tissue + self.dim_embedding_token
 
         # Embedding layers
         self.tissue_encoder = nn.Embedding(len(TISSUES), self.dim_embedding_tissue, max_norm=config.embedding_max_norm)
@@ -27,7 +26,7 @@ class ModelMamba(nn.Module):
         if model.lower() == 'mamba':
             self.mamba = Mamba(
                 # This module uses roughly 3 * expand * d_model^2 parameters
-                d_model=self.embedding_dim,  # Model dimension d_model
+                d_model=self.dim_embedding_token,  # Model dimension d_model
                 d_state=config.d_state,  # SSM state expansion factor
                 d_conv=config.d_conv,  # Local convolution width
                 expand=config.expand,  # Block expansion factor
@@ -35,7 +34,7 @@ class ModelMamba(nn.Module):
         elif model.lower() == 'mamba2':
             self.mamba = Mamba2(
                 # This module uses roughly 3 * expand * d_model^2 parameters
-                d_model=self.embedding_dim,  # Model dimension d_model
+                d_model=self.dim_embedding_token,  # Model dimension d_model
                 d_state=config.d_state,  # SSM state expansion factor
                 d_conv=config.d_conv,  # Local convolution width
                 expand=config.expand,  # Block expansion factor
@@ -44,7 +43,7 @@ class ModelMamba(nn.Module):
         else:
             raise ValueError(f"Mamba model {model} not supported")
 
-        self.predictor = Predictor(config, self.embedding_dim).to(self.device)
+        self.predictor = Predictor(config, self.dim_embedding_token).to(self.device)
 
     def forward(self, inputs: Tensor) -> Tensor:
         rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
@@ -52,21 +51,18 @@ class ModelMamba(nn.Module):
         tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_token)
         seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, seq_len, dim_embedding_token)
 
-        # Expand tissue embedding to match sequence length (batch_size, seq_len, dim_embedding_token)
-        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).repeat(1, seq_embedding.size(1), 1)
+        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, seq_embedding.size(1), -1)
 
-        # Concat embeddings (batch_size, seq_len, embedding_dim)
-        combined_embedding = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)
+        x = seq_embedding + tissue_embedding_expanded  # (batch_size, padded_seq_length, dim_embedding_token)
 
-        # Remove tissue embeddings after the sequence ends
-        attention_mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
-        combined_embedding = combined_embedding * attention_mask
+        mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
+        x *= mask
 
         # Apply Mamba model
         if isinstance(self.mamba, Mamba):
-            out = self.mamba(combined_embedding)
+            out = self.mamba(x)
         elif isinstance(self.mamba, Mamba2):
-            out = self.mamba(combined_embedding, cu_seqlens=seq_lengths)
+            out = self.mamba(x, cu_seqlens=seq_lengths)
         else:
             raise ValueError(f"Model type {type(self.mamba)} not supported")
 
@@ -77,3 +73,26 @@ class ModelMamba(nn.Module):
         y_pred = self.predictor(out_last)
 
         return y_pred
+
+
+if __name__ == "__main__":
+    # Test forward pass
+    # FIXME not working
+    config_dev = OmegaConf.load("config/mamba.yml")
+    config_dev = OmegaConf.merge(config_dev,
+                                 {"binary_class": True, "max_seq_length": 2700, "embedding_max_norm": 2})
+
+    sample_batch = [
+        # rna_data_padded (batch_size x max_seq_length)
+        torch.nn.utils.rnn.pad_sequence(torch.randint(1, 64, (config_dev.batch_size, config_dev.max_seq_length)),
+                                        batch_first=True),
+        torch.randint(29, (config_dev.batch_size,)),  # tissue_ids (batch_size x 1)
+        torch.tensor([config_dev.max_seq_length] * config_dev.batch_size, dtype=torch.int64)
+        # seq_lengths (batch_size x 1)
+    ]
+
+    sample_batch = [tensor.to(torch.device("cuda:0")) for tensor in sample_batch]
+
+    model = ModelMamba(config_dev, torch.device("cuda:0"))
+
+    print(model(sample_batch))

@@ -64,7 +64,7 @@ class TISnet(nn.Module):
         self.res1d = ResidualBlock1D(base_channel * 4)
         self.avgpool = nn.AvgPool2d((1, self.n_features))
         self.gpool = nn.AdaptiveAvgPool1d(1)
-        self.fc = nn.Linear(base_channel * 4 * 8 + config.dim_embedding_tissue, 1)
+        self.fc = nn.Linear(base_channel * 4 * 8, 1)
         if self.binary_class:
             self.sigmoid = nn.Sigmoid()
         self._initialize_weights()
@@ -104,8 +104,15 @@ class TISnet(nn.Module):
         tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_tissue)
         seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, padded_seq_length, dim_embedding_token)
 
+        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, seq_embedding.size(1), -1)
+
+        x = seq_embedding + tissue_embedding_expanded  # (batch_size, padded_seq_length, dim_embedding_token)
+
+        mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
+        x *= mask
+
         # Permute seq_embedding to match Conv1d input shape
-        x = seq_embedding.permute(0, 2, 1)  # (batch_size, dim_embedding_token, max_seq_length)
+        x = x.permute(0, 2, 1)  # (batch_size, dim_embedding_token, max_seq_length)
         x = x.unsqueeze(1)
         # if self.mode == "seq":
         #     input = input[:, :, :, :4]
@@ -123,8 +130,6 @@ class TISnet(nn.Module):
         x = F.dropout(x, 0.3, training=self.training)
         x = self.gpool(x)
         x = x.view(x.shape[0], x.shape[1])
-
-        x = torch.cat((tissue_embedding, x), dim=1)  # (batch_size, flatten_size + dim_embedding_tissue)
 
         x = self.fc(x)
 
