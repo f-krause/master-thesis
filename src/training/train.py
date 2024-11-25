@@ -7,6 +7,7 @@ import numpy as np
 from tqdm import tqdm
 from sklearn.metrics import roc_auc_score
 from omegaconf import OmegaConf, DictConfig
+from knockknock import discord_sender
 
 from log.logger import setup_logger
 from utils import save_checkpoint, mkdir, get_device, get_model_stats, log_pred_true_scatter, log_confusion_matrix, \
@@ -159,10 +160,14 @@ def train_fold(config: DictConfig, fold: int = 0):
     aim_run.close()
 
 
+@discord_sender(webhook_url="https://discord.com/api/webhooks/1308890399942774946/"
+                            "3UQa1CD1iNt1JRccZUxPj8ksKJzSuYcAnXMSYa8l9H4gs1DYi-t64qUR8o9-J4A1NFzS")
 def train(config: DictConfig):
     # TODO possibility of parallelization across folds!
     for fold in range(config.nr_folds):
         train_fold(config, fold)
+
+    return {"run": os.environ["SUBPROJECT"].replace("runs/", "", 1)}
 
 # TODO include optuna wrapper?
 # https://github.com/optuna/optuna/blob/master/README.md#key-features
