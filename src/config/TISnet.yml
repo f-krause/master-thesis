@@ -8,8 +8,8 @@ num_workers: 1
 
 # Model
 model: "TISnet"
-dim_embedding_tissue: 16  # max 29 tissues
-dim_embedding_token: 32  # 64 codons or 4 nucleotides/
+dim_embedding_tissue: 8  # max 29 tissues
+dim_embedding_token: 8  # 64 codons or 4 nucleotides/
 #predictor_hidden_dim: 64  # hidden size of the output layer
 #predictor_dropout: 0.1  # dropout rate of the output layer
 

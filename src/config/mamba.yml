@@ -8,8 +8,9 @@ num_workers: 0  # TODO seems faster than 1
 
 # Model
 model: "mamba"  # mamba or mamba2
-dim_embedding_token: 16  # Embedding dimension for tokens
-dim_embedding_tissue: 16  # Embedding dimension for tissues
+  # best results so far with 32
+dim_embedding_token: 32  # Embedding dimension for tokens
+dim_embedding_tissue: 32  # Embedding dimension for tissues
 predictor_hidden_dim: 64
 predictor_dropout: 0.1
 
