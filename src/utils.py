@@ -144,6 +144,17 @@ def save_checkpoint(state, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
 
 
+def clean_model_weights(best_epoch, fold, checkpoint_path, logger):
+    logger.info(f"Starting weights cleanup")
+    files = os.listdir(checkpoint_path)
+    if f"checkpoint_{best_epoch}_fold-{fold}" not in str(files):
+        raise FileNotFoundError(f"Could not find the best epoch weights: checkpoint_{best_epoch}_fold-{fold}")
+    for file in files:
+        if f"checkpoint_{best_epoch}_fold-{fold}" not in file:
+            os.remove(os.path.join(checkpoint_path, file))
+    logger.info(f"Removed all checkpoint weights except the best one: checkpoint_{best_epoch}_fold-{fold}")
+
+
 def get_device(config: DictConfig, logger=None):
     # os.environ["CUDA_VISIBLE_DEVICES"] = str(config.gpu_id)  # removed as not working
     if logger:

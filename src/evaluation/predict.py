@@ -1,5 +1,6 @@
 import os
 import torch
+import aim
 import pandas as pd
 import numpy as np
 from omegaconf import OmegaConf, DictConfig
@@ -7,18 +8,10 @@ from tqdm import tqdm
 from sklearn.metrics import mean_absolute_error, mean_squared_error, root_mean_squared_error, r2_score, roc_auc_score, \
     confusion_matrix
 
-from utils import mkdir, set_project_path, get_device
+from utils import mkdir, set_project_path, get_device, log_pred_true_scatter, log_confusion_matrix, log_roc_curve
 from models.get_model import get_model
 from log.logger import setup_logger
 from data_handling.data_loader import get_train_data_loaders, get_val_data_loader, get_test_data_loader
-
-
-def clean_model_weights(best_epoch, fold, checkpoint_path, logger):
-    # Remove all weights except the best one
-    for file in os.listdir(checkpoint_path):
-        if f"checkpoint_{best_epoch}_fold-{fold}" not in file:
-            os.remove(os.path.join(checkpoint_path, file))
-    logger.info(f"Removed all checkpoint weights except the best one: checkpoint_{best_epoch}_fold-{fold}")
 
 
 def load_model(config: DictConfig, subproject, device, logger, full_output=False):
@@ -29,28 +22,18 @@ def load_model(config: DictConfig, subproject, device, logger, full_output=False
 
     # later average models: https://git01lab.cs.univie.ac.at/a1142469/dap/-/blob/main/RNAdegformer/src/OpenVaccine/predict.py#L98
     for fold in range(config.nr_folds):
-        # FIXME currently only returning last train_loss and best_epoch
+        # FIXME currently only returning train_loss and best_epoch of last fold loaded!
         losses = pd.read_csv(os.path.join(checkpoint_path, f"losses_fold-{fold}.csv"))
         losses = losses[~losses.checkpoint_stored.isna()]
         best_epoch = int(losses.loc[losses.val_loss.idxmin(), "epoch"])
         train_loss = losses.loc[losses.val_loss.idxmin(), "train_loss"]
         data = torch.load(os.path.join(checkpoint_path, f'checkpoint_{best_epoch}_fold-{fold}.pth.tar'),
                           weights_only=False)
-        if config.clean_up_weights:
-            clean_model_weights(best_epoch, fold, checkpoint_path, logger)
         model.load_state_dict(data['state_dict'])
-
+        # TODO allow to merge weights across folds?
     if full_output:
         return model, train_loss, best_epoch
     return model
-
-
-def evaluate(target, prediction):
-    mae = mean_absolute_error(target, prediction)
-    mse = mean_squared_error(target, prediction)
-    rmse = root_mean_squared_error(target, prediction)
-    r2 = r2_score(target, prediction)
-    return mae, mse, rmse, r2
 
 
 def predict(config: DictConfig, subproject, logger, val=False, test=False, full_output=False):
@@ -90,41 +73,61 @@ def predict(config: DictConfig, subproject, logger, val=False, test=False, full_
     return df
 
 
-def predict_and_evaluate(config: DictConfig, subproject, logger):
+def evaluate(y_true, y_pred, dataset, best_epoch, binary_class, subproject, logger, aim_tracker=None):
+    logger.info("Starting evaluation")
     prediction_path = os.path.join(os.environ["PROJECT_PATH"], subproject, "predictions")
     mkdir(prediction_path)
 
-    preds_df, train_loss, best_epoch = predict(config, subproject, logger, full_output=True)
-    preds_df.to_csv(os.path.join(prediction_path, "predictions.csv"))
+    # Store predictions
+    preds_df = pd.DataFrame({"target": y_true, "prediction": y_pred})
+    preds_df.to_csv(os.path.join(prediction_path, f"predictions_{dataset}.csv"))
     logger.info(f"Predictions stored at {prediction_path}")
 
-    if config.binary_class:
-        metric = roc_auc_score(preds_df.target, preds_df.prediction)
-        logger.info(confusion_matrix(preds_df.target, [1 if target > 0.5 else 0 for target in preds_df.prediction]))
-        logger.info(f"AUC: {metric}, Best epoch: {best_epoch}")
+    # store scatter of predictions
+    img_buffer = log_pred_true_scatter(y_true, y_pred, binary_class)
+    if aim_tracker: aim_tracker.track(aim.Image(img_buffer), name=f"pred_true_scatter_{dataset}")
 
-        with open(os.path.join(prediction_path, "evaluation_metrics.txt"), "w") as f:
-            f.write(f"AUC: {metric},\n"
-                    f"Best epoch: {best_epoch}")
+    if binary_class:
+        # Confusion matrix
+        conf_matrix = confusion_matrix(y_true, [1 if target > 0.5 else 0 for target in y_pred])
+        logger.info(f"Confusion Matrix:\n{conf_matrix}")
+        img_buffer = log_confusion_matrix(y_true, y_pred)
+        if aim_tracker: aim_tracker.track(aim.Image(img_buffer), name=f"confusion_matrix_{dataset}")
+
+        # AUC score
+        auc = roc_auc_score(y_true, y_pred)
+        if aim_tracker: aim_tracker.track(auc, name=f'AUC_{dataset}')
+        logger.info(f"{dataset}: AUC: {auc}, best epoch: {best_epoch}")
+
+        with open(os.path.join(prediction_path, f"evaluation_metrics_{dataset}.txt"), "w") as f:
+            f.write(f"{dataset}:\n"
+                    f"AUC: {auc}\n"
+                    f"Best epoch: {best_epoch}\n"
+                    f"{conf_matrix}\n")
+
+        # ROC curve
+        img_buffer = log_roc_curve(y_true, y_pred)
+        if aim_tracker: aim_tracker.track(aim.Image(img_buffer), name=f"roc_curve_{dataset}")
     else:
-        mae, mse, rmse, r2 = evaluate(preds_df.target, preds_df.prediction)
+        mae = mean_absolute_error(y_true, y_pred)
+        mse = mean_squared_error(y_true, y_pred)
+        rmse = root_mean_squared_error(y_true, y_pred)
+        r2 = r2_score(y_true, y_pred)
 
-        logger.info(
-            f"MAE: {mae}, MSE: {mse}, RMSE: {rmse}, RMSE_train: {train_loss}, R2: {r2}, best epoch: {best_epoch}")
+        logger.info(f"{dataset}: MAE: {mae}, MSE: {mse}, RMSE: {rmse}, R2: {r2}, best epoch: {best_epoch}")
+        if aim_tracker: aim_tracker.track(r2, name=f'R2_{dataset}')
 
-        with open(os.path.join(prediction_path, "evaluation_metrics.txt"), "w") as f:
-            f.write(f"MAE:        {mae}\n"
+        with open(os.path.join(prediction_path, f"evaluation_metrics_{dataset}.txt"), "w") as f:
+            f.write(f"{dataset}:\n"
+                    f"MAE:        {mae}\n"
                     f"MSE:        {mse}\n"
                     f"RMSE:       {rmse}\n"
-                    f"RMSE_train: {train_loss}\n"
                     f"R2:         {r2}\n"
                     f"Best epoch: {best_epoch}\n")
-        metric = r2
-
-    return preds_df.target, preds_df.prediction, metric
 
 
 if __name__ == "__main__":
+    # UNTESTED
     CONFIG_PATH = "config/mamba.yml"
 
     general_config = OmegaConf.load("config/general_codon.yml")
@@ -137,4 +140,6 @@ if __name__ == "__main__":
     os.environ["LOG_FILE"] = os.path.join(predictions_path, "log_predict.log")
     custom_logger = setup_logger()
 
-    predict_and_evaluate(custom_config, os.path.join("runs", custom_config.subproject), custom_logger)
+    df, _, best_epoch = predict(custom_config, custom_config.subproject, custom_logger, full_output=True)
+    evaluate(df.target, df.prediction, "train", best_epoch, custom_config.binary_class, os.environ["SUBPROJECT"],
+             custom_logger)
