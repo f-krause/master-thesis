@@ -1,5 +1,3 @@
-# FIXME needs cuda 12.1 to run
-
 import torch
 import torch.nn as nn
 from torch import Tensor
@@ -31,7 +29,7 @@ class ModelXLSTM(nn.Module):
                                         max_norm=config.embedding_max_norm)
 
         # Total embedding dimension after concatenation
-        self.embedding_dim = config.dim_embedding_token + config.dim_embedding_token
+        self.embedding_dim = config.dim_embedding_token
 
         # xLSTMBlockStack configuration
         cfg = xLSTMBlockStackConfig(
@@ -45,7 +43,7 @@ class ModelXLSTM(nn.Module):
             slstm_block=sLSTMBlockConfig(
                 slstm=sLSTMLayerConfig(
                     # backend="vanilla",  # device.type,  # cuda or vanilla, cuda build fails with ninja build error
-                    backend='cuda' if device.type == 'cuda' else 'vanilla',
+                    backend='cuda' if device.type == 'cuda' else 'vanilla',  # TODO check this!
                     num_heads=config.num_heads,
                     conv1d_kernel_size=config.conv1d_kernel_size,
                     bias_init="powerlaw_blockdependent",
@@ -73,18 +71,15 @@ class ModelXLSTM(nn.Module):
         tissue_embedding = self.tissue_encoder(tissue_id)
         seq_embedding = self.seq_encoder(rna_data_pad)
 
-        # Expand tissue embedding to match sequence length (batch_size, seq_len, dim_embedding_token)
-        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).repeat(1, seq_embedding.size(1), 1)
+        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, seq_embedding.size(1), -1)
 
-        # Concat embeddings (batch_size, seq_len, embedding_dim)
-        combined_embedding = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)
+        x = seq_embedding + tissue_embedding_expanded  # (batch_size, padded_seq_length, dim_embedding_token)
 
-        # Remove tissue embeddings after the sequence ends
-        attention_mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
-        combined_embedding = combined_embedding * attention_mask
+        mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
+        x *= mask
 
         # Forward pass through xLSTMBlockStack
-        x = combined_embedding.to(self.device)
+        # x = x.to(self.device)
         out = self.xlstm_stack(x)
 
         # Extract outputs corresponding to the last valid time step

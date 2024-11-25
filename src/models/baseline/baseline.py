@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from knowledge_db import TISSUES, CODON_MAP_DNA
 
 
@@ -18,8 +18,7 @@ class ModelBaseline(nn.Module):
                                         max_norm=config.embedding_max_norm)  # 64 codons + padding 0
 
         layers = [
-            nn.Linear(config.dim_embedding_tissue + self.max_seq_length * config.dim_embedding_token,
-                      config.hidden_size),
+            nn.Linear(self.max_seq_length * config.dim_embedding_token, config.hidden_size),
             nn.GELU(),
             nn.Dropout(p=config.dropout),
             nn.Linear(config.hidden_size, config.hidden_size // 2),
@@ -46,15 +45,41 @@ class ModelBaseline(nn.Module):
 
         rna_data_pad = F.pad(rna_data, (0, self.max_seq_length - rna_data.size(1)), value=0)
 
-        tissue_embedding = self.tissue_encoder(tissue_id)
-        seq_embedding = self.seq_encoder(rna_data_pad)
-        seq_embedding_flat = seq_embedding.flatten(start_dim=1)
+        tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_tissue)
+        seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, padded_seq_length, dim_embedding_token)
 
-        # Apply pooling to reduce sequence length
+        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, seq_embedding.size(1), -1)
+
+        x = seq_embedding + tissue_embedding_expanded  # (batch_size, padded_seq_length, dim_embedding_token)
+
+        mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
+        x *= mask
+
+        x = x.flatten(start_dim=1)
+
+        # Apply pooling to reduce sequence length (very old legacy)
         # x = self.pool(seq_embedding.transpose(1, 2)).transpose(1, 2)
-
-        x = torch.cat((tissue_embedding, seq_embedding_flat), dim=1)
 
         y_pred = self.fc(x)
 
         return y_pred
+
+
+if __name__ == "__main__":
+    # Test forward pass
+    config_dev = OmegaConf.load("config/baseline.yml")
+    config_dev = OmegaConf.merge(config_dev,
+                                 {"binary_class": True, "max_seq_length": 2700, "embedding_max_norm": 2})
+
+    sample_batch = [
+        # rna_data_padded (batch_size x max_seq_length)
+        torch.nn.utils.rnn.pad_sequence(torch.randint(1, 64, (config_dev.batch_size, config_dev.max_seq_length)),
+                                        batch_first=True),
+        torch.randint(29, (config_dev.batch_size,)),  # tissue_ids (batch_size x 1)
+        torch.tensor([config_dev.max_seq_length] * config_dev.batch_size, dtype=torch.int64)
+        # seq_lengths (batch_size x 1)
+    ]
+
+    model = ModelBaseline(config_dev, torch.device("cpu"))
+
+    print(model(sample_batch))

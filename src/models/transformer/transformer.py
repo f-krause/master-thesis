@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torch import Tensor
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from knowledge_db import TISSUES, CODON_MAP_DNA
 
 from models.predictor import Predictor
@@ -38,7 +38,7 @@ class ModelTransformer(nn.Module):
         self.max_seq_length = config.max_seq_length
         self.dim_embedding_token = config.dim_embedding_token
         self.dim_embedding_token = config.dim_embedding_token
-        self.embedding_dim = self.dim_embedding_token + self.dim_embedding_token
+        self.embedding_dim = self.dim_embedding_token
 
         # Embedding layers
         self.tissue_encoder = nn.Embedding(len(TISSUES), self.dim_embedding_token, max_norm=config.embedding_max_norm)
@@ -74,20 +74,21 @@ class ModelTransformer(nn.Module):
         tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_token)
         seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, seq_len, dim_embedding_token)
 
-        # Expand tissue embedding to match sequence length (batch_size, seq_len, dim_embedding_token)
-        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).repeat(1, seq_embedding.size(1), 1)
+        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, seq_embedding.size(1), -1)
 
-        # Concatenate sequence embedding and tissue embedding (batch_size, seq_len, embedding_dim)
-        combined_embedding = torch.cat((seq_embedding, tissue_embedding_expanded), dim=2)
+        x = seq_embedding + tissue_embedding_expanded  # (batch_size, padded_seq_length, dim_embedding_token)
+
+        mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
+        x *= mask
 
         # Apply positional encoding
-        combined_embedding = self.positional_encoding(combined_embedding)  # (batch_size, seq_len, embedding_dim)
+        x = self.positional_encoding(x)  # (batch_size, seq_len, embedding_dim)
 
         # Create attention mask (batch_size, seq_len)
         attention_mask = (rna_data_pad == 0)
 
         # Pass through Transformer Encoder: (seq_len, batch_size, embedding_dim)
-        out = self.transformer_encoder(combined_embedding, src_key_padding_mask=attention_mask)
+        out = self.transformer_encoder(x, src_key_padding_mask=attention_mask)
 
         # Extract outputs corresponding to the last valid time step
         idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, out.size(2)))  # (batch_size, 1, embedding_dim)
@@ -96,3 +97,23 @@ class ModelTransformer(nn.Module):
         y_pred = self.predictor(out_last)
 
         return y_pred
+
+
+if __name__ == "__main__":
+    # Test forward pass
+    config_dev = OmegaConf.load("config/transformer.yml")
+    config_dev = OmegaConf.merge(config_dev,
+                                 {"binary_class": True, "max_seq_length": 2700, "embedding_max_norm": 2})
+
+    sample_batch = [
+        # rna_data_padded (batch_size x max_seq_length)
+        torch.nn.utils.rnn.pad_sequence(torch.randint(1, 64, (config_dev.batch_size, config_dev.max_seq_length)),
+                                        batch_first=True),
+        torch.randint(29, (config_dev.batch_size,)),  # tissue_ids (batch_size x 1)
+        torch.tensor([config_dev.max_seq_length] * config_dev.batch_size, dtype=torch.int64)
+        # seq_lengths (batch_size x 1)
+    ]
+
+    model = ModelTransformer(config_dev, torch.device("cpu"))
+
+    print(model(sample_batch))

@@ -151,7 +151,7 @@ class LEGnet(nn.Module):
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, config.dim_embedding_token, padding_idx=0,
                                         max_norm=config.embedding_max_norm)  # 64 codons + padding 0
 
-        predictor = Predictor(config, config.final_ch + config.dim_embedding_tissue)  # FIXME/TODO
+        predictor = Predictor(config, config.final_ch)# + config.dim_embedding_tissue)  # FIXME/TODO
         self.predictor = predictor.to(self.device)
 
         seqextblocks = OrderedDict()
@@ -255,26 +255,32 @@ class LEGnet(nn.Module):
         tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_tissue)
         seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, padded_seq_length, dim_embedding_token)
 
-        x = seq_embedding.permute(0, 2, 1)  # (batch_size, dim_embedding_token, max_seq_length)  = (4, 16, 2700)
+        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, seq_embedding.size(1), -1)
+
+        x = seq_embedding + tissue_embedding_expanded  # (batch_size, padded_seq_length, dim_embedding_token)
+
+        mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
+        x *= mask
+
+        x = x.permute(0, 2, 1)  # (batch_size, dim_embedding_token, max_seq_length)  = (4, 16, 2700)
 
         f = self.feature_extractor(x)
         x = self.mapper(f)
         x = F.adaptive_avg_pool1d(x, 1)
         x = x.squeeze(2)
 
-        x = torch.cat((tissue_embedding, x), dim=1)  # (batch_size, flatten_size + dim_embedding_tissue)
+        # x = torch.cat((tissue_embedding, x), dim=1)  # (batch_size, flatten_size + dim_embedding_tissue)
 
         y_pred = self.predictor(x)
 
-        return y_pred  # modified
+        return y_pred
 
 
 if __name__ == "__main__":
-    # Test model
+    # Test forward pass
     config_dev = OmegaConf.load("config/LEGnet.yml")
     config_dev = OmegaConf.merge(config_dev,
                                  {"binary_class": True, "max_seq_length": 2700, "embedding_max_norm": 2})
-    device_dev = torch.device("cpu")
 
     sample_batch = [
         # rna_data_padded (batch_size x max_seq_length)
@@ -285,6 +291,6 @@ if __name__ == "__main__":
         # seq_lengths (batch_size x 1)
     ]
 
-    model = LEGnet(config_dev, device_dev)
+    model = LEGnet(config_dev, torch.device("cpu"))
 
     print(model(sample_batch))
