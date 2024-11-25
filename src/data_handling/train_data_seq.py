@@ -38,7 +38,6 @@ def get_train_data_file(file_name: str, check_reproduce=False):
     rna_data = []
     targets = []
     targets_bin = []
-    failed_sequences = []
 
     for identifier, content in tqdm(raw_data.items()):
         sec_struc, loop_type, mfe = _get_structure_pred(identifier, FOLDING_ALG)
@@ -66,15 +65,7 @@ def get_train_data_file(file_name: str, check_reproduce=False):
                 sec_struc_ohe = [TOKENS.index(c) + 1 for c in sec_struc]
                 loop_type_ohe = [TOKENS.index(c) + 1 for c in loop_type]
 
-                # TODO note that 5' and 3' can have non-triplet length! add padding for convolution?
-                try:
-                    rna_data.append(torch.tensor([sequence_ohe, coding_area_ohe, sec_struc_ohe, loop_type_ohe]))  # 4 x n
-                except Exception as e:
-                    print(e)
-                    failed_sequences.append(identifier)
-                    break
-                    # expected sequence of length 8058 at dim 1 (got 6412)
-                    # Broken: too short loop type (bpRNA issue?): ENST00000392782, ENST00000619168, ENST00000389532
+                rna_data.append(torch.tensor([sequence_ohe, coding_area_ohe, sec_struc_ohe, loop_type_ohe]))  # 4 x n
 
                 identifiers.append(identifier)
                 sequences.append(sequence)
@@ -87,8 +78,6 @@ def get_train_data_file(file_name: str, check_reproduce=False):
                     break
             if len(rna_data) >= MAX_DATA:
                 break
-
-    print(failed_sequences)
 
     train_indices, val_indices, test_indices = get_train_val_test_indices(sequences, random_state=SEED)
 
@@ -121,7 +110,7 @@ def get_train_data_file(file_name: str, check_reproduce=False):
 if __name__ == '__main__':
     from utils import set_project_path
 
-    CHECK_REPRODUCTION = False
+    CHECK_REPRODUCTION = True
     FILE_NAME = ""
 
     if FILE_NAME:
