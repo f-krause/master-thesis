@@ -60,6 +60,7 @@ def main_param_tune(config: DictConfig):
 
     study = optuna.create_study(
         direction='maximize' if config.binary_class else 'minimize',
+        pruner=optuna.pruners.MedianPruner(n_startup_trials=config.optuna.n_startup_trials),
         storage=os.path.join(config.optuna.storage, config.model + '.db'),
         study_name=config.optuna.study_name,
         load_if_exists=True
