@@ -1,4 +1,4 @@
-# Based on https://github.com/autosome-ru/LegNet/blob/main/legnet/model.py
+# Based on https://github.com/autosome-ru/LegNet/blob/main/legnet/model.py (MIT license)
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -151,7 +151,7 @@ class LEGnet(nn.Module):
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, config.dim_embedding_token, padding_idx=0,
                                         max_norm=config.embedding_max_norm)  # 64 codons + padding 0
 
-        predictor = Predictor(config, config.final_ch)# + config.dim_embedding_tissue)  # FIXME/TODO
+        predictor = Predictor(config, config.final_ch)
         self.predictor = predictor.to(self.device)
 
         seqextblocks = OrderedDict()
@@ -268,8 +268,6 @@ class LEGnet(nn.Module):
         x = self.mapper(f)
         x = F.adaptive_avg_pool1d(x, 1)
         x = x.squeeze(2)
-
-        # x = torch.cat((tissue_embedding, x), dim=1)  # (batch_size, flatten_size + dim_embedding_tissue)
 
         y_pred = self.predictor(x)
 
