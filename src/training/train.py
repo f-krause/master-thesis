@@ -19,6 +19,10 @@ from evaluation.predict import evaluate
 
 
 def train_fold(config: DictConfig, fold: int = 0):
+    if config.save_freq % config.val_freq != 0:
+        raise ValueError(f"save_freq ({config.save_freq}) should be a multiple of val_freq ({config.val_freq})")
+
+    # Initialize loggers
     logger = setup_logger()
 
     # Initialize Aim run
