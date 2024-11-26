@@ -92,7 +92,6 @@ def train_tune_fold(config: DictConfig, train_loader, val_loader, trial):
                 raise optuna.exceptions.TrialPruned()
 
             if early_stopper.early_stop(val_loss):
-                # TODO needed?
                 break
 
     if config.binary_class:
@@ -116,17 +115,26 @@ def create_objective(config):
 
 def set_trial_parameters(trial, config):
     # TODO automize based on yml files
-    lr_range = (1e-5, 1e-2)
-    # weight_decay_range = (1e-6, 1e-1)
-    batch_size_options = [32, 64, 128]
-    dropout_range = (0.0, 0.5)
-    rnn_hidden_size_options = [64, 128, 256, 512]
-    num_layers_range = (1, 4)
 
-    # Suggest hyperparameters
-    config.optimizer.lr = trial.suggest_float('lr', *lr_range, log=True)
-    # config.optimizer.weight_decay = trial.suggest_float('weight_decay', *weight_decay_range, log=True)
-    config.batch_size = trial.suggest_categorical('batch_size', batch_size_options)
-    config.dropout = trial.suggest_float('dropout', *dropout_range)
-    config.rnn_hidden_size = trial.suggest_categorical('rnn_hidden_size', rnn_hidden_size_options)
-    config.num_layers = trial.suggest_int('num_layers', *num_layers_range)
+    optimizers = ['adam', 'ranger']
+    weight_decay_options = [1e-5, 1e-4, 1e-3]
+    lr_options = [1e-5, 1e-4, 1e-3, 1e-2]
+    batch_size_options = [8, 16, 32, 64]
+
+    # config.optimizer.name = trial.suggest_categorical('optimizer_name', optimizers)
+    # if config.optimizer.name == 'ranger':
+    #     config.optimizer.weight_decay = trial.suggest_categorical('weight_decay', weight_decay_options, log=True)
+    # config.optimizer.lr = trial.suggest_categorical('lr', lr_options, log=True)
+    # config.batch_size = trial.suggest_categorical('batch_size', batch_size_options)
+
+    if config.model == 'gru':
+        # TODO write wrapper, that dynamically sets the model parameters based on the lists of the separate yml.
+        # dropout_options = [0.0, 0.1, 0.2, 0.3, 0.5]
+        rnn_hidden_size_options = [64, 128, 256, 512]
+        # num_layers_range = (1, 4)
+
+        # config.dropout = trial.suggest_categorical('dropout', dropout_options)
+        config.rnn_hidden_size = trial.suggest_categorical('rnn_hidden_size', rnn_hidden_size_options)
+        # config.num_layers = trial.suggest_int('num_layers', *num_layers_range)
+    else:
+        raise NotImplementedError(f"Model {config.model} not implemented for hyperparameter tuning.")
