@@ -24,8 +24,6 @@ def train_fold(config: DictConfig, fold: int = 0):
 
     # Initialize loggers
     logger = setup_logger()
-
-    # Initialize Aim run
     aim_run = aim.Run(experiment=os.environ["SUBPROJECT"].replace("runs/", "", 1),
                       repo="~/master-thesis", log_system_params=True)
     aim_run['model_config'] = OmegaConf.to_container(config)
