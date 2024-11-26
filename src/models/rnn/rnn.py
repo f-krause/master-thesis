@@ -38,18 +38,15 @@ class ModelRNN(nn.Module):
         tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_tissue)
         seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, padded_seq_length, dim_embedding_token)
 
-        # Expand tissue embedding to match sequence length (batch_size, seq_len, dim_embedding_token)
         tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, seq_embedding.size(1), -1)
 
-        rnn_input = tissue_embedding_expanded + seq_embedding
+        x = seq_embedding + tissue_embedding_expanded  # (batch_size, padded_seq_length, dim_embedding_token)
 
-        # Remove tissue embeddings after the sequence ends
-        # FIXME seems to decrease performance of GRU
-        # mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
-        # rnn_input = rnn_input * mask
+        mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
+        x *= mask
 
         # Packing the sequence
-        x_packed = torch.nn.utils.rnn.pack_padded_sequence(rnn_input, seq_lengths.to('cpu'), batch_first=True,
+        x_packed = torch.nn.utils.rnn.pack_padded_sequence(x, seq_lengths.to('cpu'), batch_first=True,
                                                            enforce_sorted=False)
 
         if isinstance(self.rnn, nn.LSTM):
