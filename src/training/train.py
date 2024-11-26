@@ -28,7 +28,7 @@ def train_fold(config: DictConfig, fold: int = 0):
 
     # gpu selection
     device = get_device(config, logger)
-    # device = "cpu"  # FIXME for development
+    # device = torch.device("cpu")  # FIXME for development
 
     # Create checkpoint directory
     checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], os.environ["SUBPROJECT"], "weights")
