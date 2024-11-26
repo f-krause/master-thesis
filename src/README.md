@@ -1,6 +1,6 @@
 # Source Code of Masters Thesis 
 
-## Execute
+## Run model training
 First either 
 - configure existing config files (check `config` folder) and run as described below
 - create a custom config yml file and provide it as a flag to the main script
@@ -30,3 +30,26 @@ With the possible flags:
 
 ## TODO
 - remove `torchxlstm` model if not needed
+
+
+## Optuna Hyperparameter Optimization
+1. Set general study parameters in [`general_codon.yml`](src/config/general_codon.yml) config
+```yaml
+optuna:
+  storage: 'sqlite:////export/share/krausef99dm/tuning_dbs/'  # only provide path, will add database per model
+  study_name: 'study_1'
+  n_trials: 5
+  timeout: 86400  # for 24h max runtime
+```
+
+2. Set parameters to try in the respective yaml files in [`config/param_tuning`](config/param_tuning)
+
+3. Run hyperparameter optimization with Optuna
+```shell
+python main.py --tuning  --model_name
+```
+
+4. Get dashboard for Optuna study
+```shell
+optuna-dashboard sqlite:////export/share/krausef99dm/tuning_dbs/dev/gru.db
+```

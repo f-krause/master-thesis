@@ -6,6 +6,7 @@ gpu_id: 1
 dev: False
 binary_class: True
 frequency_features: False
+param_tune: True
 tissue_id: -1  # 0-28 or -1 for all tissues
 
 # Data
@@ -31,3 +32,10 @@ clean_up_weights: True  # if True, will remove the non-optimal model weights aft
 # Paths
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
+
+# Optuna params
+optuna:
+  storage: 'sqlite:////export/share/krausef99dm/tuning_dbs/dev/'
+  study_name: 'dev_3'
+  n_trials: 5
+  timeout: 86400  # in seconds (= 24h)

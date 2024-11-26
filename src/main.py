@@ -1,7 +1,8 @@
 import os
 import argparse
+from omegaconf import DictConfig
+from knockknock import discord_sender
 
-from training import train
 from log.logger import setup_logger
 from utils import set_log_file, set_project_path, get_config, set_seed
 
@@ -16,17 +17,17 @@ parser.add_argument('-l', "--lstm", help="Use lstm config", action="store_true")
 parser.add_argument('-g', "--gru", help="Use gru config", action="store_true")
 parser.add_argument('-x', "--xlstm", help="Use xlstm config", action="store_true")
 parser.add_argument('-m', "--mamba", help="Use mamba config", action="store_true")
-parser.add_argument('-j', "--jamba", help="Use jamba config", action="store_true")
+parser.add_argument("--jamba", help="Use jamba config", action="store_true")
 parser.add_argument('-t', "--transformer", help="Use transformer config", action="store_true")
 parser.add_argument("--tisnet", help="Use TISnet config", action="store_true")
 parser.add_argument("--legnet", help="Use LEGnet config", action="store_true")
-parser.add_argument('-p', "--ptrnet", help="Use PTRNet config", action="store_true")
+parser.add_argument("--ptrnet", help="Use PTRNet config", action="store_true")
 
 args = parser.parse_args()
 
 
-if __name__ == "__main__":
-    config = get_config(args)
+def main_train(config: DictConfig):
+    from training import train
 
     set_project_path(config)
     set_log_file(config)
@@ -35,9 +36,6 @@ if __name__ == "__main__":
     logger = setup_logger()
     logger.info(f"Project path: {os.path.join(os.environ['PROJECT_PATH'], os.environ['SUBPROJECT'])}")
     logger.info(f"Config: \n {config}")
-
-    if config.save_freq % config.val_freq != 0:
-        raise ValueError(f"save_freq ({config.save_freq}) should be a multiple of val_freq ({config.val_freq})")
 
     try:
         logger.info("TRAINING STARTED")
@@ -49,3 +47,42 @@ if __name__ == "__main__":
 
     logger.info("COMPLETED")
     print("Log file saved at:", os.environ["LOG_FILE"])
+
+
+@discord_sender(webhook_url="https://discord.com/api/webhooks/1308890399942774946/"
+                            "3UQa1CD1iNt1JRccZUxPj8ksKJzSuYcAnXMSYa8l9H4gs1DYi-t64qUR8o9-J4A1NFzS")
+def main_param_tune(config: DictConfig):
+    import optuna
+    from training.param_tuning import create_objective
+
+    set_project_path(config)
+    set_seed(config.seed)
+
+    study = optuna.create_study(
+        direction='maximize' if config.binary_class else 'minimize',
+        storage=os.path.join(config.optuna.storage, config.model + '.db'),
+        study_name=config.optuna.study_name,
+        load_if_exists=True
+    )
+
+    objective = create_objective(config)
+
+    study.optimize(objective, n_trials=config.optuna.n_trials, timeout=config.optuna.timeout)
+
+    # Print the best trial information
+    print(f'Best trial: {study.best_trial.number}')
+    print(f'Best value: {study.best_value}')
+    print(f'Best hyperparameters: {study.best_trial.params}')
+
+    # return relevant information for discord message
+    return {"best_trial": study.best_trial.number, "best_value": study.best_value,
+            "best_params": study.best_trial.params}
+
+
+if __name__ == "__main__":
+    main_config = get_config(args)
+
+    if main_config.param_tune:
+        main_param_tune(main_config)
+    else:
+        main_train(main_config)
