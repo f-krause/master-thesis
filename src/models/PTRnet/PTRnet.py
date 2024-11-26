@@ -1,3 +1,6 @@
+# TODO check out Bio-xLSTM (DNA) implementation
+# https://github.com/ml-jku/DNA-xLSTM
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
