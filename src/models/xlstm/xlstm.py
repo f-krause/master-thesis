@@ -20,6 +20,9 @@ class ModelXLSTM(nn.Module):
     def __init__(self, config: DictConfig, device: torch.device):
         super(ModelXLSTM, self).__init__()
 
+        if config.gpu_id != 0:
+            raise Exception("Currently xLSTM only supports the default GPU (cuda:0)!")
+
         self.device = device
         self.max_seq_length = config.max_seq_length
 
@@ -42,8 +45,7 @@ class ModelXLSTM(nn.Module):
             ),
             slstm_block=sLSTMBlockConfig(
                 slstm=sLSTMLayerConfig(
-                    # backend="vanilla",  # device.type,  # cuda or vanilla, cuda build fails with ninja build error
-                    backend='cuda' if device.type == 'cuda' else 'vanilla',  # TODO check this!
+                    backend='cuda' if device.type == 'cuda' else 'vanilla',
                     num_heads=config.num_heads,
                     conv1d_kernel_size=config.conv1d_kernel_size,
                     bias_init="powerlaw_blockdependent",
@@ -79,7 +81,6 @@ class ModelXLSTM(nn.Module):
         x *= mask
 
         # Forward pass through xLSTMBlockStack
-        # x = x.to(self.device)
         out = self.xlstm_stack(x)
 
         # Extract outputs corresponding to the last valid time step
