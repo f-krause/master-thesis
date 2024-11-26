@@ -136,6 +136,20 @@ def _pad_sequences(batch):
     rna_data, tissue_ids = zip(*data)
     tissue_ids = torch.tensor(tissue_ids)
     seq_lengths = torch.tensor([seq.size(0) for seq in rna_data])
+
+    rna_data_padded = torch.nn.utils.rnn.pad_sequence(rna_data, batch_first=True)
+
+    return [rna_data_padded, tissue_ids, seq_lengths], torch.tensor(targets), torch.tensor(targets_bin)
+
+
+def _pad_sequences_and_reverse(batch):
+    data, targets, targets_bin = zip(*batch)
+    rna_data, tissue_ids = zip(*data)
+    tissue_ids = torch.tensor(tissue_ids)
+    seq_lengths = torch.tensor([seq.size(0) for seq in rna_data])
+
+    rna_data = [torch.flip(seq, dims=[0]) if torch.rand(1).item() < 0.5 else seq for seq in rna_data]
+
     rna_data_padded = torch.nn.utils.rnn.pad_sequence(rna_data, batch_first=True)
 
     return [rna_data_padded, tissue_ids, seq_lengths], torch.tensor(targets), torch.tensor(targets_bin)
@@ -147,10 +161,16 @@ def get_train_data_loaders(config: DictConfig, fold: int):
 
     fit_evaluate_simple_models(train_dataset, val_dataset, config.binary_class)
 
-    train_loader = DataLoader(dataset=train_dataset, batch_size=config.batch_size, shuffle=True,
-                              num_workers=config.num_workers, collate_fn=_pad_sequences)
-    val_loader = DataLoader(dataset=val_dataset, batch_size=config.batch_size, shuffle=False,
-                            num_workers=config.num_workers, collate_fn=_pad_sequences)
+    if config.random_reverse:
+        train_loader = DataLoader(dataset=train_dataset, batch_size=config.batch_size, shuffle=True,
+                                  num_workers=config.num_workers, collate_fn=_pad_sequences_and_reverse)
+        val_loader = DataLoader(dataset=val_dataset, batch_size=config.batch_size, shuffle=False,
+                                num_workers=config.num_workers, collate_fn=_pad_sequences_and_reverse)
+    else:
+        train_loader = DataLoader(dataset=train_dataset, batch_size=config.batch_size, shuffle=True,
+                                  num_workers=config.num_workers, collate_fn=_pad_sequences)
+        val_loader = DataLoader(dataset=val_dataset, batch_size=config.batch_size, shuffle=False,
+                                num_workers=config.num_workers, collate_fn=_pad_sequences)
     return train_loader, val_loader
 
 
@@ -174,11 +194,10 @@ if __name__ == "__main__":
 
     dev_config = OmegaConf.create(
         {"project_path": None, "log_file_path": None, "subproject": "dev/delete_me", "model": "baseline",
-         "train_data_file": "bin_codon_train_2.7k_data.pkl", "val_data_file": "bin_codon_val_2.7k_data.pkl",
-         "test_data_file": "bin_codon_test_2.7k_data.pkl", "batch_size": 4, "num_workers": 4,
-         "folding_algorithm": "viennarna", "seed": 42, "nr_folds": 1,
-         "tissue_id": 28,
-         "binary_class": False}
+         "train_data_file": "codon_dev_train_2.7k_data.pkl", "val_data_file": "codon_val_2.7k_data.pkl",
+         "test_data_file": "codon_test_2.7k_data.pkl", "batch_size": 4, "num_workers": 4,
+         "folding_algorithm": "viennarna", "seed": 42, "nr_folds": 1, "random_reverse": True,
+         "tissue_id": -1, "binary_class": True, "frequency_features": False}
     )
     set_project_path(dev_config)
     set_log_file(dev_config)
