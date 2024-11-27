@@ -1,4 +1,5 @@
 import os
+import time
 import argparse
 from omegaconf import DictConfig
 from knockknock import discord_sender
@@ -22,6 +23,7 @@ parser.add_argument('-t', "--transformer", help="Use transformer config", action
 parser.add_argument("--tisnet", help="Use TISnet config", action="store_true")
 parser.add_argument("--legnet", help="Use LEGnet config", action="store_true")
 parser.add_argument("--ptrnet", help="Use PTRNet config", action="store_true")
+parser.add_argument("--tune", help="Run optuna based hyperparameter tuning", action="store_true")
 
 args = parser.parse_args()
 
@@ -52,6 +54,7 @@ def main_train(config: DictConfig):
 @discord_sender(webhook_url="https://discord.com/api/webhooks/1308890399942774946/"
                             "3UQa1CD1iNt1JRccZUxPj8ksKJzSuYcAnXMSYa8l9H4gs1DYi-t64qUR8o9-J4A1NFzS")
 def main_param_tune(config: DictConfig):
+    print("Starting optuna based hyperparameter tuning for model:", config.model)
     import optuna
     from training.param_tuning import create_objective
 
@@ -60,6 +63,7 @@ def main_param_tune(config: DictConfig):
 
     study = optuna.create_study(
         direction='maximize' if config.binary_class else 'minimize',
+        sampler=optuna.samplers.TPESampler(seed=config.seed, n_startup_trials=config.optuna.n_startup_trials),
         pruner=optuna.pruners.MedianPruner(n_startup_trials=config.optuna.n_startup_trials),
         storage=os.path.join(config.optuna.storage, config.model + '.db'),
         study_name=config.optuna.study_name,
@@ -68,7 +72,9 @@ def main_param_tune(config: DictConfig):
 
     objective = create_objective(config)
 
+    start_time = time.time()
     study.optimize(objective, n_trials=config.optuna.n_trials, timeout=config.optuna.timeout)
+    runtime = time.time() - start_time
 
     # Print the best trial information
     print(f'Best trial: {study.best_trial.number}')
@@ -76,14 +82,15 @@ def main_param_tune(config: DictConfig):
     print(f'Best hyperparameters: {study.best_trial.params}')
 
     # return relevant information for discord message
-    return {"best_trial": study.best_trial.number, "best_value": study.best_value,
-            "best_params": study.best_trial.params}
+    return {"run": config.model + "/" + config.optuna.study_name, "runtime_h": runtime / 3600,
+            "best_trial": study.best_trial.number, "best_value": study.best_value,
+            "best_params": study.best_trial.params, "config": config}
 
 
 if __name__ == "__main__":
     main_config = get_config(args)
 
-    if main_config.param_tune:
+    if args.tune:
         main_param_tune(main_config)
     else:
         main_train(main_config)

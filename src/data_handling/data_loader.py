@@ -70,7 +70,7 @@ class RNADataset(torch.utils.data.Dataset):
 
             mrna_sequences = ["".join(map(str, tensor.tolist())) for tensor in
                               rna_data_full]  # FIXME: mrna sequence length is now not fully identical with the original sequence length
-            train_indices, val_indices = self._get_train_val_indices(mrna_sequences, fold, config.seed, config.nr_folds)
+            train_indices, val_indices = self._get_train_val_indices(config, mrna_sequences, fold)
 
             # SANITY CHECK DISTRIBUTION
             logger.info(
@@ -101,14 +101,15 @@ class RNADataset(torch.utils.data.Dataset):
 
                 logger.info(f"Train dataset with {len(self.rna_data)} samples loaded")
 
-    def _get_train_val_indices(self, mrna_sequences, fold, random_state=42, nr_folds=3):
-        if nr_folds == 1:
+    def _get_train_val_indices(self, config: DictConfig, mrna_sequences, fold):
+        if config.nr_folds == 1:
             # train_indices, val_indices = train_test_split(range(len(mrna_sequences)), test_size=0.2,
             #                                               random_state=random_state)  # legacy
-            train_indices, val_indices, _ = get_train_val_test_indices(mrna_sequences, val_frac=0.15, test_frac=0,
-                                                                       random_state=random_state)
-        elif nr_folds == 3:
-            train_indices, val_indices = self._get_3_fold_indices(mrna_sequences, fold, random_state=random_state)
+            train_indices, val_indices, _ = get_train_val_test_indices(mrna_sequences, val_frac=config.val_fraction,
+                                                                       test_frac=0, random_state=config.seed)
+
+        elif config.nr_folds == 3:
+            train_indices, val_indices = self._get_3_fold_indices(mrna_sequences, fold, random_state=config.seed)
         else:
             raise ValueError("Only 1 and 3 folds are currently supported")
         return train_indices, val_indices

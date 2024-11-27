@@ -1,0 +1,4 @@
+bidirectional: [True, False]
+dropout: [0.0, 0.1, 0.2, 0.3, 0.5]
+rnn_hidden_size: [64, 128, 256, 512]
+num_layers: [2, 3, 4]

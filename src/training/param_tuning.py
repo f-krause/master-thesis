@@ -3,7 +3,7 @@ import optuna
 import numpy as np
 from tqdm import tqdm
 from sklearn.metrics import roc_auc_score, root_mean_squared_error
-from omegaconf import DictConfig
+from omegaconf import OmegaConf, DictConfig
 
 from utils import get_device, set_seed
 from models.get_model import get_model
@@ -114,27 +114,18 @@ def create_objective(config):
 
 
 def set_trial_parameters(trial, config):
-    # TODO automize based on yml files
+    # load the hyperparameters from the yml file with omegaconfig
+    params_general = OmegaConf.load('config/param_tuning/general_param.yml')
 
-    optimizers = ['adam', 'ranger']
-    weight_decay_options = [1e-5, 1e-4, 1e-3]
-    lr_options = [1e-5, 1e-4, 1e-3, 1e-2]
-    batch_size_options = [8, 16, 32, 64]
+    # set the hyperparameters for the trial
+    config.optimizer.lr = trial.suggest_categorical('lr', params_general.lr)
+    config.batch_size = trial.suggest_categorical('batch_size', params_general.batch_size)
+    config.dim_embedding_tissue = trial.suggest_categorical('dim_embedding', params_general.dim_embedding)
+    config.dim_embedding_token = config.dim_embedding_tissue
 
-    # config.optimizer.name = trial.suggest_categorical('optimizer_name', optimizers)
-    # if config.optimizer.name == 'ranger':
-    #     config.optimizer.weight_decay = trial.suggest_categorical('weight_decay', weight_decay_options, log=True)
-    # config.optimizer.lr = trial.suggest_categorical('lr', lr_options, log=True)
-    # config.batch_size = trial.suggest_categorical('batch_size', batch_size_options)
-
-    if config.model == 'gru':
-        # TODO write wrapper, that dynamically sets the model parameters based on the lists of the separate yml.
-        # dropout_options = [0.0, 0.1, 0.2, 0.3, 0.5]
-        rnn_hidden_size_options = [64, 128, 256, 512]
-        # num_layers_range = (1, 4)
-
-        # config.dropout = trial.suggest_categorical('dropout', dropout_options)
-        config.rnn_hidden_size = trial.suggest_categorical('rnn_hidden_size', rnn_hidden_size_options)
-        # config.num_layers = trial.suggest_int('num_layers', *num_layers_range)
-    else:
-        raise NotImplementedError(f"Model {config.model} not implemented for hyperparameter tuning.")
+    try:
+        params_model = OmegaConf.load(f'config/param_tuning/{config.model}_param.yml')
+        for key, values in params_model.items():
+            config[key] = trial.suggest_categorical(key, values)
+    except FileNotFoundError:
+        raise Exception(f"No yml file for {config.model} found at config/param_tuning for hyperparameter tuning.")
