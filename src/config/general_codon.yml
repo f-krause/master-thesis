@@ -6,7 +6,6 @@ gpu_id: 1
 dev: False
 binary_class: True
 frequency_features: False
-param_tune: True
 tissue_id: -1  # 0-28 or -1 for all tissues
 
 # Data
@@ -15,6 +14,7 @@ train_data_file: "codon_train_2.7k_data.pkl"
 
 val_data_file: "codon_val_2.7k_data.pkl"
 test_data_file: "codon_test_2.7k_data.pkl"
+val_fraction: 0.15
 random_reverse: True
 max_seq_length: 2700
 
@@ -23,7 +23,7 @@ nr_folds: 1  # if 1, will take 20% of the train data as validation set during tr
 folding_algorithm: "viennarna" # viennarna, linearfold # TODO - currently not supported
 embedding_max_norm: 2
 
-early_stopper_patience: 7  # disabled if < 0
+early_stopper_patience: 5  # disabled if < 0
 early_stopper_delta: 0.01
 
 final_evaluation: True  # if True, will evaluate the model on the train val set after training
@@ -35,7 +35,8 @@ log_file_path: "" # optional
 
 # Optuna params
 optuna:
-  storage: 'sqlite:////export/share/krausef99dm/tuning_dbs/dev/'
-  study_name: 'dev_3'
-  n_trials: 5
-  timeout: 86400  # in seconds (= 24h)
+  storage: 'sqlite:////export/share/krausef99dm/tuning_dbs/'
+  study_name: 'codon_1'
+  n_trials: 150
+  n_startup_trials: 10
+  timeout: 86400  # in seconds (86400 = 24h)
