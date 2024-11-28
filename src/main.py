@@ -61,11 +61,16 @@ def main_param_tune(config: DictConfig):
     set_project_path(config)
     set_seed(config.seed)
 
+    if config.dev or "dev" in config.train_data_file:
+        storage_path = os.path.join(config.optuna.storage, "dev", config.model + '.db')
+    else:
+        storage_path = os.path.join(config.optuna.storage, config.model + '.db')
+
     study = optuna.create_study(
         direction='maximize' if config.binary_class else 'minimize',
         sampler=optuna.samplers.TPESampler(seed=config.seed, n_startup_trials=config.optuna.n_startup_trials),
         pruner=optuna.pruners.MedianPruner(n_startup_trials=config.optuna.n_startup_trials),
-        storage=os.path.join(config.optuna.storage, config.model + '.db'),
+        storage=storage_path,
         study_name=config.optuna.study_name,
         load_if_exists=True
     )
