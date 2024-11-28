@@ -75,18 +75,18 @@ def train_tune_fold(config: DictConfig, train_loader, val_loader, trial):
             y_true_val, y_pred_val = np.vstack(y_true_val), np.vstack(y_pred_val)
 
             if config.binary_class:
-                val_neg_auc = -roc_auc_score(y_true_val, y_pred_val)
-                losses[epoch].update({"val_neg_auc": val_neg_auc})
-                val_loss = val_neg_auc  # for early stopping in classification setting
-                if val_neg_auc < losses[best_epoch].get("val_neg_auc", 0):
+                val_auc = roc_auc_score(y_true_val, y_pred_val)
+                losses[epoch].update({"val_auc": val_auc})
+                if val_auc > losses[best_epoch].get("val_auc", 0):
                     best_epoch = epoch
                     y_true_val_best, y_pred_val_best = y_true_val.flatten(), y_pred_val.flatten()
+                trial.report(val_auc, epoch)
+                val_loss = -val_auc  # for early stopping in classification setting
             else:
                 if val_loss < losses[best_epoch].get("val_loss", np.inf):
                     best_epoch = epoch
                     y_true_val_best, y_pred_val_best = y_true_val.flatten(), y_pred_val.flatten()
-
-            trial.report(val_loss, epoch)
+                trial.report(val_loss, epoch)
 
             if trial.should_prune():
                 raise optuna.exceptions.TrialPruned()
@@ -105,11 +105,9 @@ def create_objective(config):
         set_trial_parameters(trial, config)
         set_seed(config.seed)
         train_loader, val_loader = get_train_data_loaders(config, 0)
-        try:
-            score = train_tune_fold(config, train_loader, val_loader, trial)
-        except optuna.exceptions.TrialPruned:
-            return None
+        score = train_tune_fold(config, train_loader, val_loader, trial)
         return score
+
     return objective
 
 
