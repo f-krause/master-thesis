@@ -51,5 +51,9 @@ python main.py --tuning  --model_name
 
 4. Get dashboard for Optuna study
 ```shell
-optuna-dashboard sqlite:////export/share/krausef99dm/tuning_dbs/dev/gru.db
+optuna-dashboard sqlite:////export/share/krausef99dm/tuning_dbs/model_name.db
+```
+
+```shell
+optuna-dashboard sqlite:////export/share/krausef99dm/tuning_dbs/baseline.db
 ```
