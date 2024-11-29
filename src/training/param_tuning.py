@@ -94,6 +94,8 @@ def train_tune_fold(config: DictConfig, train_loader, val_loader, trial):
             if early_stopper.early_stop(val_loss):
                 break
 
+    if y_true_val_best is None and y_pred_val_best is None:
+        return None
     if config.binary_class:
         return roc_auc_score(y_true_val_best, y_pred_val_best)
     else:
@@ -105,14 +107,17 @@ def create_objective(config):
         set_trial_parameters(trial, config)
         set_seed(config.seed)
         train_loader, val_loader = get_train_data_loaders(config, 0)
-        score = train_tune_fold(config, train_loader, val_loader, trial)
+        try:
+            score = train_tune_fold(config, train_loader, val_loader, trial)
+        except RuntimeError:  # skip CUDA out of memory
+            raise optuna.exceptions.TrialPruned()
         return score
 
     return objective
 
 
 def set_trial_parameters(trial, config):
-    # load the hyperparameters from the yml file with omegaconfig
+    # load the hyperparameters from the yml file with OmegaConfig
     params_general = OmegaConf.load('config/param_tuning/general_param.yml')
 
     # set the hyperparameters for the trial
