@@ -122,7 +122,7 @@ def set_trial_parameters(trial, config):
 
     # set the hyperparameters for the trial
     config.optimizer.lr = trial.suggest_categorical('lr', params_general.lr)
-    config.batch_size = trial.suggest_categorical('batch_size', params_general.batch_size)
+    #config.batch_size = trial.suggest_categorical('batch_size', params_general.batch_size)
     config.dim_embedding_tissue = trial.suggest_categorical('dim_embedding', params_general.dim_embedding)
     config.dim_embedding_token = config.dim_embedding_tissue
 
@@ -130,5 +130,10 @@ def set_trial_parameters(trial, config):
         params_model = OmegaConf.load(f'config/param_tuning/{config.model}_param.yml')
         for key, values in params_model.items():
             config[key] = trial.suggest_categorical(key, values)
+        if config.model == "cnn":
+            if config["num_filters_conv1"] < config["num_filters_conv2"]:
+                config["num_filters_conv1"] = config["num_filters_conv2"] * 2
+            if config["max_pool1"] < config["max_pool2"]:
+                config["max_pool1"] = config["max_pool2"] + 10
     except FileNotFoundError:
         raise Exception(f"No yml file for {config.model} found at config/param_tuning for hyperparameter tuning.")
