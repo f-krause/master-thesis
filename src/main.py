@@ -87,8 +87,8 @@ def main_param_tune(config: DictConfig):
     print(f'Best hyperparameters: {study.best_trial.params}')
 
     # return relevant information for discord message
-    return {"run": config.model + "/" + config.optuna.study_name, "runtime_h": runtime / 3600,
-            "best_trial": study.best_trial.number, "best_value": study.best_value,
+    return {"RUN": config.model + "/" + config.optuna.study_name, "BEST_VALUE": study.best_value,
+            "runtime_h": runtime / 3600, "best_trial": study.best_trial.number,
             "best_params": study.best_trial.params, "config": config}
 
 
