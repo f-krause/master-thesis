@@ -131,9 +131,9 @@ def set_trial_parameters(trial, config):
         for key, values in params_model.items():
             config[key] = trial.suggest_categorical(key, values)
         if config.model == "cnn":
-            if config["num_filters_conv1"] < config["num_filters_conv2"]:
-                config["num_filters_conv1"] = config["num_filters_conv2"] * 2
-            if config["max_pool1"] < config["max_pool2"]:
-                config["max_pool1"] = config["max_pool2"] + 10
+            if config.num_filters_conv1 < config.num_filters_conv2:
+                config.num_filters_conv1 = config.num_filters_conv2 * 2
+            if config.max_pool1 < config.max_pool2:
+                config.max_pool1 = config.max_pool2 + 10
     except FileNotFoundError:
         raise Exception(f"No yml file for {config.model} found at config/param_tuning for hyperparameter tuning.")
