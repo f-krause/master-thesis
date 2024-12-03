@@ -24,7 +24,7 @@ filter_len_conv2: 9
 stride_conv2: 1
 max_pool2: 10
 
-padding: 'same'
+padding: 'same' # only supports same currently
 
 # Optimizer
 optimizer:
