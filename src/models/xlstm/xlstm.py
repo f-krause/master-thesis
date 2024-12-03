@@ -39,7 +39,7 @@ class ModelXLSTM(nn.Module):
             mlstm_block=mLSTMBlockConfig(
                 mlstm=mLSTMLayerConfig(
                     conv1d_kernel_size=config.conv1d_kernel_size,
-                    qkv_proj_blocksize=config.qkv_proj_blocksize,
+                    qkv_proj_blocksize=config.m_qkv_proj_blocksize,
                     num_heads=config.num_heads,
                 )
             ),
@@ -51,8 +51,8 @@ class ModelXLSTM(nn.Module):
                     bias_init="powerlaw_blockdependent",
                 ),
                 feedforward=FeedForwardConfig(
-                    proj_factor=config.proj_factor,
-                    act_fn=config.act_fn
+                    proj_factor=config.s_proj_factor,
+                    act_fn=config.s_act_fn
                 ),
             ),
             context_length=config.max_seq_length,

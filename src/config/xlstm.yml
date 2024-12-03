@@ -15,10 +15,12 @@ predictor_dropout: 0.1
 
 # xLSTM Config
 conv1d_kernel_size: 4
-qkv_proj_blocksize: 4
-num_heads: 4
-proj_factor: 1.3
-act_fn: "gelu"
+num_heads: 4  # for both s and mLSTM
+
+m_qkv_proj_blocksize: 4
+s_proj_factor: 1.3
+s_act_fn: "gelu"
+
 num_blocks: 7
 slstm_at: [1]  # architecture: mlstm, slstm, mlstm, mlstm, mlstm, mlstm, mlstm
 bias: True
