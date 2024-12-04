@@ -1,0 +1,5 @@
+d_state: [8, 16, 32, 64, 128]
+d_conv: [2, 3, 4]
+expand: [1, 2, 4]
+num_layers: [1, 2, 3, 4]
+head_dim: [2, 4, 8]
