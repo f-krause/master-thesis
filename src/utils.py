@@ -98,12 +98,8 @@ def get_config(args):
         config_path = "config/xlstm.yml"
     elif args.mamba:
         config_path = "config/mamba.yml"
-    elif args.jamba:
-        config_path = "config/jamba.yml"
     elif args.transformer:
         config_path = "config/transformer.yml"
-    elif args.tisnet:
-        config_path = "config/TISnet.yml"
     elif args.legnet:
         config_path = "config/LEGnet.yml"
     else:

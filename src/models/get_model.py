@@ -41,10 +41,6 @@ def get_model(config: DictConfig, device: torch.device, logger=None):
         if logger: logger.info("Using Mamba2 model")
         from models.mamba.mamba import ModelMamba
         return ModelMamba(config, device, model="mamba2").to(device)
-    elif config.model == "jamba":
-        if logger: logger.info("Using Jamba model")
-        from models.jamba.jamba import ModelJamba
-        return ModelJamba(config, device).to(device)
     elif config.model == "transformer":
         if config.frequency_features:
             if logger: logger.info("Using Transformer model (frequencies)")
@@ -53,10 +49,6 @@ def get_model(config: DictConfig, device: torch.device, logger=None):
             if logger: logger.info("Using Transformer model")
             from models.transformer.transformer import ModelTransformer
         return ModelTransformer(config, device).to(device)
-    elif config.model.lower() == "tisnet":
-        if logger: logger.info("Using TISnet model")
-        from models.TISnet.TISnet import TISnet
-        return TISnet(config, device).to(device)
     elif config.model.lower() == "legnet":
         if logger: logger.info("Using LEGnet model")
         from models.LEGnet.LEGnet import LEGnet
