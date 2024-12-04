@@ -135,5 +135,9 @@ def set_trial_parameters(trial, config):
                 config.num_filters_conv1 = config.num_filters_conv2 * 2
             if config.max_pool1 < config.max_pool2:
                 config.max_pool1 = config.max_pool2 + 10
+        if config.model == "mamba2":
+            if (config.dim_embedding_token * config.expand / config.head_dim) % 8 != 0:
+                print("WARNING: Infeasible combination of parameters")
+                raise optuna.exceptions.TrialPruned()
     except FileNotFoundError:
         raise Exception(f"No yml file for {config.model} found at config/param_tuning for hyperparameter tuning.")
