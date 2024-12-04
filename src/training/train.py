@@ -18,12 +18,11 @@ from training.early_stopper import EarlyStopper
 from evaluation.predict import evaluate
 
 
-def train_fold(config: DictConfig, fold: int = 0):
+def train_fold(config: DictConfig, logger, fold: int = 0):
     if config.save_freq % config.val_freq != 0:
         raise ValueError(f"save_freq ({config.save_freq}) should be a multiple of val_freq ({config.val_freq})")
 
     # Initialize loggers
-    logger = setup_logger()
     experiment_name = os.environ["SUBPROJECT"].replace("runs/", "", 1)
     if config.nr_folds > 1:
         experiment_name += f"_fold-{fold}"
@@ -48,11 +47,12 @@ def train_fold(config: DictConfig, fold: int = 0):
         criterion = torch.nn.MSELoss()
 
     early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
+
     train_loader, val_loader = get_train_data_loaders(config, fold=fold)
 
     losses = {}
 
-    logger.info("Starting training")
+    logger.info(f"Starting training fold {fold}")
     start_time = time.time()
     end_time = None
     best_epoch = 1
@@ -169,10 +169,10 @@ def train_fold(config: DictConfig, fold: int = 0):
         aim_run.track(nr_flops, name='nr_flops')
 
     if config.final_evaluation:
-        metric_val = evaluate(y_true_val_best, y_pred_val_best, "val", best_epoch, config.binary_class,
-                 os.environ["SUBPROJECT"], logger, aim_run)
-        metric_train = evaluate(y_true_train_best, y_pred_train_best, "train", best_epoch, config.binary_class,
-                 os.environ["SUBPROJECT"], logger, aim_run)
+        metric_val = evaluate(y_true_val_best, y_pred_val_best, "val", best_epoch, fold, config.binary_class,
+                              os.environ["SUBPROJECT"], logger, aim_run)
+        metric_train = evaluate(y_true_train_best, y_pred_train_best, "train", best_epoch, fold,
+                                config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
 
     if config.clean_up_weights:
         clean_model_weights(best_epoch, fold, checkpoint_path, logger)
@@ -182,22 +182,25 @@ def train_fold(config: DictConfig, fold: int = 0):
 
     if config.final_evaluation:
         return {"metric_val": float(metric_val), "metric_train": float(metric_train), "best_epoch": best_epoch,
-                "training_time": training_time}
+                "training_time_min": training_time}
     else:
-        return {"best_epoch": best_epoch, "training_time": training_time}
+        return {"best_epoch": best_epoch, "training_time_min": training_time}
 
 
 @discord_sender(webhook_url="https://discord.com/api/webhooks/1308890399942774946/"
                             "3UQa1CD1iNt1JRccZUxPj8ksKJzSuYcAnXMSYa8l9H4gs1DYi-t64qUR8o9-J4A1NFzS")
 def train(config: DictConfig):
+    logger = setup_logger()
     results = {"run": os.environ["SUBPROJECT"].replace("runs/", "", 1)}
     for fold in range(config.nr_folds):
-        results[fold] = train_fold(config, fold)
+        results[fold] = train_fold(config, logger, fold)
 
     if config.final_evaluation:
         metrics_val = [results[fold]["metric_val"] for fold in range(config.nr_folds)]
         metrics_train = [results[fold]["metric_train"] for fold in range(config.nr_folds)]
         results["cv_metrics_val"] = {"mean": float(np.mean(metrics_val)), "std": float(np.std(metrics_val))}
         results["cv_metric_train"] = {"mean": float(np.mean(metrics_train)), "std": float(np.std(metrics_train))}
+
+    logger.info(results)
 
     return results

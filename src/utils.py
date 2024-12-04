@@ -147,6 +147,8 @@ def clean_model_weights(best_epoch, fold, checkpoint_path, logger):
     files = os.listdir(checkpoint_path)
     if f"checkpoint_{best_epoch}_fold-{fold}" not in str(files):
         raise FileNotFoundError(f"Could not find the best epoch weights: checkpoint_{best_epoch}_fold-{fold}")
+    # only keep files ending on correct fold
+    files = [file for file in files if file.split(".")[0].endswith(str(fold)) and file.startswith("checkpoint")]
     for file in files:
         if f"checkpoint_{best_epoch}_fold-{fold}" not in file:
             os.remove(os.path.join(checkpoint_path, file))

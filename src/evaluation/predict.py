@@ -73,14 +73,14 @@ def predict(config: DictConfig, subproject, logger, val=False, test=False, full_
     return df
 
 
-def evaluate(y_true, y_pred, dataset, best_epoch, binary_class, subproject, logger, aim_tracker=None):
+def evaluate(y_true, y_pred, dataset, best_epoch, fold, binary_class, subproject, logger, aim_tracker=None):
     logger.info("Starting evaluation")
     prediction_path = os.path.join(os.environ["PROJECT_PATH"], subproject, "predictions")
     mkdir(prediction_path)
 
     # Store predictions
     preds_df = pd.DataFrame({"target": y_true, "prediction": y_pred})
-    preds_df.to_csv(os.path.join(prediction_path, f"predictions_{dataset}.csv"))
+    preds_df.to_csv(os.path.join(prediction_path, f"predictions_{dataset}_fold-{fold}.csv"))
     logger.info(f"Predictions stored at {prediction_path}")
 
     # store scatter of predictions
@@ -99,7 +99,7 @@ def evaluate(y_true, y_pred, dataset, best_epoch, binary_class, subproject, logg
         if aim_tracker: aim_tracker.track(auc, name=f'AUC_{dataset}')
         logger.info(f"{dataset}: AUC: {auc}, best epoch: {best_epoch}")
 
-        with open(os.path.join(prediction_path, f"evaluation_metrics_{dataset}.txt"), "w") as f:
+        with open(os.path.join(prediction_path, f"evaluation_metrics_{dataset}_fold-{fold}.txt"), "w") as f:
             f.write(f"{dataset}:\n"
                     f"AUC: {auc}\n"
                     f"Best epoch: {best_epoch}\n"
@@ -118,7 +118,7 @@ def evaluate(y_true, y_pred, dataset, best_epoch, binary_class, subproject, logg
         logger.info(f"{dataset}: MAE: {mae}, MSE: {mse}, RMSE: {rmse}, R2: {r2}, best epoch: {best_epoch}")
         if aim_tracker: aim_tracker.track(r2, name=f'R2_{dataset}')
 
-        with open(os.path.join(prediction_path, f"evaluation_metrics_{dataset}.txt"), "w") as f:
+        with open(os.path.join(prediction_path, f"evaluation_metrics_{dataset}_fold-{fold}.txt"), "w") as f:
             f.write(f"{dataset}:\n"
                     f"MAE:        {mae}\n"
                     f"MSE:        {mse}\n"
