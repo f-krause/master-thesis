@@ -108,6 +108,7 @@ def evaluate(y_true, y_pred, dataset, best_epoch, binary_class, subproject, logg
         # ROC curve
         img_buffer = log_roc_curve(y_true, y_pred)
         if aim_tracker: aim_tracker.track(aim.Image(img_buffer), name=f"roc_curve_{dataset}")
+        return auc
     else:
         mae = mean_absolute_error(y_true, y_pred)
         mse = mean_squared_error(y_true, y_pred)
@@ -124,6 +125,7 @@ def evaluate(y_true, y_pred, dataset, best_epoch, binary_class, subproject, logg
                     f"RMSE:       {rmse}\n"
                     f"R2:         {r2}\n"
                     f"Best epoch: {best_epoch}\n")
+        return r2
 
 
 if __name__ == "__main__":

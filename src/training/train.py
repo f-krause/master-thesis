@@ -24,8 +24,10 @@ def train_fold(config: DictConfig, fold: int = 0):
 
     # Initialize loggers
     logger = setup_logger()
-    aim_run = aim.Run(experiment=os.environ["SUBPROJECT"].replace("runs/", "", 1),
-                      repo="~/master-thesis", log_system_params=True)
+    experiment_name = os.environ["SUBPROJECT"].replace("runs/", "", 1)
+    if config.nr_folds > 1:
+        experiment_name += f"_fold-{fold}"
+    aim_run = aim.Run(experiment=experiment_name, repo="~/master-thesis", log_system_params=True)
     aim_run['model_config'] = OmegaConf.to_container(config)
 
     # gpu selection
@@ -167,9 +169,9 @@ def train_fold(config: DictConfig, fold: int = 0):
         aim_run.track(nr_flops, name='nr_flops')
 
     if config.final_evaluation:
-        evaluate(y_true_val_best, y_pred_val_best, "val", best_epoch, config.binary_class,
+        metric_val = evaluate(y_true_val_best, y_pred_val_best, "val", best_epoch, config.binary_class,
                  os.environ["SUBPROJECT"], logger, aim_run)
-        evaluate(y_true_train_best, y_pred_train_best, "train", best_epoch, config.binary_class,
+        metric_train = evaluate(y_true_train_best, y_pred_train_best, "train", best_epoch, config.binary_class,
                  os.environ["SUBPROJECT"], logger, aim_run)
 
     if config.clean_up_weights:
@@ -178,16 +180,24 @@ def train_fold(config: DictConfig, fold: int = 0):
     logger.info(f"Weights path: {checkpoint_path}")
     aim_run.close()
 
+    if config.final_evaluation:
+        return {"metric_val": float(metric_val), "metric_train": float(metric_train), "best_epoch": best_epoch,
+                "training_time": training_time}
+    else:
+        return {"best_epoch": best_epoch, "training_time": training_time}
+
 
 @discord_sender(webhook_url="https://discord.com/api/webhooks/1308890399942774946/"
                             "3UQa1CD1iNt1JRccZUxPj8ksKJzSuYcAnXMSYa8l9H4gs1DYi-t64qUR8o9-J4A1NFzS")
 def train(config: DictConfig):
-    # TODO possibility of parallelization across folds!
+    results = {"run": os.environ["SUBPROJECT"].replace("runs/", "", 1)}
     for fold in range(config.nr_folds):
-        train_fold(config, fold)
+        results[fold] = train_fold(config, fold)
 
-    return {"run": os.environ["SUBPROJECT"].replace("runs/", "", 1)}
+    if config.final_evaluation:
+        metrics_val = [results[fold]["metric_val"] for fold in range(config.nr_folds)]
+        metrics_train = [results[fold]["metric_train"] for fold in range(config.nr_folds)]
+        results["cv_metrics_val"] = {"mean": float(np.mean(metrics_val)), "std": float(np.std(metrics_val))}
+        results["cv_metric_train"] = {"mean": float(np.mean(metrics_train)), "std": float(np.std(metrics_train))}
 
-
-# TODO include optuna wrapper?
-# https://github.com/optuna/optuna/blob/master/README.md#key-features
+    return results
