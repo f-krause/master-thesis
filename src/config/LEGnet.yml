@@ -9,25 +9,23 @@ num_workers: 1
 # Model
 model: "LEGnet"
   # best so far with 32 each!
-dim_embedding_tissue: 32  # max 29 tissues
-dim_embedding_token: 32  # 64 codons or 4 nucleotides/
+dim_embedding_tissue: 64  # max 29 tissues
+dim_embedding_token: 64  # 64 codons or 4 nucleotides/
 predictor_hidden_dim: 64  # hidden size of the output layer
 predictor_dropout: 0.1  # dropout rate of the output layer
 
 # add model specific parameters here
 block_sizes: [256, 256, 128, 128, 64, 64, 32, 32]
-kernel_size: 11
-resize_factor: 4
+kernel_size: 9
+resize_factor: 2
 se_reduction: 4
 final_ch: 18
-filter_per_group: 2
+filter_per_group: 1
 bn_momentum: 0.1
 
-activation: "gelu" # TODO
+activation: "gelu"
 
 # Optimizer
 optimizer:
-  name: adam  # sgd, adam, ranger
+  name: adam
   lr: 0.001
-  momentum: 0.9  # sgd only
-  weight_decay: 0.1  # ranger only
