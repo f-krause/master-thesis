@@ -18,7 +18,7 @@ from arnie.mea.mea import MEA
 FOLD_PACKAGE = 'vienna_2'  # see doc for more packages: https://github.com/DasLab/arnie/blob/master/docs/setup_doc.md
 DATA_PATH = '/export/share/krausef99dm/data'
 
-OVERWRITE_FILES = True  # FIXME for dev only
+OVERWRITE_FILES = False  # only for dev recommended
 MAX_SEQ_LENGTH = 400  # 3241 seq with len below 2000
 MAX_PRED_NR = 2
 
@@ -91,7 +91,7 @@ def main():
     counter = 0
     start_time = time.time()
 
-    # for idx in ["ENST00000304312"]:  # FIXME dev
+    # for idx in ["ENST00000304312"]:  # for dev
     for idx in tqdm(ids):
         preds = {}
         if counter >= MAX_PRED_NR:
@@ -102,7 +102,7 @@ def main():
         seq = data[idx]['fasta']
 
         if len(seq) > MAX_SEQ_LENGTH:
-            # logging.warning(f"Skipping {idx}. Sequence longer than {MAX_SEQ_LENGTH}.")  # FIXME for dev only
+            # logging.warning(f"Skipping {idx}. Sequence longer than {MAX_SEQ_LENGTH}.")  # for dev only
             continue
 
         logging.info(f"Computing predictions for: {idx}-{FOLD_PACKAGE}")
