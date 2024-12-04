@@ -19,7 +19,7 @@ random_reverse: True
 max_seq_length: 2700
 
 # Misc
-nr_folds: 1  # if 1, will take 20% of the train data as validation set during training ("train val")
+nr_folds: 1  # if 1, will take val_fraction % of the train data as validation set during training ("train val")
 folding_algorithm: "viennarna" # viennarna, linearfold # TODO - currently not supported
 embedding_max_norm: 2
 

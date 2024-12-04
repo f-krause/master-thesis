@@ -28,7 +28,5 @@ padding: 'same' # only supports same currently
 
 # Optimizer
 optimizer:
-  name: adam  # sgd, adam, ranger
+  name: adam
   lr: 0.01
-  momentum: 0.9  # sgd only
-  weight_decay: 0.1  # ranger only
