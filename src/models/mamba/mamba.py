@@ -12,34 +12,46 @@ class ModelMamba(nn.Module):
     def __init__(self, config: DictConfig, device: torch.device, model: str = "mamba"):
         super(ModelMamba, self).__init__()
 
+        if config.gpu_id != 0 and config.model.lower() == "mamba2":
+            raise Exception("Currently Mamba2 only supports the default GPU (cuda:0)!")
+
         self.device = device
         self.max_seq_length = config.max_seq_length
         self.dim_embedding_tissue = config.dim_embedding_tissue
         self.dim_embedding_token = config.dim_embedding_token
+        self.model = model
 
         # Embedding layers
         self.tissue_encoder = nn.Embedding(len(TISSUES), self.dim_embedding_tissue, max_norm=config.embedding_max_norm)
         self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, self.dim_embedding_token, padding_idx=0,
                                         max_norm=config.embedding_max_norm)
 
-        # Mamba model
-        if model.lower() == 'mamba':
-            self.mamba = Mamba(
-                # This module uses roughly 3 * expand * d_model^2 parameters
-                d_model=self.dim_embedding_token,  # Model dimension d_model
-                d_state=config.d_state,  # SSM state expansion factor
-                d_conv=config.d_conv,  # Local convolution width
-                expand=config.expand,  # Block expansion factor
-            ).to(self.device)
-        elif model.lower() == 'mamba2':
-            self.mamba = Mamba2(
-                # This module uses roughly 3 * expand * d_model^2 parameters
-                d_model=self.dim_embedding_token,  # Model dimension d_model
-                d_state=config.d_state,  # SSM state expansion factor
-                d_conv=config.d_conv,  # Local convolution width
-                expand=config.expand,  # Block expansion factor
-                headdim=config.headdim
-            ).to(self.device)
+        # Mamba model (roughly 3 * expand * d_model^2 parameters)
+        if self.model.lower() == 'mamba':
+            self.model_layers = nn.ModuleList(
+                [
+                    Mamba(
+                        d_model=self.dim_embedding_token,  # Model dimension d_model
+                        d_state=config.d_state,  # SSM state expansion factor
+                        d_conv=config.d_conv,  # Local convolution width
+                        expand=config.expand,  # Block expansion factor
+                    ).to(self.device)
+                    for _ in range(config.num_layers)
+                ]
+            )
+        elif self.model.lower() == 'mamba2':
+            self.model_layers = nn.ModuleList(
+                [
+                    Mamba2(
+                        d_model=self.dim_embedding_token,  # Model dimension d_model
+                        d_state=config.d_state,  # SSM state expansion factor
+                        d_conv=config.d_conv,  # Local convolution width
+                        expand=config.expand,  # Block expansion factor
+                        headdim=config.head_dim
+                    ).to(self.device)
+                    for _ in range(config.num_layers)
+                ]
+            )
         else:
             raise ValueError(f"Mamba model {model} not supported")
 
@@ -59,18 +71,20 @@ class ModelMamba(nn.Module):
         x *= mask
 
         # Apply Mamba model
-        if isinstance(self.mamba, Mamba):
-            out = self.mamba(x)
-        elif isinstance(self.mamba, Mamba2):
-            out = self.mamba(x, cu_seqlens=seq_lengths)
+        if self.model.lower() == 'mamba':
+            for layer in self.model_layers:
+                x = layer(x)
+        elif self.model.lower() == 'mamba2':
+            for layer in self.model_layers:
+                x = layer(x, cu_seqlens=seq_lengths)
         else:
             raise ValueError(f"Model type {type(self.mamba)} not supported")
 
         # Extract outputs corresponding to the last valid time step
-        idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, out.size(2)))  # (batch_size, 1, embedding_dim)
-        out_last = out.gather(1, idx).squeeze(1)  # (batch_size, embedding_dim)
+        idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, x.size(2)))  # (batch_size, 1, embedding_dim)
+        x_last = x.gather(1, idx).squeeze(1)  # (batch_size, embedding_dim)
 
-        y_pred = self.predictor(out_last)
+        y_pred = self.predictor(x_last)
 
         return y_pred
 

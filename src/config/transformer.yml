@@ -9,14 +9,14 @@ num_workers: 1
 # Model
 model: "transformer"
 # probably 32 better for complex models
-dim_embedding_tissue: 32  # max 29 tissues
-dim_embedding_token: 32  # 64 codons or 4 nucleotides
+dim_embedding_tissue: 64  # max 29 tissues
+dim_embedding_token: 64  # 64 codons or 4 nucleotides
 predictor_hidden_dim: 64
 predictor_dropout: 0.1
 
 # Transformer Config
-num_heads: 8
-num_layers: 6
+num_heads: 2
+num_layers: 12
 dim_feedforward: 256
 dropout: 0.2
 activation: "gelu"
@@ -24,5 +24,5 @@ activation: "gelu"
 # Optimizer
 optimizer:
   name: adam
-  lr: 0.001
+  lr: 0.0001
   weight_decay: 0.1  # ranger only

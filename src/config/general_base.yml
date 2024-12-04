@@ -9,11 +9,12 @@ frequency_features: True
 tissue_id: -1  # 0-28 or -1 for all tissues
 
 # Data
-#train_data_file: "TODO_train_2.7k_data.pkl"
-train_data_file: "TODO_dev_train_2.7k_data.pkl"  # DEV (also: codon_dev_1k_data.pkl)
+#train_data_file: "train_8.1k_data.pkl"
+train_data_file: "dev_train_8.1k_data.pkl"
 
-val_data_file: "TODO_val_2.7k_data.pkl"
-test_data_file: "TODO_test_2.7k_data.pkl"
+val_data_file: "val_8.1k_data.pkl"
+test_data_file: "test_8.1k_data.pkl"
+val_fraction: 0.15
 random_reverse: True
 max_seq_length: 2700
 

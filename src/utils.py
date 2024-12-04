@@ -112,8 +112,10 @@ def get_config(args):
     model_config = OmegaConf.load(config_path)
 
     if args.ptrnet:  # TODO add more cases
+        # Config for nucleotide sequence based models
         general_config = OmegaConf.load("config/general_base.yml")
     else:
+        # Config for codon based models
         general_config = OmegaConf.load("config/general_codon.yml")
 
     config = OmegaConf.merge(general_config, model_config)

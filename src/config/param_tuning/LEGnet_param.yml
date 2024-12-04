@@ -1,0 +1,4 @@
+kernel_size: [5, 7, 9, 11, 13]
+resize_factor: [2, 4, 6, 8]
+se_reduction: [2, 4, 8]
+filter_per_group: [1, 2, 4]

@@ -1,3 +1,5 @@
+# Currently only works on gpu 0!
+
 # Training
 epochs: 100
 save_freq: 1
@@ -8,24 +10,25 @@ num_workers: 1
 
 # Model
 model: "xlstm"
-dim_embedding_tissue: 8  # max 29 tissues
-dim_embedding_token: 8  # 64 codons or 4 nucleotides
+dim_embedding_tissue: 32  # max 29 tissues
+dim_embedding_token: 32  # 64 codons or 4 nucleotides
 predictor_hidden_dim: 64
 predictor_dropout: 0.1
 
 # xLSTM Config
 conv1d_kernel_size: 4
-qkv_proj_blocksize: 4
-num_heads: 4
-proj_factor: 1.3
-act_fn: "gelu"
-num_blocks: 7
+num_heads: 2  # for both s and mLSTM
+
+m_qkv_proj_blocksize: 8
+s_proj_factor: 2
+s_act_fn: "gelu"
+
+num_blocks: 9
 slstm_at: [1]  # architecture: mlstm, slstm, mlstm, mlstm, mlstm, mlstm, mlstm
 bias: True
-dropout: 0.2
+dropout: 0.5
 
 # Optimizer
 optimizer:
   name: adam
-  lr: 0.001
-  weight_decay: 0.1  # ranger only
+  lr: 0.0001

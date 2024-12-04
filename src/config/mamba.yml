@@ -8,21 +8,23 @@ num_workers: 0  # TODO seems faster than 1
 
 # Model
 model: "mamba"  # mamba or mamba2
-  # best results so far with 32
+# best results so far with 32
 dim_embedding_token: 32  # Embedding dimension for tokens
 dim_embedding_tissue: 32  # Embedding dimension for tissues
+dim_embedding_token: 16  # Embedding dimension for tokens
+dim_embedding_tissue: 16  # Embedding dimension for tissues
 predictor_hidden_dim: 64
 predictor_dropout: 0.1
 
 # Mamba2 Config
-# Requirement: (dim_embedding_token + dim_embedding_tissue) * expand / headdim = multiple of 8
-d_state: 128   # SSM state expansion factor
-d_conv: 4     # Local convolution width
-expand: 2     # Block expansion factor
-headdim: 8   # only for mamba2
+# Requirement: dim_embedding * expand / headdim = multiple of 8
+d_state: 16   # SSM state expansion factor
+d_conv: 3      # Local convolution width
+expand: 2      # Block expansion factor
+num_layers: 1  # number of sequential mamba blocks
+head_dim: 8     # only for mamba2
 
 # Optimizer
 optimizer:
   name: adam
-  lr: 0.001
-  weight_decay: 0.1  # ranger only
+  lr: 0.01
