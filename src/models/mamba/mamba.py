@@ -12,6 +12,9 @@ class ModelMamba(nn.Module):
     def __init__(self, config: DictConfig, device: torch.device, model: str = "mamba"):
         super(ModelMamba, self).__init__()
 
+        if config.gpu_id != 0 and config.model.lower() == "mamba2":
+            raise Exception("Currently Mamba2 only supports the default GPU (cuda:0)!")
+
         self.device = device
         self.max_seq_length = config.max_seq_length
         self.dim_embedding_tissue = config.dim_embedding_tissue
@@ -73,7 +76,7 @@ class ModelMamba(nn.Module):
                 x = layer(x)
         elif self.model.lower() == 'mamba2':
             for layer in self.model_layers:
-                x = layer(x, cu_seqlens=seq_lengths)  # FIXME RuntimeError: Triton Error [CUDA]: context is destroyed
+                x = layer(x, cu_seqlens=seq_lengths)
         else:
             raise ValueError(f"Model type {type(self.mamba)} not supported")
 
