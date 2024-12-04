@@ -44,7 +44,7 @@ class ModelMamba(nn.Module):
                         d_state=config.d_state,  # SSM state expansion factor
                         d_conv=config.d_conv,  # Local convolution width
                         expand=config.expand,  # Block expansion factor
-                        headdim=config.headdim
+                        headdim=config.head_dim
                     ).to(self.device)
                     for _ in range(config.num_layers)
                 ]

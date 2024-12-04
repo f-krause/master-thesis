@@ -22,7 +22,7 @@ d_state: 16   # SSM state expansion factor
 d_conv: 3      # Local convolution width
 expand: 2      # Block expansion factor
 num_layers: 1  # number of sequential mamba blocks
-headdim: 8     # only for mamba2
+head_dim: 8     # only for mamba2
 
 # Optimizer
 optimizer:
