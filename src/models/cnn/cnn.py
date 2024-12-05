@@ -32,7 +32,7 @@ class ModelCNN(nn.Module):
         self.conv2 = nn.Conv1d(
             in_channels=config.num_filters_conv1,
             out_channels=config.num_filters_conv2,
-            kernel_size=config.num_filters_conv2,
+            kernel_size=config.filter_len_conv2,
             stride=config.stride_conv2,
             padding=config.padding
         )
