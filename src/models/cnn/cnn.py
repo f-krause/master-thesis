@@ -22,17 +22,17 @@ class ModelCNN(nn.Module):
         # Convolutional layers
         self.conv1 = nn.Conv1d(
             in_channels=config.dim_embedding_token,
-            out_channels=config.num_filters_conv1,
-            kernel_size=config.filter_len_conv1,
+            out_channels=config.num_kernels_conv1,
+            kernel_size=config.kernel_size_conv1,
             stride=config.stride_conv1,
             padding=config.padding
         )
         self.pool1 = nn.MaxPool1d(kernel_size=config.max_pool1)
 
         self.conv2 = nn.Conv1d(
-            in_channels=config.num_filters_conv1,
-            out_channels=config.num_filters_conv2,
-            kernel_size=config.filter_len_conv2,
+            in_channels=config.num_kernels_conv1,
+            out_channels=config.num_kernels_conv2,
+            kernel_size=config.kernel_size_conv2,
             stride=config.stride_conv2,
             padding=config.padding
         )
@@ -45,7 +45,7 @@ class ModelCNN(nn.Module):
         length_after_conv2 = length_after_pool1  # Since padding='same'
         length_after_pool2 = length_after_conv2 // config.max_pool2
 
-        predictor = Predictor(config, length_after_pool2 * config.num_filters_conv2)
+        predictor = Predictor(config, length_after_pool2 * config.num_kernels_conv2)
         self.predictor = predictor.to(self.device)
 
     def forward(self, inputs):
