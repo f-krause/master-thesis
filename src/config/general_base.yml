@@ -1,29 +1,24 @@
 # General
 seed: 2024
 gpu_id: 1
-
-# Params
 dev: True
-binary_class: True
-frequency_features: True
 tissue_id: -1  # 0-28 or -1 for all tissues
 
 # Data
 #train_data_file: "train_8.1k_data.pkl"
 train_data_file: "dev_train_8.1k_data.pkl"
-
-val_data_file: "val_8.1k_data.pkl"
 test_data_file: "test_8.1k_data.pkl"
-val_fraction: 0.15
-random_reverse: True
 max_seq_length: 2700
+binary_class: True
+frequency_features: True
+random_reverse: True
 
 # Misc
 nr_folds: 1  # if 1, will take 20% of the train data as validation set during training ("train val")
-folding_algorithm: "viennarna" # viennarna, linearfold # TODO - currently not supported
+val_fraction: 0.15  # only if nr_folds == 1
 embedding_max_norm: 2
 
-early_stopper_patience: 8  # disabled if < 0
+early_stopper_patience: 6  # disabled if < 0
 early_stopper_delta: 0.01
 
 final_evaluation: True  # if True, will evaluate the model on the train val set after training
