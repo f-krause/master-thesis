@@ -8,7 +8,6 @@ num_workers: 1
 
 # Model
 model: "LEGnet"
-  # best so far with 32 each!
 dim_embedding_tissue: 64  # max 29 tissues
 dim_embedding_token: 64  # 64 codons or 4 nucleotides/
 predictor_hidden_dim: 64  # hidden size of the output layer
