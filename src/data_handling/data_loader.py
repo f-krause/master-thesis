@@ -198,7 +198,7 @@ if __name__ == "__main__":
         {"project_path": None, "log_file_path": None, "subproject": "dev/delete_me", "model": "baseline",
          "train_data_file": "codon_dev_train_2.7k_data.pkl", "val_data_file": "codon_val_2.7k_data.pkl",
          "test_data_file": "codon_test_2.7k_data.pkl", "batch_size": 4, "num_workers": 4,
-         "folding_algorithm": "viennarna", "seed": 42, "nr_folds": 1, "random_reverse": True,
+         "folding_algorithm": "viennarna", "seed": 42, "nr_folds": 3, "random_reverse": True,
          "tissue_id": -1, "binary_class": True, "frequency_features": False}
     )
     set_project_path(dev_config)
