@@ -68,11 +68,13 @@ class RNADataset(torch.utils.data.Dataset):
             tissue_ids_full, targets_full, targets_bin_full = \
                 [tensor[mask] for tensor in [tissue_ids_full, targets_full, targets_bin_full]]
 
-            mrna_sequences = ["".join(map(str, tensor.tolist())) for tensor in
-                              rna_data_full]  # FIXME: mrna sequence length is now not fully identical with the original sequence length
+            INVERTED_CODON_MAP = {value: key for key, value in CODON_MAP_DNA.items()}
+            rna_data_full_inverted = [[INVERTED_CODON_MAP[int(idx)] for idx in rna_data] for rna_data in rna_data_full]
+            mrna_sequences = ["".join(map(str, seq)) for seq in rna_data_full_inverted]
+            # mrna_sequences = ["".join(map(str, tensor.tolist())) for tensor in
+            #                   rna_data_full]  # legacy: to reproduce optuna training
             train_indices, val_indices = self._get_train_val_indices(config, mrna_sequences, fold)
 
-            # SANITY CHECK DISTRIBUTION
             logger.info(
                 f"Distribution seq lens - full data: {np.histogram([len(seq) for seq in mrna_sequences], bins=10)}")
 
@@ -116,10 +118,9 @@ class RNADataset(torch.utils.data.Dataset):
 
     @staticmethod
     def _get_3_fold_indices(mrna_sequences, fold, random_state=42):
-        # TODO test this!
         indices_triple = get_train_val_test_indices(mrna_sequences, val_frac=0.33, test_frac=0.33,
                                                     random_state=random_state)
-
+        indices_triple = list(indices_triple)
         val_indices = indices_triple.pop(fold)
         train_indices = np.concatenate(indices_triple)
 
@@ -204,7 +205,7 @@ if __name__ == "__main__":
     set_log_file(dev_config)
 
     print("Testing train and train_val data loaders")
-    train_loader_test, train_val_loader_test = get_train_data_loaders(dev_config, fold=1)
+    train_loader_test, train_val_loader_test = get_train_data_loaders(dev_config, fold=0)
     data_iter = iter(train_loader_test)
     x, y, y2 = next(data_iter)
     print(x.size())
