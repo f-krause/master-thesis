@@ -133,13 +133,13 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                 logger.info(f'Validation neg AUC:  {val_neg_auc}')
                 aim_run.track(val_neg_auc, name="val_neg_auc", epoch=epoch)
                 val_loss = val_neg_auc  # for early stopping in classification setting
-                if val_neg_auc < losses[best_epoch].get("val_neg_auc", 0):
+                if val_neg_auc <= losses[best_epoch].get("val_neg_auc", 0):
                     best_epoch = epoch
                     end_time = time.time()
                     y_true_val_best, y_pred_val_best = y_true_val.flatten(), y_pred_val.flatten()
                     y_true_train_best, y_pred_train_best = y_true.flatten(), y_pred.flatten()
             else:
-                if val_loss < losses[best_epoch].get("val_loss", np.inf):
+                if val_loss <= losses[best_epoch].get("val_loss", np.inf):
                     best_epoch = epoch
                     end_time = time.time()
                     y_true_val_best, y_pred_val_best = y_true_val.flatten(), y_pred_val.flatten()
