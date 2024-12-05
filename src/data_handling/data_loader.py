@@ -61,8 +61,8 @@ class RNADataset(torch.utils.data.Dataset):
             tissue_ids_full, targets_full, targets_bin_full = \
                 [tensor[mask] for tensor in [tissue_ids_full, targets_full, targets_bin_full]]
 
-            INVERTED_CODON_MAP = {value: key for key, value in CODON_MAP_DNA.items()}
-            rna_data_full_inverted = [[INVERTED_CODON_MAP[int(idx)] for idx in rna_data] for rna_data in rna_data_full]
+            inverted_codon_map = {value: key for key, value in CODON_MAP_DNA.items()}
+            rna_data_full_inverted = [[inverted_codon_map[int(idx)] for idx in rna_data] for rna_data in rna_data_full]
             mrna_sequences = ["".join(map(str, seq)) for seq in rna_data_full_inverted]
             # mrna_sequences = ["".join(map(str, tensor.tolist())) for tensor in
             #                   rna_data_full]  # legacy: to reproduce optuna training
