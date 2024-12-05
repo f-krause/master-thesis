@@ -164,7 +164,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     aim_run.track(training_time, name='training_time_min')
     aim_run.track(training_time / best_epoch, name='avg_epoch_time')
 
-    if config.model != "dummy" and config.model != "best" and config.model != "mamba2":
+    if config.model != "best" and config.model != "mamba2":
         nr_params, nr_flops = get_model_stats(config, model, device, logger)
         aim_run.track(nr_params, name='nr_params')
         aim_run.track(nr_flops, name='nr_flops')

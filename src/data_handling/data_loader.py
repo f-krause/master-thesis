@@ -37,20 +37,13 @@ class RNADataset(torch.utils.data.Dataset):
                 self.rna_data, self.tissue_ids, self.targets, self.targets_bin = pickle.load(f)
             logger.info(f"Test dataset with {len(self.rna_data)} samples loaded")
         else:
-            if config.model == "dummy":
-                # Dummy data needed for dev
-                logger.warning("USING DUMMY DATA")
-                rna_data_full = torch.rand(100, 10)
-                tissue_ids_full = np.random.choice(range(10), 100)
-                targets_full = torch.rand(100, 1)
-            else:
-                # Actual train data needed
-                with open(os.path.join(os.environ["PROJECT_PATH"], "data/data_train", config.train_data_file),
-                          'rb') as f:
-                    logger.info(f"Loading data from: {config.train_data_file}")
-                    rna_data_full, tissue_ids_full, targets_full, targets_bin_full = pickle.load(f)  # n x 3, n, n
-                    if len(rna_data_full) < 10000:
-                        logger.warning(f"DATASET HAS ONLY {len(rna_data_full)} SAMPLES")
+            # Actual train data needed
+            with open(os.path.join(os.environ["PROJECT_PATH"], "data/data_train", config.train_data_file),
+                      'rb') as f:
+                logger.info(f"Loading data from: {config.train_data_file}")
+                rna_data_full, tissue_ids_full, targets_full, targets_bin_full = pickle.load(f)  # n x 3, n, n
+                if len(rna_data_full) < 10000:
+                    logger.warning(f"DATASET HAS ONLY {len(rna_data_full)} SAMPLES")
 
             mask = torch.ones((len(rna_data_full)), dtype=torch.bool)
 

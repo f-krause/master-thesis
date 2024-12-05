@@ -11,7 +11,6 @@ parser = argparse.ArgumentParser(prog='main.py', description='Trains DL models o
 
 parser.add_argument('-z', '--gpu_id', help="GPU to train on", type=int, default=None)
 parser.add_argument('-s', '--custom_path', help="Path to config file", type=str, default=None)
-parser.add_argument('-d', "--dummy", help="Use dummy config for test", action="store_true")
 parser.add_argument('-b', "--baseline", help="Use baseline config", action="store_true")
 parser.add_argument('-c', "--cnn", help="Use cnn config", action="store_true")
 parser.add_argument('-l', "--lstm", help="Use lstm config", action="store_true")

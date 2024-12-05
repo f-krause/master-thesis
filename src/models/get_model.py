@@ -5,11 +5,6 @@ from omegaconf import DictConfig
 def get_model(config: DictConfig, device: torch.device, logger=None):
     if config.frequency_features and config.model not in ["baseline", "transformer"]:
         raise ValueError(f"Frequency features only supported for baseline and transformer models, not {config.model}")
-
-    if config.model == "dummy":
-        if logger: logger.warning("Using dummy model")
-        from models.dummy.dummy import ModelDummy
-        return ModelDummy(device).to(device)
     elif config.model == "baseline":
         if config.frequency_features:
             if logger: logger.info("Using baseline model (frequencies)")
@@ -59,4 +54,4 @@ def get_model(config: DictConfig, device: torch.device, logger=None):
         raise NotImplementedError("Best model not implemented yet")
     else:
         raise ValueError(f"Model {config.model} not implemented! Choose from: "
-                         f"dummy, baseline, cnn, gru, lstm, xlstm, mamba, transformer, best")  # TODO update
+                         f"baseline, cnn, gru, lstm, xlstm, mamba, transformer, LEGnet, best")  # TODO update

@@ -84,8 +84,6 @@ def get_timestamp():
 def get_config(args):
     if args.custom_path:
         config_path = args.custom_path
-    elif args.dummy:
-        config_path = "config/dummy.yml"
     elif args.baseline:
         config_path = "config/baseline.yml"
     elif args.cnn:
