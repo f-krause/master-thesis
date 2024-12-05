@@ -86,16 +86,6 @@ def get_train_data_file(file_name: str, check_reproduce=False):
         print("Data successfully created")
 
 
-def _get_structure_pred(identifier: str, config: DictConfig):
-    try:
-        with open(os.path.join(os.environ["PROJECT_PATH"],
-                               f"data/sec_struc/{identifier}-{config.folding_algorithm}.json"), 'r') as f:
-            struc_data = json.load(f)
-        return struc_data["structure"], struc_data["loop_type"]
-    except FileNotFoundError:
-        return None, None
-
-
 if __name__ == '__main__':
     from utils import set_project_path
 
