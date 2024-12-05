@@ -1,30 +1,49 @@
 # Training
-epochs: 200
+epochs: 100
 save_freq: 1
 val_freq: 1
 warmup: 0
 batch_size: 64
 num_workers: 0  # TODO seems faster than 1
 
+
+### Best Mamba Config
 # Model
 model: "mamba"  # mamba or mamba2
-# best results so far with 32
-dim_embedding_token: 32  # Embedding dimension for tokens
-dim_embedding_tissue: 32  # Embedding dimension for tissues
 dim_embedding_token: 16  # Embedding dimension for tokens
 dim_embedding_tissue: 16  # Embedding dimension for tissues
 predictor_hidden_dim: 64
 predictor_dropout: 0.1
 
-# Mamba2 Config
 # Requirement: dim_embedding * expand / headdim = multiple of 8
 d_state: 16   # SSM state expansion factor
 d_conv: 3      # Local convolution width
 expand: 2      # Block expansion factor
 num_layers: 1  # number of sequential mamba blocks
-head_dim: 8     # only for mamba2
 
 # Optimizer
 optimizer:
   name: adam
   lr: 0.01
+
+
+#### Best Mamba2 Config
+## Model
+#model: "mamba2"  # mamba or mamba2
+#dim_embedding_token: 64  # Embedding dimension for tokens
+#dim_embedding_tissue: 64  # Embedding dimension for tissues
+#predictor_hidden_dim: 64
+#predictor_dropout: 0.1
+#
+## Requirement: dim_embedding * expand / headdim = multiple of 8
+#d_state: 32    # SSM state expansion factor
+#d_conv: 4      # Local convolution width
+#expand: 1      # Block expansion factor
+#num_layers: 1  # number of sequential mamba blocks
+#head_dim: 4
+## Best combination out of proper study was: lr: 0.01, d_state: 16, d_conv: 2, expand: 1, num_layers: 1, head_dim: 4
+#
+## Optimizer
+#optimizer:
+#  name: adam
+#  lr: 0.01
