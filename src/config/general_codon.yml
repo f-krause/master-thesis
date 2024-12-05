@@ -11,7 +11,7 @@ val_data_file: "codon_val_2.7k_data.pkl"
 test_data_file: "codon_test_2.7k_data.pkl"
 max_seq_length: 2700
 binary_class: True
-frequency_features: True
+frequency_features: False
 random_reverse: True
 tissue_id: -1  # 0-28 or -1 for all tissues
 
