@@ -154,7 +154,7 @@ def get_train_data_loaders(config: DictConfig, fold: int):
     train_dataset = RNADataset(config, fold)
     val_dataset = RNADataset(config, fold, train_val=True)
 
-    fit_evaluate_simple_models(train_dataset, val_dataset, config.binary_class)
+    # fit_evaluate_simple_models(train_dataset, val_dataset, config.binary_class)
 
     if config.random_reverse:
         train_loader = DataLoader(dataset=train_dataset, batch_size=config.batch_size, shuffle=True,
