@@ -29,11 +29,11 @@ def fit_evaluate_simple_models(train_dataset, val_dataset, binary_class=False):
 
     for clf in [clf1]:
         if binary_class:
-            cv_scores = cross_validate(clf, x, y, cv=5, scoring=['roc_auc'], return_train_score=True)
+            cv_scores = cross_validate(clf, x, y, cv=3, scoring=['roc_auc'], return_train_score=True)
             print(type(clf).__name__)
-            print("Mean Test ROC:", cv_scores['test_roc_auc'].mean())
+            print("Mean Test ROC:", cv_scores['test_roc_auc'].mean(), cv_scores['test_roc_auc'].std())
         else:
-            cv_scores = cross_validate(clf, x, y, cv=5, scoring=['neg_root_mean_squared_error'],
+            cv_scores = cross_validate(clf, x, y, cv=3, scoring=['neg_root_mean_squared_error'],
                                        return_train_score=True)
             print(type(clf).__name__)
             print("Mean Test RMSE:", cv_scores['test_neg_root_mean_squared_error'].mean())
