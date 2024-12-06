@@ -46,7 +46,7 @@ optuna:
 
 3. Run hyperparameter optimization with Optuna
 ```shell
-python main.py --tuning  --model_name
+python main.py --model_name --tune
 ```
 
 4. Get dashboard for Optuna study
