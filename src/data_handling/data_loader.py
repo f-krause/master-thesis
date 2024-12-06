@@ -80,7 +80,7 @@ class RNADataset(torch.utils.data.Dataset):
                 # SANITY CHECK DISTRIBUTION
                 mrna_sequences = [mrna_sequences[i] for i in val_indices]
                 logger.info(
-                    f"Distribution seq len - train val set: {np.histogram([len(seq) for seq in mrna_sequences], bins=10)}")
+                    f"Distribution seq lens - train val set: {np.histogram([len(seq) for seq in mrna_sequences], bins=10)}")
 
                 logger.info(f"Train validation dataset with {len(self.rna_data)} samples loaded")
             else:
@@ -92,7 +92,7 @@ class RNADataset(torch.utils.data.Dataset):
                 # SANITY CHECK DISTRIBUTION
                 mrna_sequences = [mrna_sequences[i] for i in train_indices]
                 logger.info(
-                    f"Distribution seq len - train set: {np.histogram([len(seq) for seq in mrna_sequences], bins=10)}")
+                    f"Distribution seq lens - train set: {np.histogram([len(seq) for seq in mrna_sequences], bins=10)}")
 
                 logger.info(f"Train dataset with {len(self.rna_data)} samples loaded")
 
