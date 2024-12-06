@@ -123,7 +123,7 @@ def set_trial_parameters(trial, config):
 
     # set the hyperparameters for the trial
     config.optimizer.lr = trial.suggest_categorical('lr', params_general.lr)
-    #config.batch_size = trial.suggest_categorical('batch_size', params_general.batch_size)
+    # config.batch_size = trial.suggest_categorical('batch_size', params_general.batch_size)
     config.dim_embedding_tissue = trial.suggest_categorical('dim_embedding', params_general.dim_embedding)
     config.dim_embedding_token = config.dim_embedding_tissue
 
