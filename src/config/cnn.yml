@@ -8,25 +8,25 @@ num_workers: 1
 
 # Model
 model: "cnn"
-dim_embedding_tissue: 32  # max 29 tissues
-dim_embedding_token: 32  # 64 codons or 4 nucleotides
+dim_embedding_tissue: 64  # max 29 tissues
+dim_embedding_token: 64  # 64 codons or 4 nucleotides
 predictor_hidden_dim: 64
 predictor_dropout: 0.1
 
 # Convolutional Layer Parameters
-num_kernels_conv1: 32
-kernel_size_conv1: 6
+num_kernels_conv1: 64
+kernel_size_conv1: 15
 stride_conv1: 1
-max_pool1: 10
+max_pool1: 20
 
-num_kernels_conv2: 32
+num_kernels_conv2: 16
 kernel_size_conv2: 15
 stride_conv2: 1
-max_pool2: 20
+max_pool2: 5
 
 padding: 'same' # only supports same currently
 
 # Optimizer
 optimizer:
   name: adam
-  lr: 0.01
+  lr: 0.001
