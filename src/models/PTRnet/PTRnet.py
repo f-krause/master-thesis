@@ -1,71 +1,94 @@
-# TODO check out Bio-xLSTM (DNA) implementation
-# https://github.com/ml-jku/DNA-xLSTM
+# MambaVision: https://github.com/NVlabs/MambaVision/blob/main/mambavision/assets/arch.png
+# combine transformer and mamba in parallel?
+
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from omegaconf import DictConfig
-from knowledge_db import TISSUES
+from torch import Tensor
+from omegaconf import DictConfig, OmegaConf
+from knowledge_db import TISSUES, CODON_MAP_DNA
+
+from models.predictor import Predictor
+from mamba_ssm import Mamba, Mamba2
 
 
-class PTRNet(nn.Module):
-    def __init__(self, config: DictConfig, device: torch.device, hidden_size=128, pooling_dim=128):
-        super(PTRNet, self).__init__()
+class PTRnet(nn.Module):
+    def __init__(self, config: DictConfig, device: torch.device):
+        super(PTRnet, self).__init__()
+
+        if config.gpu_id != 0 and config.model.lower() == "mamba2":
+            raise Exception("Currently Mamba2 only supports the default GPU (cuda:0)!")
 
         self.device = device
-        self.max_norm = 2
         self.max_seq_length = config.max_seq_length
-        self.tissue_encoder = nn.Embedding(len(TISSUES), config.dim_embedding_tissue, padding_idx=0,
-                                           max_norm=self.max_norm)  # 29 tissues in total
-        self.seq_encoder = nn.Embedding(5, config.dim_embedding_token, padding_idx=0,
-                                        max_norm=self.max_norm)  # 4 nucleotides + padding
-        self.sec_structure_encoder = nn.Embedding(4, config.dim_embedding_token, padding_idx=0,
-                                                  max_norm=self.max_norm)  # 3 structures + padding
-        self.loop_type_encoder = nn.Embedding(8, config.dim_embedding_token, padding_idx=0,
-                                              max_norm=self.max_norm)  # 7 loop types + padding
+        self.dim_embedding_tissue = config.dim_embedding_tissue
+        self.dim_embedding_token = config.dim_embedding_token
+        # TODO add other embeddings
 
-        # Pooling to reduce the sequence dimension # TODO
-        self.pooling_dim = pooling_dim
-        self.pool = nn.AdaptiveAvgPool1d(self.pooling_dim)  # Reduce sequence length to pooling_dim
+        # Embedding layers
+        self.tissue_encoder = nn.Embedding(len(TISSUES), self.dim_embedding_tissue, max_norm=config.embedding_max_norm)
+        self.seq_encoder = nn.Embedding(len(CODON_MAP_DNA) + 1, self.dim_embedding_token, padding_idx=0,
+                                        max_norm=config.embedding_max_norm)
 
-        # MLP layers # TODO
-        self.fc1 = nn.Linear(config.dim_embedding_tissue + 3 * self.pooling_dim * config.dim_embedding_token,
-                             hidden_size)
-        self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(hidden_size, hidden_size // 2)
-        self.fc3 = nn.Linear(hidden_size // 2, 1)
+        # Mamba model (roughly 3 * expand * d_model^2 parameters)
+        self.mamba_layers = nn.ModuleList(
+            [
+                Mamba(
+                    d_model=self.dim_embedding_token,  # Model dimension d_model
+                    d_state=config.d_state,  # SSM state expansion factor
+                    d_conv=config.d_conv,  # Local convolution width
+                    expand=config.expand,  # Block expansion factor
+                ).to(self.device)
+                for _ in range(config.num_layers)
+            ]
+        )
 
-    def forward(self, x):
-        # TODO needs to be updated!
-        # last working state of MLP implementation using raw sequences, sec struc and loop type information
-        rna_data, tissue_id = zip(*x)
-        tissue_id = torch.tensor(tissue_id).to(self.device)
-        rna_data = torch.stack(rna_data).to(self.device)
-        rna_data = rna_data.permute(0, 2, 1)
+        self.predictor = Predictor(config, self.dim_embedding_token).to(self.device)
 
-        # RNA data: (batch_size, 3, seq_length), where 3 is [seq, structure, loop]
-        tissue_embedding = self.tissue_encoder(tissue_id)
+    def forward(self, inputs: Tensor) -> Tensor:
+        rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
 
-        # Embedding for each component
-        seq_embedding = self.seq_encoder(rna_data[:, 0])
-        sec_structure_embedding = self.sec_structure_encoder(rna_data[:, 1])
-        loop_type_embedding = self.loop_type_encoder(rna_data[:, 2])
+        tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_token)  # FIXME apparently sth here is on cpu
+        seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, seq_len, dim_embedding_token)
 
-        # Apply pooling to reduce sequence length
-        seq_embedding = self.pool(seq_embedding.transpose(1, 2)).transpose(1, 2)
-        sec_structure_embedding = self.pool(sec_structure_embedding.transpose(1, 2)).transpose(1, 2)
-        loop_type_embedding = self.pool(loop_type_embedding.transpose(1, 2)).transpose(1, 2)
+        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, seq_embedding.size(1), -1)
 
-        # Concatenate embeddings along the feature dimension
-        x = torch.cat((seq_embedding, sec_structure_embedding, loop_type_embedding), dim=2)
-        x = x.flatten(start_dim=1)  # Flatten the pooled embeddings
-        x = torch.cat((tissue_embedding, x), dim=1)
+        x = seq_embedding + tissue_embedding_expanded  # (batch_size, padded_seq_length, dim_embedding_token)
 
-        # MLP layers
-        x = self.fc1(x)
-        x = self.relu(x)
-        x = self.fc2(x)
-        x = self.relu(x)
-        x = self.fc3(x)
+        mask = (rna_data_pad != 0).unsqueeze(-1).to(self.device)
+        x *= mask
 
-        return x
+        # Apply Mamba model
+        for layer in self.mamba_layers:
+            x = layer(x)
+
+        # Extract outputs corresponding to the last valid time step
+        idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, x.size(2)))  # (batch_size, 1, embedding_dim)
+        x_last = x.gather(1, idx).squeeze(1)  # (batch_size, embedding_dim)
+
+        y_pred = self.predictor(x_last)
+
+        return y_pred
+
+
+if __name__ == "__main__":
+    # Test forward pass
+    device = torch.device("cuda:0")
+    config_dev = OmegaConf.load("config/PTRnet.yml")
+    config_dev = OmegaConf.merge(config_dev, {"binary_class": True, "max_seq_length": 8100,
+                                              "embedding_max_norm": 2, "gpu_id": 0})
+
+    sample_batch = [
+        # rna_data_padded (batch_size x max_seq_length)
+        torch.nn.utils.rnn.pad_sequence(torch.randint(1, 64, (config_dev.batch_size, config_dev.max_seq_length)),
+                                        batch_first=True),
+        torch.randint(29, (config_dev.batch_size,)),  # tissue_ids (batch_size x 1)
+        torch.tensor([config_dev.max_seq_length] * config_dev.batch_size, dtype=torch.int64)
+        # seq_lengths (batch_size x 1)
+    ]
+
+    sample_batch = [tensor.to(torch.device(device)) for tensor in sample_batch]
+
+    model = PTRnet(config_dev, device).to(device)
+
+    print(model(sample_batch))
