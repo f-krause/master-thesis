@@ -91,10 +91,10 @@ class ModelMamba(nn.Module):
 
 if __name__ == "__main__":
     # Test forward pass
-    # FIXME not working
+    device = torch.device("cuda:0")
     config_dev = OmegaConf.load("config/mamba.yml")
     config_dev = OmegaConf.merge(config_dev,
-                                 {"binary_class": True, "max_seq_length": 2700, "embedding_max_norm": 2})
+                                 {"binary_class": True, "max_seq_length": 2700, "embedding_max_norm": 2, "gpu_id": 0})
 
     sample_batch = [
         # rna_data_padded (batch_size x max_seq_length)
@@ -105,8 +105,8 @@ if __name__ == "__main__":
         # seq_lengths (batch_size x 1)
     ]
 
-    sample_batch = [tensor.to(torch.device("cuda:0")) for tensor in sample_batch]
+    sample_batch = [tensor.to(torch.device(device)) for tensor in sample_batch]
 
-    model = ModelMamba(config_dev, torch.device("cuda:0"))
+    model = ModelMamba(config_dev, torch.device("cuda:0")).to(device)
 
     print(model(sample_batch))
