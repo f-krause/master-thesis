@@ -15,7 +15,9 @@ from models.get_model import get_model
 from data_handling.data_loader import get_train_data_loaders
 from training.optimizer import get_optimizer
 from training.early_stopper import EarlyStopper
-from evaluation.predict import evaluate
+from evaluation.evaluate import evaluate
+
+# from training.lr_scheduler import GradualWarmupScheduler
 
 
 def train_fold(config: DictConfig, logger, fold: int = 0):
