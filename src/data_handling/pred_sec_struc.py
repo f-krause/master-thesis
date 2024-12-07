@@ -12,8 +12,8 @@ FOLD_PACKAGE = 'linearfold'
 DATA_PATH = '/export/share/krausef99dm/data'
 
 OVERWRITE_FILES = False  # set True only for debugging!
-MIN_SEQ_LENGTH = 8000
-MAX_SEQ_LENGTH = 8100  # 3241 seq with len below 2000; 5697 below 3000; Skipped 818 above 8000
+MIN_SEQ_LENGTH = 8100
+MAX_SEQ_LENGTH = 9000  # 3241 seq with len below 2000; 5697 below 3000; Skipped 818 above 8000
 MAX_PRED_NR = 3000
 
 logging.basicConfig(level=logging.INFO,
@@ -65,6 +65,7 @@ def _pred_loop_type(seq, structure, debug=False):
 
 def main():
     logging.info("Predicting secondary structure and loop type.")
+    logging.info(f"MIN_SEQ_LENGTH: {MIN_SEQ_LENGTH}")
     logging.info(f"MAX_SEQ_LENGTH: {MAX_SEQ_LENGTH}")
     logging.info(f"MAX_PRED_NR: {MAX_PRED_NR}")
     logging.info(f"FOLD_PACKAGE: {FOLD_PACKAGE}")
