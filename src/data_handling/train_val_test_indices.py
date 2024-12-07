@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from omegaconf import OmegaConf
 from collections import defaultdict
 
@@ -107,8 +108,24 @@ def get_train_val_test_indices(mrna_sequences, val_frac=0.15, test_frac=0.15, nu
     return train_indices, val_indices, test_indices
 
 
+def get_train_val_test_indices_from_file(identifiers, train_identifiers_path, val_identifiers_path,
+                                         test_identifiers_path):
+    # load identifiers
+    train_ids = set(pd.read_csv(train_identifiers_path).identifier.tolist())
+    val_ids = set(pd.read_csv(val_identifiers_path).identifier.tolist())
+    test_ids = set(pd.read_csv(test_identifiers_path).identifier.tolist())
+
+    # get indices
+    train_indices = [i for i, identifier in enumerate(identifiers) if identifier in train_ids]
+    val_indices = [i for i, identifier in enumerate(identifiers) if identifier in val_ids]
+    test_indices = [i for i, identifier in enumerate(identifiers) if identifier in test_ids]
+
+    return train_indices, val_indices, test_indices
+
+
 if __name__ == "__main__":
     from utils import set_project_path, set_log_file
+
     dev_config = OmegaConf.create({"project_path": None, "subproject": "dev"})
     set_project_path(dev_config)
 
@@ -127,4 +144,3 @@ if __name__ == "__main__":
     assert np.array_equal(val, val2)
     assert np.array_equal(test, test2)
     print("Seed test passed")
-

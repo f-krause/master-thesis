@@ -6,14 +6,18 @@ import torch
 import numpy as np
 from omegaconf import OmegaConf
 
-from train_val_test_indices import get_train_val_test_indices
+from train_val_test_indices import get_train_val_test_indices, get_train_val_test_indices_from_file
 from data_utils import store_data, check_identical
 
-MAX_SEQ_LENGTH = 8100  # Maximum number of codons in CDS (note: 3' and 5' tails (UTR) are removed)
+MAX_SEQ_LENGTH = 9000  # Maximum number of codons in CDS (note: 3' and 5' tails (UTR) are removed)
 MAX_DATA = 300_000  # 182_625 seq-tuple pairs in total
 FOLDING_ALG = "linearfold"
-TOKENS = "01235ACGT().BEHIMSX"
+train_identifiers_path = "/export/share/krausef99dm/data/data_train/codon_train_2.7k_indices.csv"
+val_identifiers_path = "/export/share/krausef99dm/data/data_test/codon_val_2.7k_indices.csv"
+test_identifiers_path = "/export/share/krausef99dm/data/data_test/codon_test_2.7k_indices.csv"
 SEED = 1192  # randomly drawn with np.random.randint(0,2024) on 22.10.2024, 15:00
+
+TOKENS = "01235ACGT().BEHIMSX"
 
 
 def _get_structure_pred(identifier: str, folding_algorithm="linearfold"):
@@ -79,7 +83,11 @@ def get_train_data_file(file_name: str, check_reproduce=False):
             if len(rna_data) >= MAX_DATA:
                 break
 
-    train_indices, val_indices, test_indices = get_train_val_test_indices(sequences, random_state=SEED)
+    # NOTE: can create train-val-test split with either random_state or from codon split files for max comparability
+    # indices = get_train_val_test_indices(sequences, random_state=SEED)
+    indices = get_train_val_test_indices_from_file(identifiers, train_identifiers_path, val_identifiers_path,
+                                                   test_identifiers_path)
+    train_indices, val_indices, test_indices = indices
 
     print("Num seq-tuple pairs TRAIN:", len(train_indices))
     print("Num seq-tuple pairs VAL:", len(val_indices))
