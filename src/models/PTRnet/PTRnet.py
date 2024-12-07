@@ -48,7 +48,7 @@ class PTRnet(nn.Module):
     def forward(self, inputs: Tensor) -> Tensor:
         rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
 
-        tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_token)  # FIXME apparently sth here is on cpu
+        tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_token)
         seq_embedding = self.seq_encoder(rna_data_pad)  # (batch_size, seq_len, dim_embedding_token)
 
         tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, seq_embedding.size(1), -1)

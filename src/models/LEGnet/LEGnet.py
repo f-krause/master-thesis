@@ -209,6 +209,7 @@ class LEGnet(nn.Module):
                 activation(),  # Exponential(sz), #activation(),
 
             )
+
             seqextblocks[f'inv_res_blc{ind}'] = block
             block = nn.Sequential(
                 nn.Conv1d(
