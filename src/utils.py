@@ -100,6 +100,8 @@ def get_config(args):
         config_path = "config/transformer.yml"
     elif args.legnet:
         config_path = "config/LEGnet.yml"
+    elif args.ptrnet:
+        config_path = "config/PTRnet.yml"
     else:
         raise ValueError("No config file specified.")
 
@@ -107,7 +109,7 @@ def get_config(args):
 
     if args.ptrnet:  # TODO add more cases
         # Config for nucleotide sequence based models
-        general_config = OmegaConf.load("config/general_base.yml")
+        general_config = OmegaConf.load("config/general_nucleotide.yml")
     else:
         # Config for codon based models
         general_config = OmegaConf.load("config/general_codon.yml")
