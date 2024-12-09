@@ -32,6 +32,10 @@ With the possible flags:
 - remove `torchxlstm` model if not needed
 
 
+## Data
+See data specific [readme](data_handling/README.md)
+
+
 ## Optuna Hyperparameter Optimization
 1. Set general study parameters in [`general_codon.yml`](src/config/general_codon.yml) config
 ```yaml
