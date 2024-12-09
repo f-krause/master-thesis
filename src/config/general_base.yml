@@ -5,10 +5,10 @@ dev: True
 tissue_id: -1  # 0-28 or -1 for all tissues
 
 # Data
-#train_data_file: "train_8.1k_data.pkl"
-train_data_file: "dev_train_8.1k_data.pkl"
-test_data_file: "test_8.1k_data.pkl"
-max_seq_length: 2700
+#train_data_file: "train_9.0k_data.pkl"
+train_data_file: "dev_train_9.0k_data.pkl"
+test_data_file: "test_9.0k_data.pkl"
+max_seq_length: 9000
 binary_class: True
 frequency_features: True
 random_reverse: True
