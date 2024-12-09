@@ -1,21 +1,27 @@
 # General
 seed: 2024
-gpu_id: 1
+gpu_id: 0
 dev: True
-tissue_id: -1  # 0-28 or -1 for all tissues
+pretrain: False
 
-# Data
+# Data files
 #train_data_file: "train_9.0k_data.pkl"
+#val_data_file: "val_9.0k_data.pkl"
+#test_data_file: "test_9.0k_data.pkl"
 train_data_file: "dev_train_9.0k_data.pkl"
-test_data_file: "test_9.0k_data.pkl"
+val_data_file: "dev_val_9.0k_data.pkl"
+test_data_file: "dev_test_9.0k_data.pkl"
+
+# Data params
 max_seq_length: 9000
 binary_class: True
-frequency_features: True
+frequency_features: False
 random_reverse: True
+tissue_id: -1  # 0-28 or -1 for all tissues
 
 # Misc
-nr_folds: 1  # if 1, will take 20% of the train data as validation set during training ("train val")
-val_fraction: 0.15  # only if nr_folds == 1
+nr_folds: 1  # only 1 supported, as cv only for codon based models supported
+val_fraction_of_train: 0  # use val_data_file as validation set
 embedding_max_norm: 2
 
 early_stopper_patience: 6  # disabled if < 0
