@@ -31,13 +31,13 @@ class RNADataset(torch.utils.data.Dataset):
                 logger.info(f"Loading data from: {config.val_data_file}")
                 rna_data, tissue_ids, targets, targets_bin = pickle.load(f)
                 self.rna_data, self.tissue_ids, self.targets, self.targets_bin = \
-                    self.mask_data(config, rna_data, tissue_ids, targets, targets_bin, logger)
+                    self.filter_data(config, rna_data, tissue_ids, targets, targets_bin, logger)
             logger.info(f"Validation dataset with {len(self.rna_data)} samples loaded")
         elif test:
             with open(os.path.join(os.environ["PROJECT_PATH"], "data/data_test", config.test_data_file), 'rb') as f:
                 rna_data, tissue_ids, targets, targets_bin = pickle.load(f)
                 self.rna_data, self.tissue_ids, self.targets, self.targets_bin = \
-                    self.mask_data(config, rna_data, tissue_ids, targets, targets_bin, logger)
+                    self.filter_data(config, rna_data, tissue_ids, targets, targets_bin, logger)
             logger.info(f"Test dataset with {len(self.rna_data)} samples loaded")
         else:
             # Actual train data needed
@@ -49,7 +49,7 @@ class RNADataset(torch.utils.data.Dataset):
                     logger.warning(f"DATASET HAS ONLY {len(rna_data_full)} SAMPLES")
 
                 rna_data_full, tissue_ids_full, targets_full, targets_bin_full = \
-                    self.mask_data(config, rna_data_full, tissue_ids_full, targets_full, targets_bin_full, logger)
+                    self.filter_data(config, rna_data_full, tissue_ids_full, targets_full, targets_bin_full, logger)
 
             if config.val_fraction_of_train > 0:
                 inverted_codon_map = {value: key for key, value in CODON_MAP_DNA.items()}
@@ -120,7 +120,7 @@ class RNADataset(torch.utils.data.Dataset):
         return train_indices.tolist(), val_indices
 
     @staticmethod
-    def mask_data(config, rna_data, tissue_ids, targets, targets_bin, logger):
+    def filter_data(config, rna_data, tissue_ids, targets, targets_bin, logger):
         mask = torch.ones((len(rna_data)), dtype=torch.bool)
 
         if config.tissue_id in range(len(TISSUES)):
