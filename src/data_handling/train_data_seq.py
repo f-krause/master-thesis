@@ -6,8 +6,8 @@ import torch
 import numpy as np
 from omegaconf import OmegaConf
 
-from train_val_test_indices import get_train_val_test_indices, get_train_val_test_indices_from_file
-from data_utils import store_data, check_identical
+from data_handling.train_val_test_indices import get_train_val_test_indices, get_train_val_test_indices_from_file
+from data_handling.data_utils import store_data, check_identical
 
 MAX_SEQ_LENGTH = 9000  # Maximum number of codons in CDS (note: 3' and 5' tails (UTR) are removed)
 MAX_DATA = 300_000  # 182_625 seq-tuple pairs in total
@@ -82,6 +82,8 @@ def get_train_data_file(file_name: str, check_reproduce=False):
                     break
             if len(rna_data) >= MAX_DATA:
                 break
+
+    rna_data = [ts.permute(1, 0) for ts in rna_data]  # change rna_data to n x 4
 
     # NOTE: can create train-val-test split with either random_state or from codon split files for max comparability
     # indices = get_train_val_test_indices(sequences, random_state=SEED)
