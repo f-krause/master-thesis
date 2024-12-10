@@ -1,3 +1,4 @@
+# ideas from https://github.com/CatIIIIIIII/RNAErnie/blob/main/rna_pretrainer.py (last accessed 10.12.2024)
 import torch
 import random
 from omegaconf import OmegaConf, DictConfig
@@ -206,9 +207,7 @@ def motif_level_masking(data, config: DictConfig):
             ngram_indexes_extra.append([ngram_index])
 
         random.shuffle(ngram_indexes_extra)  # Shuffle the candidates
-        # Statistics motifs are added if not enough from Databases
-        ngram_indexes.extend(ngram_indexes_extra)
-
+        ngram_indexes.extend(ngram_indexes_extra)  # Statistics motifs are added if not enough from Databases
 
         # Select motifs until we reach num_to_predict
         covered_indexes = set()
@@ -249,7 +248,6 @@ def get_pretrain_mask_data(data, config: DictConfig):
     # data: [rna_data: (B,N,D), tissue_ids: (B,), seq_lengths: (B,)]
     masking_strategy = random.choice([base_level_masking, subsequence_masking, motif_level_masking])
     # masking_strategy = motif_level_masking  # for dev
-
     return masking_strategy(data, config)
 
 
