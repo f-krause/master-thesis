@@ -6,7 +6,7 @@ from data_handling.train_data_seq import TOKENS
 from pretraining.pretrain_utils import get_motif_tree_dict
 
 MASK_TOKEN = len(TOKENS) + 1
-motif_tree = get_motif_tree_dict()  # returns an ahocorapy KeywordTree, with keys [ATtRACT, SpliceAid, Statistics] and encoded motifs as values
+motif_tree_dict = get_motif_tree_dict()  # ahocorapy KeywordTree with encoded motifs as values
 
 
 def naive_masking(data, config: DictConfig):
@@ -150,23 +150,105 @@ def subsequence_masking(data, config: DictConfig):
 
 
 def motif_level_masking(data, config: DictConfig):
-    # TODO implement motif-level masking
+    # data = [rna_data: (B, N, D), tissue_ids: (B,), seq_lengths: (B,)]
+    # 1. Search motifs using the motif_trees["DataBases"] and motif_trees["Statistics"].
+    # 2. Gather the found motifs as ngram candidates.
+    # 3. Shuffle them and select as many as needed until we reach num_to_predict.
+    # 4. Mask them with 80/10/10 distribution, choosing random tokens column-wise.
+
     rna_data, tissue_ids, seq_lengths = data
+    batch_size, max_len, dim = rna_data.shape
+    device = rna_data.device
+
+    # Hyperparameters (can be from config)
+    masked_lm_prob = getattr(config, 'masked_lm_prob', 0.15)
+    max_predictions_per_seq = getattr(config, 'max_predictions_per_seq', int(max_len * masked_lm_prob))
+
+    # Prepare mask
+    mask = torch.zeros(batch_size, max_len, dtype=torch.bool, device=device)
+
+    # Motif searching: We'll consider the first column of rna_data as "tokens"
+    # If another column is needed, adjust here.
+    for i in range(batch_size):
+        length = seq_lengths[i].item()
+        if length == 0:
+            continue
+
+        # Extract tokens for motif search (as a Python list)
+        # We're assuming motif trees expect a list of ints
+        tokens_list = rna_data[i, :length, 0].tolist()
+
+        # Compute num_to_predict
+        num_to_predict = min(max_predictions_per_seq, max(1, int(round(length * masked_lm_prob))))
+
+        # Find motif occurrences in "DataBases"
+        motif_tree_db = motif_tree_dict["DataBases"]
+        db_results = motif_tree_db.search_all(tokens_list)
+        # db_results is a list of tuples like: (matched_string, start_index)
+        # We'll store the indices covered by this motif
+        ngram_indexes = []
+        for result in db_results:
+            motif_len = len(result[0])
+            start_idx = result[1]
+            ngram_index = list(range(start_idx, start_idx + motif_len))
+            ngram_indexes.append([ngram_index])
+
+        random.shuffle(ngram_indexes)  # Shuffle the candidates
+
+        # If we haven't reached num_to_predict, also look at "Statistics"
+        motif_tree_stats = motif_tree_dict["Statistics"]
+        stats_results = motif_tree_stats.search_all(tokens_list)
+        ngram_indexes_extra = []
+        for result in stats_results:
+            motif_len = len(result[0])
+            start_idx = result[1]
+            ngram_index = list(range(start_idx, start_idx + motif_len))
+            ngram_indexes_extra.append([ngram_index])
+
+        random.shuffle(ngram_indexes_extra)  # Shuffle the candidates
+        # Statistics motifs are added if not enough from Databases
+        ngram_indexes.extend(ngram_indexes_extra)
+
+
+        # Select motifs until we reach num_to_predict
+        covered_indexes = set()
+        selected_indexes = []
+        for cand_index_set in ngram_indexes:
+            if len(selected_indexes) >= num_to_predict:
+                break
+            if not cand_index_set:
+                continue
+            index_set = cand_index_set[0]
+            # Check if adding this motif exceeds num_to_predict
+            if len(selected_indexes) + len(index_set) > num_to_predict:
+                continue
+            # Check overlap
+            if any(idx in covered_indexes for idx in index_set):
+                continue
+            # Add these indexes
+            for idx in index_set:
+                covered_indexes.add(idx)
+            selected_indexes.extend(index_set)
+
+        # Mark them in the mask
+        # Only mask within actual length
+        selected_indexes = [idx for idx in selected_indexes if idx < length]  # not sure if needed
+        if len(selected_indexes) > 0:
+            mask[i, selected_indexes] = True
+
+    # Extract targets (original tokens at masked positions)
+    targets = rna_data[mask].permute(1, 0).clone()
+
+    # Apply the 80/10/10 replacements
+    rna_data = apply_masking_strategy(rna_data, mask, device)
 
     return [rna_data, tissue_ids, seq_lengths], targets, mask
 
 
 def get_pretrain_mask_data(data, config: DictConfig):
     # data: [rna_data: (B,N,D), tissue_ids: (B,), seq_lengths: (B,)]
-    # Supported Masking strategies:
-    #  - naive_masking
-    #  - base_level_masking (BERT-style)
-    #  - subsequence_masking (ERNIE-style)
-    #  - motif_level_masking
-    # For demonstration, we'll just pick one.
-    # You could randomize if desired:
-    # masking_strategy = random.choice([base_level_masking, subsequence_masking, motif_level_masking])
-    masking_strategy = subsequence_masking
+    masking_strategy = random.choice([base_level_masking, subsequence_masking, motif_level_masking])
+    # masking_strategy = motif_level_masking  # for dev
 
     return masking_strategy(data, config)
 
