@@ -235,6 +235,10 @@ def motif_level_masking(data, config: DictConfig):
         if len(selected_indexes) > 0:
             mask[i, selected_indexes] = True
 
+    if mask.sum() < 2:
+        # Fallback if not successful
+        return base_level_masking(data, config)
+
     # Extract targets (original tokens at masked positions)
     targets = rna_data[mask].permute(1, 0).clone()
 
@@ -246,7 +250,8 @@ def motif_level_masking(data, config: DictConfig):
 
 def get_pretrain_mask_data(data, config: DictConfig):
     # data: [rna_data: (B,N,D), tissue_ids: (B,), seq_lengths: (B,)]
-    masking_strategy = random.choice([base_level_masking, subsequence_masking, motif_level_masking])
+    masking_strategy = random.choice([base_level_masking, base_level_masking, subsequence_masking,
+                                      subsequence_masking, motif_level_masking])  # use motif masking half as often
     # masking_strategy = motif_level_masking  # for dev
     return masking_strategy(data, config)
 
