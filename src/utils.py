@@ -119,6 +119,11 @@ def get_config(args):
     if args.gpu_id is not None:
         OmegaConf.update(config, "gpu_id", args.gpu_id)
 
+    OmegaConf.update(config, "pretrain", args.pretrain)
+    if args.pretrain:
+        # If pretraining, force model to not be in binary classification mode
+        OmegaConf.update(config, "binary", False)
+
     return config
 
 
