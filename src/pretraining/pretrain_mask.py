@@ -3,24 +3,10 @@ import random
 from omegaconf import OmegaConf, DictConfig
 
 from data_handling.train_data_seq import TOKENS
+from pretraining.pretrain_utils import get_motif_tree_dict
 
 MASK_TOKEN = len(TOKENS) + 1
-motif_tree = None
-
-
-def get_pretrain_mask(data, config: DictConfig):
-    # data: [rna_data: (B,N,D), tissue_ids: (B,), seq_lengths: (B,)]
-    # Choose a masking strategy
-    # Possible strategies:
-    #  - naive_masking
-    #  - base_level_masking (BERT-style)
-    #  - subsequence_masking (ERNIE-style)
-    #  - motif_level_masking
-    # For demonstration, we'll just pick one.
-    # You could randomize if desired:
-    # masking_strategy = random.choice([base_level_masking, subsequence_masking, motif_level_masking])
-    masking_strategy = base_level_masking
-    return masking_strategy(data, config)
+motif_tree = get_motif_tree_dict()  # returns an ahocorapy KeywordTree, with keys [ATtRACT, SpliceAid, Statistics] and encoded motifs as values
 
 
 def naive_masking(data, config: DictConfig):
@@ -48,42 +34,16 @@ def naive_masking(data, config: DictConfig):
     return [rna_data, tissue_ids, seq_lengths], targets, mask
 
 
-def base_level_masking(data, config: DictConfig):
-    # BERT-style masking:
-    # 1. ~15% of tokens are selected for masking
-    # 2. Of these selected:
-    #    80% -> [MASK]
-    #    10% -> original token
-    #    10% -> random token from the vocab (per-column aligned)
-
-    rna_data, tissue_ids, seq_lengths = data
-    batch_size, max_len, dim = rna_data.shape
-    device = rna_data.device
-
-    masked_lm_prob = 0.15  # BERT default
-    mask = torch.zeros(batch_size, max_len, dtype=torch.bool, device=device)
-
-    for i in range(batch_size):
-        length = seq_lengths[i].item()
-        num_to_mask = int(length * masked_lm_prob)
-        if num_to_mask > 0:
-            positions = torch.randperm(length, device=device)[:num_to_mask]
-            mask[i, positions] = True
-
-    # Extract the original tokens that will be predicted
-    # targets: (dim, total_masked_positions)
-    targets = rna_data[mask].permute(1, 0).clone()
-
+def apply_masking_strategy(rna_data, mask, device):
     # Apply the 80/10/10 replacements
     num_masked = mask.sum().item()
     if num_masked > 0:
         # Decide replacement strategy for each masked position
-        # shape: (num_masked,)
         rand_replacements = torch.rand(num_masked, device=device)
 
         # Column-specific token ranges (adjust if needed)
         col_ranges = [
-            (6, 10),   # tokens in [6,9] - seq ohe
+            (6, 10),  # tokens in [6,9] - seq ohe
             (1, 6),   # tokens in [1,5] - coding area
             (10, 13), # tokens in [10,12] - loop type pred
             (13, 20), # tokens in [13,19] - sec structure pred
@@ -108,6 +68,38 @@ def base_level_masking(data, config: DictConfig):
 
         rna_data[mask] = mutated_rna_mask
 
+    return rna_data
+
+
+def base_level_masking(data, config: DictConfig):
+    # BERT-style masking:
+    # 1. ~15% of tokens are selected for masking
+    # 2. Of these selected:
+    #    80% -> [MASK]
+    #    10% -> original token
+    #    10% -> random token from the vocab (per-column aligned)
+
+    rna_data, tissue_ids, seq_lengths = data
+    batch_size, max_len, dim = rna_data.shape
+    device = rna_data.device
+
+    masked_lm_prob = 0.15  # TODO add to config
+    mask = torch.zeros(batch_size, max_len, dtype=torch.bool, device=device)
+
+    for i in range(batch_size):
+        length = seq_lengths[i].item()
+        num_to_mask = int(length * masked_lm_prob)
+        if num_to_mask > 0:
+            positions = torch.randperm(length, device=device)[:num_to_mask]
+            mask[i, positions] = True
+
+    # Extract the original tokens that will be predicted
+    # targets: (dim, total_masked_positions)
+    targets = rna_data[mask].permute(1, 0).clone()
+
+    # Apply the 80/10/10 replacements
+    rna_data = apply_masking_strategy(rna_data, mask, device)
+
     # Return mutated data, targets, and mask
     return [rna_data, tissue_ids, seq_lengths], targets, mask
 
@@ -124,7 +116,7 @@ def subsequence_masking(data, config: DictConfig):
     batch_size, max_len, dim = rna_data.shape
     device = rna_data.device
 
-    masked_lm_prob = 0.15
+    masked_lm_prob = 0.15  # TODO add to config
     mask = torch.zeros(batch_size, max_len, dtype=torch.bool, device=device)
 
     # We'll choose subsequence lengths randomly (e.g., lengths 2-5) until we reach num_to_mask
@@ -135,7 +127,7 @@ def subsequence_masking(data, config: DictConfig):
             tokens_to_mask = 0
             while tokens_to_mask < num_to_mask:
                 # Random subsequence length
-                subseq_len = random.randint(2, 5)
+                subseq_len = random.randint(3, 9)
                 start = random.randint(0, length - subseq_len)
                 end = start + subseq_len
                 # Avoid exceeding num_to_mask
@@ -151,51 +143,32 @@ def subsequence_masking(data, config: DictConfig):
     # Targets are original tokens at masked positions
     targets = rna_data[mask].permute(1, 0).clone()
 
-    # Same 80/10/10 distribution as BERT
-    num_masked = mask.sum().item()
-    if num_masked > 0:
-        rand_replacements = torch.rand(num_masked, device=device)
-        random_tokens = torch.randint(
-            low=1,
-            high=len(TOKENS) + 1,
-            size=(num_masked, dim),
-            device=device
-        )
-
-        masked_data_view = rna_data[mask]
-
-        mask80 = rand_replacements < 0.8
-        mask10_2 = rand_replacements >= 0.9
-        # 80% -> MASK_TOKEN
-        masked_data_view[mask80] = MASK_TOKEN
-        # 10% -> keep original (do nothing)
-        masked_data_view[mask10_2] = random_tokens[mask10_2]
+    # Apply the 80/10/10 replacements
+    rna_data = apply_masking_strategy(rna_data, mask, device)
 
     return [rna_data, tissue_ids, seq_lengths], targets, mask
 
 
 def motif_level_masking(data, config: DictConfig):
-    # Placeholder for motif-based masking.
-    # Here, you'd need a list of motifs and their positions for each sequence.
-    # Similar to subsequence masking, but we rely on known motifs.
-    # Steps:
-    #  - Identify motif positions (list of index ranges).
-    #  - Select some of them to mask according to masked_lm_prob and max_predictions_per_seq
-    #  - Apply 80/10/10 distribution.
-
+    # TODO implement motif-level masking
     rna_data, tissue_ids, seq_lengths = data
-    batch_size, max_len, dim = rna_data.shape
-    device = rna_data.device
-
-    masked_lm_prob = 0.15
-    mask = torch.zeros(batch_size, max_len, dtype=torch.bool, device=device)
-
-    # Suppose we have motif_positions as input (not provided here).
-    # motif_positions[i] could be a list of tuples (start, end) for motifs in sequence i.
-    # For now, we just do nothing:
-    targets = torch.empty(dim, 0, device=device)
 
     return [rna_data, tissue_ids, seq_lengths], targets, mask
+
+
+def get_pretrain_mask_data(data, config: DictConfig):
+    # data: [rna_data: (B,N,D), tissue_ids: (B,), seq_lengths: (B,)]
+    # Supported Masking strategies:
+    #  - naive_masking
+    #  - base_level_masking (BERT-style)
+    #  - subsequence_masking (ERNIE-style)
+    #  - motif_level_masking
+    # For demonstration, we'll just pick one.
+    # You could randomize if desired:
+    # masking_strategy = random.choice([base_level_masking, subsequence_masking, motif_level_masking])
+    masking_strategy = subsequence_masking
+
+    return masking_strategy(data, config)
 
 
 if __name__ == "__main__":
@@ -203,7 +176,7 @@ if __name__ == "__main__":
     import copy
 
     config_dev = OmegaConf.create({
-        "batch_size": 4,
+        "batch_size": 8,
         "max_seq_length": 1000,
         "binary_class": True,
         "embedding_max_norm": 2,
@@ -230,7 +203,7 @@ if __name__ == "__main__":
         torch.tensor(seq_lengths, dtype=torch.int64)  # seq_lengths (B)
     ]
     sample_batch_copy = copy.deepcopy(sample_batch)
-    mutated_data, targets, mask = get_pretrain_mask(sample_batch, config_dev)
+    mutated_data, targets, mask = get_pretrain_mask_data(sample_batch, config_dev)
     print(mutated_data[0].shape)
     print(mask.shape)
     print(targets.shape)
