@@ -12,8 +12,6 @@ from data_handling.train_val_test_indices import get_train_val_test_indices
 from data_handling.data_utils import fit_evaluate_simple_models
 from knowledge_db import CODON_MAP_DNA, TISSUES
 
-TOKENS = 'ACGT().BEHIMSX'
-
 
 class RNADataset(torch.utils.data.Dataset):
     def __init__(self, config: DictConfig, fold: int, train_val: bool = False, val: bool = False, test: bool = False):
