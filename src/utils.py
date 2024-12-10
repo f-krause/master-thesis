@@ -39,6 +39,8 @@ def get_run_path(config, project_path, runs_folder="runs"):
 
     if config.binary_class:
         path_components.append("binary")
+    elif config.pretrain:
+        path_components.append("pretrain")
     else:
         path_components.append("regr")
 
@@ -122,7 +124,8 @@ def get_config(args):
     OmegaConf.update(config, "pretrain", args.pretrain)
     if args.pretrain:
         # If pretraining, force model to not be in binary classification mode
-        OmegaConf.update(config, "binary", False)
+        OmegaConf.update(config, "binary_class", False)
+        OmegaConf.update(config, "final_evaluation", False)
 
     return config
 

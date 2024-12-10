@@ -2,7 +2,6 @@
 seed: 2024
 gpu_id: 0
 dev: False
-pretrain: False
 
 # Data files
 train_data_file: "codon_train_2.7k_data.pkl"

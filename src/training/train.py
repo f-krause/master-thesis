@@ -13,11 +13,15 @@ from log.logger import setup_logger
 from utils import save_checkpoint, mkdir, get_device, get_model_stats, clean_model_weights
 from models.get_model import get_model
 from data_handling.data_loader import get_train_data_loaders
+from data_handling.train_data_seq import TOKENS
 from training.optimizer import get_optimizer
 from training.early_stopper import EarlyStopper
+from training.pretrain_mask import get_pretrain_mask
 from evaluation.evaluate import evaluate
 
 # from training.lr_scheduler import GradualWarmupScheduler
+
+MASK_TOKEN = len(TOKENS) + 1
 
 
 def train_fold(config: DictConfig, logger, fold: int = 0):
@@ -43,7 +47,9 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     model = get_model(config, device, logger)
     optimizer = get_optimizer(model, config.optimizer)
 
-    if config.binary_class:
+    if config.pretrain:
+        criterion = torch.nn.CrossEntropyLoss()
+    elif config.binary_class:
         criterion = torch.nn.BCELoss()
     else:
         criterion = torch.nn.MSELoss()
@@ -66,18 +72,35 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
         running_loss = 0.0
         y_true, y_pred = [], []
         for batch_idx, (data, target, target_bin) in enumerate(tqdm(train_loader)):
-            data = [d.to(device) for d in data]
-            if config.binary_class:
-                target = target_bin
-            target = target.to(device)
             optimizer.zero_grad()
-            output = model(data)
-            loss = criterion(output.squeeze().float(), target.float())
+            data = [d.to(device) for d in data]
+
+            if config.pretrain:
+                mask = get_pretrain_mask(data, config)
+                mask = mask.to(device)
+                targets = data[0][mask].permute(1, 0)  # store the original tokens
+                data[0][mask] = MASK_TOKEN
+                output = model(data)
+                # compute combined loss, need to subtract the min token value from the target to get the correct index
+                loss = (criterion(output[0][mask], targets[0] - 6) +
+                        criterion(output[1][mask], targets[1] - 1) +
+                        criterion(output[2][mask], targets[2] - 10) +
+                        criterion(output[3][mask], targets[3] - 13))
+                y_true.append(torch.tensor(0))  # dummy
+                y_pred.append(torch.tensor(0))  # dummy
+            else:
+                if config.binary_class:
+                    target = target_bin
+                target = target.to(device)
+                output = model(data)
+                loss = criterion(output.squeeze().float(), target.float())
+                y_true.append(target.unsqueeze(1).cpu().detach().numpy())
+                y_pred.append(output.cpu().detach().numpy())
+
             loss.backward()
+            # torch.nn.utils.clip_grad_norm_(model.parameters(), 1)  # TODO try gradient clipping
             optimizer.step()
             running_loss += loss.item()
-            y_true.append(target.unsqueeze(1).cpu().detach().numpy())
-            y_pred.append(output.cpu().detach().numpy())
 
         train_loss = running_loss / len(train_loader)
         losses[epoch] = {"epoch": epoch, "train_loss": train_loss}
@@ -111,16 +134,31 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             with torch.no_grad():
                 for data, target, target_bin in val_loader:
                     data = [d.to(device) for d in data]
-                    if config.binary_class:
-                        target = target_bin
-                    target = target.to(device)
+                    # TODO add pretrain here
 
-                    output = model(data)
-                    loss = criterion(output.squeeze().float(), target.float())
+                    if config.pretrain:
+                        mask = get_pretrain_mask(data, config)
+                        mask = mask.to(device)
+                        targets = data[0][mask].permute(1, 0)  # store the original tokens
+                        data[0][mask] = MASK_TOKEN
+                        output = model(data)
+                        # compute combined loss, need to subtract the min token value from the target to get the correct index
+                        loss = (criterion(output[0][mask], targets[0] - 6) +
+                                criterion(output[1][mask], targets[1] - 1) +
+                                criterion(output[2][mask], targets[2] - 10) +
+                                criterion(output[3][mask], targets[3] - 13))
+                        y_true_val.append(torch.tensor(0))  # dummy
+                        y_pred_val.append(torch.tensor(0))  # dummy
+                    else:
+                        if config.binary_class:
+                            target = target_bin
+                        target = target.to(device)
+                        output = model(data)
+                        loss = criterion(output.squeeze().float(), target.float())
+                        y_true_val.append(target.unsqueeze(1).cpu().numpy())
+                        y_pred_val.append(output.cpu().numpy())
+
                     val_loss += loss.item()
-
-                    y_true_val.append(target.unsqueeze(1).cpu().numpy())
-                    y_pred_val.append(output.cpu().numpy())
 
             val_loss /= len(val_loader)
             losses[epoch].update({"val_loss": val_loss})
@@ -166,7 +204,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     aim_run.track(training_time, name='training_time_min')
     aim_run.track(training_time / best_epoch, name='avg_epoch_time')
 
-    if config.model != "best" and config.model != "mamba2":
+    if config.model != "ptrnet" and config.model != "mamba2":
         nr_params, nr_flops = get_model_stats(config, model, device, logger)
         aim_run.track(nr_params, name='nr_params')
         aim_run.track(nr_flops, name='nr_flops')

@@ -2,7 +2,6 @@
 seed: 2024
 gpu_id: 0
 dev: True
-pretrain: False
 
 # Data files
 #train_data_file: "train_9.0k_data.pkl"
@@ -20,7 +19,7 @@ random_reverse: True
 tissue_id: -1  # 0-28 or -1 for all tissues
 
 # Misc
-nr_folds: 1  # only 1 supported, as cv only for codon based models supported
+nr_folds: 1  # only 1 supported, as cross validation only for codon based models supported
 val_fraction_of_train: 0  # use val_data_file as validation set
 embedding_max_norm: 2
 
