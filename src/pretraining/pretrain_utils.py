@@ -1,5 +1,8 @@
+# adapted from https://github.com/CatIIIIIIII/RNAErnie/blob/main/rna_pretrainer.py (last accessed 10.12.2024)
 import os
-from ahocorapy.keywordtree import KeywordTree  # TODO: install ahocorapy
+from ahocorapy.keywordtree import KeywordTree
+
+from data_handling.train_data_seq import TOKENS
 
 
 def seq2kmer(seq, k_mer, max_length=None):
@@ -15,38 +18,27 @@ def seq2kmer(seq, k_mer, max_length=None):
     return kmer_text
 
 
-def load_motif(motif_dir, motif_name, tokenizer):
-    """load motifs from file
-
-    Args:
-        motif_dir (str): motif data root directory
-        motif_name (str): motif file name
-        tokenizer (tokenizer_nuc.NUCTokenizer): nucleotide tokenizer
-
-    Returns:
-        dict: {file_name: [int]}
-    """
+def load_motif(motif_name):
     res = {}
     for name in motif_name.split(","):
-        motif_path = os.path.join(motif_dir, name + ".txt")
+        motif_path = os.path.join("pretraining/motif_db", name + ".txt")
         with open(motif_path, 'r') as f:
             motifs = f.readlines()
+        motifs = [m.replace("\n", "") for m in motifs]
+        motifs = [m.replace("U", "T") for m in motifs]
 
         motif_tokens = []
         for m in motifs:
-            kmer_text = seq2kmer(seq=m, k_mer=1)
-            input_ids = tokenizer(kmer_text, return_token_type_ids=False)[
-                "input_ids"]
+            input_ids = [TOKENS.index(c) + 1 for c in m]  # tokenize as sequence OHE in train data
             input_ids = input_ids[1:-1]
             motif_tokens.append(input_ids)
         res[name] = motif_tokens
 
     return res
 
-def get_motif_dict():
-    motif_dict = load_motif(motif_dir=args.motif_dir,
-                            motif_name=args.motif_files,
-                            tokenizer=tokenizer)
+
+def get_motif_tree_dict():
+    motif_dict = load_motif(motif_name="ATtRACT,SpliceAid,Statistics")
 
     motif_tree_dict = {}
     motif_tree = KeywordTree()
@@ -66,3 +58,8 @@ def get_motif_dict():
     motif_tree_dict["Statistics"] = motif_tree
 
     return motif_tree_dict
+
+
+if __name__ == "__main__":
+    motif_tree_dict = get_motif_tree_dict()
+    print(motif_tree_dict)
