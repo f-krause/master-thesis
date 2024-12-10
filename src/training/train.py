@@ -16,7 +16,7 @@ from data_handling.data_loader import get_train_data_loaders
 from data_handling.train_data_seq import TOKENS
 from training.optimizer import get_optimizer
 from training.early_stopper import EarlyStopper
-from training.pretrain_mask import get_pretrain_mask
+from pretraining.pretrain_mask import get_pretrain_mask
 from evaluation.evaluate import evaluate
 
 # from training.lr_scheduler import GradualWarmupScheduler
@@ -76,11 +76,8 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             data = [d.to(device) for d in data]
 
             if config.pretrain:
-                mask = get_pretrain_mask(data, config)
-                mask = mask.to(device)
-                targets = data[0][mask].permute(1, 0)  # store the original tokens
-                data[0][mask] = MASK_TOKEN
-                output = model(data)
+                mutated_data, targets, mask = get_pretrain_mask(data, config)
+                output = model(mutated_data)
                 # compute combined loss, need to subtract the min token value from the target to get the correct index
                 loss = (criterion(output[0][mask], targets[0] - 6) +
                         criterion(output[1][mask], targets[1] - 1) +
@@ -137,11 +134,8 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                     # TODO add pretrain here
 
                     if config.pretrain:
-                        mask = get_pretrain_mask(data, config)
-                        mask = mask.to(device)
-                        targets = data[0][mask].permute(1, 0)  # store the original tokens
-                        data[0][mask] = MASK_TOKEN
-                        output = model(data)
+                        mutated_data, targets, mask = get_pretrain_mask(data, config)
+                        output = model(mutated_data)
                         # compute combined loss, need to subtract the min token value from the target to get the correct index
                         loss = (criterion(output[0][mask], targets[0] - 6) +
                                 criterion(output[1][mask], targets[1] - 1) +
