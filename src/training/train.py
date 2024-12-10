@@ -13,15 +13,12 @@ from log.logger import setup_logger
 from utils import save_checkpoint, mkdir, get_device, get_model_stats, clean_model_weights
 from models.get_model import get_model
 from data_handling.data_loader import get_train_data_loaders
-from data_handling.train_data_seq import TOKENS
 from training.optimizer import get_optimizer
 from training.early_stopper import EarlyStopper
-from pretraining.pretrain_mask import get_pretrain_mask
+from pretraining.pretrain_mask import get_pretrain_mask_data
 from evaluation.evaluate import evaluate
 
 # from training.lr_scheduler import GradualWarmupScheduler
-
-MASK_TOKEN = len(TOKENS) + 1
 
 
 def train_fold(config: DictConfig, logger, fold: int = 0):
@@ -76,7 +73,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             data = [d.to(device) for d in data]
 
             if config.pretrain:
-                mutated_data, targets, mask = get_pretrain_mask(data, config)
+                mutated_data, targets, mask = get_pretrain_mask_data(data, config)
                 output = model(mutated_data)
                 # compute combined loss, need to subtract the min token value from the target to get the correct index
                 loss = (criterion(output[0][mask], targets[0] - 6) +
@@ -134,7 +131,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                     # TODO add pretrain here
 
                     if config.pretrain:
-                        mutated_data, targets, mask = get_pretrain_mask(data, config)
+                        mutated_data, targets, mask = get_pretrain_mask_data(data, config)
                         output = model(mutated_data)
                         # compute combined loss, need to subtract the min token value from the target to get the correct index
                         loss = (criterion(output[0][mask], targets[0] - 6) +
