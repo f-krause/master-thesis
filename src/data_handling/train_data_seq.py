@@ -97,6 +97,10 @@ def get_train_data_file(file_name: str, check_reproduce=False):
 
     max_seq_len_logging = str(MAX_SEQ_LENGTH / 1000) + "k"
 
+    # assert len(train_indices) > 1000, "Not enough data for training"
+    # assert len(val_indices) > 100, "Not enough data for validation"
+    # assert len(test_indices) > 100, "Not enough data for testing"
+
     if check_reproduce:
         check_identical(train_indices, identifiers, tissue_ids,
                         f"data/data_train/{file_name}train_{max_seq_len_logging}")
