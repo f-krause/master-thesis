@@ -195,16 +195,10 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     aim_run.track(training_time, name='training_time_min')
     aim_run.track(training_time / best_epoch, name='avg_epoch_time')
 
-    if config.model != "ptrnet" and config.model != "mamba2":
+    if config.model != "mamba2":
         nr_params, nr_flops = get_model_stats(config, model, device, logger)
         aim_run.track(nr_params, name='nr_params')
         aim_run.track(nr_flops, name='nr_flops')
-
-    if config.final_evaluation:
-        metric_val = evaluate(y_true_val_best, y_pred_val_best, "val", best_epoch, fold, config.binary_class,
-                              os.environ["SUBPROJECT"], logger, aim_run)
-        metric_train = evaluate(y_true_train_best, y_pred_train_best, "train", best_epoch, fold,
-                                config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
 
     if config.clean_up_weights:
         clean_model_weights(best_epoch, fold, checkpoint_path, logger)
@@ -212,11 +206,15 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     logger.info(f"Weights path: {checkpoint_path}")
     aim_run.close()
 
-    if config.final_evaluation:
+    if config.final_evaluation and not config.pretrain:
+        metric_val = evaluate(y_true_val_best, y_pred_val_best, "val", best_epoch, fold, config.binary_class,
+                              os.environ["SUBPROJECT"], logger, aim_run)
+        metric_train = evaluate(y_true_train_best, y_pred_train_best, "train", best_epoch, fold,
+                                config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
         return {"metric_val": float(metric_val), "metric_train": float(metric_train), "best_epoch": best_epoch,
                 "training_time_min": training_time}
-    else:
-        return {"best_epoch": best_epoch, "training_time_min": training_time}
+
+    return {"best_epoch": best_epoch, "training_time_min": training_time}
 
 
 @discord_sender(webhook_url="https://discord.com/api/webhooks/1308890399942774946/"
