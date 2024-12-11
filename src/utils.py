@@ -125,7 +125,6 @@ def get_config(args):
     if args.pretrain:
         # If pretraining, force model to not be in binary classification mode
         OmegaConf.update(config, "binary_class", False)
-        OmegaConf.update(config, "final_evaluation", False)
 
     return config
 
