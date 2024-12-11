@@ -101,15 +101,32 @@ if __name__ == "__main__":
     # Test forward pass
     device = torch.device("cuda:0")
     config_dev = OmegaConf.load("config/PTRnet.yml")
-    config_dev = OmegaConf.merge(config_dev, {"binary_class": True, "max_seq_length": 1000,
-                                              "embedding_max_norm": 2, "gpu_id": 0, "pretrain": True})
+    config_dev = OmegaConf.merge(config_dev, {
+        "batch_size": 8,
+        "max_seq_length": 9000,
+        "binary_class": True,
+        "embedding_max_norm": 2,
+        "gpu_id": 0,
+        "pretrain": False,
+    })
+
+    sequences, seq_lengths = [], []
+    for i in range(config_dev.batch_size):
+        length = torch.randint(100, config_dev.max_seq_length + 1, (1,)).item()
+        # Generate each column with its own integer range
+        col0 = torch.randint(low=6, high=10, size=(length,))  # values in [6,9] - seq ohe
+        col1 = torch.randint(low=1, high=6, size=(length,))  # values in [1,5] - coding area
+        col2 = torch.randint(low=10, high=13, size=(length,))  # values in [10,12] - loop type pred
+        col3 = torch.randint(low=13, high=20, size=(length,))  # values in [13,19] - sec structure pred
+
+        seq = torch.stack([col0, col1, col2, col3], dim=-1)
+        sequences.append(seq)
+        seq_lengths.append(length)
 
     sample_batch = [
-        torch.nn.utils.rnn.pad_sequence(torch.randint(1, len(TOKENS) + 1, (config_dev.batch_size, config_dev.max_seq_length, 4)),
-                                        batch_first=True),  # rna_data_padded (batch_size x max_seq_length)
-        torch.randint(29, (config_dev.batch_size,)),  # tissue_ids (batch_size x 1)
-        torch.tensor([config_dev.max_seq_length] * config_dev.batch_size,
-                     dtype=torch.int64)  # seq_lengths (batch_size x 1)
+        torch.nn.utils.rnn.pad_sequence(sequences, batch_first=True),  # rna_data_padded (B x N x D)
+        torch.randint(29, (config_dev.batch_size,)),  # tissue_ids (B)
+        torch.tensor(seq_lengths, dtype=torch.int64)  # seq_lengths (B)
     ]
 
     sample_batch = [tensor.to(torch.device(device)) for tensor in sample_batch]
