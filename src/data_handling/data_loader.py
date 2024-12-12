@@ -93,6 +93,11 @@ class RNADataset(torch.utils.data.Dataset):
 
                 logger.info(f"Train dataset with {len(self.rna_data)} samples loaded")
 
+            # cast from int8 to int for computations
+            self.rna_data = [rna_data.int() for rna_data in self.rna_data]
+            self.tissue_ids = self.tissue_ids.int()
+            self.targets_bin = self.targets_bin.int()
+
     def _get_train_val_indices(self, config: DictConfig, mrna_sequences, fold):
         if config.nr_folds == 1:
             # train_indices, val_indices = train_test_split(range(len(mrna_sequences)), test_size=0.2,

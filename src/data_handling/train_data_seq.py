@@ -69,7 +69,8 @@ def get_train_data_file(file_name: str, check_reproduce=False):
                 sec_struc_ohe = [TOKENS.index(c) + 1 for c in sec_struc]
                 loop_type_ohe = [TOKENS.index(c) + 1 for c in loop_type]
 
-                rna_data.append(torch.tensor([sequence_ohe, coding_area_ohe, sec_struc_ohe, loop_type_ohe]))  # 4 x n
+                rna_data.append(torch.tensor([sequence_ohe, coding_area_ohe, sec_struc_ohe, loop_type_ohe],
+                                             dtype=torch.int8))  # 4 x n
 
                 identifiers.append(identifier)
                 sequences.append(sequence)

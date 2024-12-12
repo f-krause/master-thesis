@@ -48,8 +48,8 @@ def store_data(identifiers: list, rna_data: list, target_ids: list, targets: lis
     targets_selected = [targets[i] for i in indices]
     targets_bin_selected = [targets_bin[i] for i in indices]
     with open(os.path.join(os.environ["PROJECT_PATH"], path + "_data.pkl"), 'wb') as f:
-        pickle.dump([rna_data_selected, torch.tensor(target_ids_selected), torch.tensor(targets_selected),
-                     torch.tensor(targets_bin_selected)], f)
+        pickle.dump([rna_data_selected, torch.tensor(target_ids_selected, dtype=torch.int8),
+                     torch.tensor(targets_selected), torch.tensor(targets_bin_selected, dtype=torch.int8)], f)
     pd.DataFrame({"identifier": identifiers_selected, "target_id": target_ids_selected, "index": indices}).to_csv(
         os.path.join(os.environ["PROJECT_PATH"], path + "_indices.csv"), index=False)
 
