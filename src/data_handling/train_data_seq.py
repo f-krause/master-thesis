@@ -134,7 +134,7 @@ if __name__ == '__main__':
     dev_config = OmegaConf.create(
         {"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
          "batch_size": 32, "num_workers": 4, "train_data_file": "NONONONO", "dev": True, "binary_class": False,
-         "frequency_features": False})
+         "frequency_features": False, "pretrain": False})
     set_project_path(dev_config)
 
     get_train_data_file(FILE_NAME, check_reproduce=CHECK_REPRODUCTION)
