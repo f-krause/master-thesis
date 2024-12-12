@@ -18,7 +18,10 @@ from training.early_stopper import EarlyStopper
 from pretraining.pretrain_mask import get_pretrain_mask_data
 from evaluation.evaluate import evaluate
 
-# from training.lr_scheduler import GradualWarmupScheduler
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
+
+
+# from training.lr_scheduler import GradualWarmupScheduler, TimmCosineLRScheduler
 
 
 def train_fold(config: DictConfig, logger, fold: int = 0):
@@ -41,8 +44,22 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     mkdir(checkpoint_path)
     logger.info(f"Checkpoint path: {checkpoint_path}")
 
+    train_loader, val_loader = get_train_data_loaders(config, fold=fold)
+    iters = len(train_loader)
+
     model = get_model(config, device, logger)
     optimizer = get_optimizer(model, config.optimizer)
+
+    # scheduler = GradualWarmupScheduler(
+    #     optimizer, multiplier=8, total_epoch=float(config.epochs), after_scheduler=None)
+    # scheduler = TimmCosineLRScheduler(optimizer, t_initial=config.epochs, lr_min=1e-6)
+    scheduler = CosineAnnealingWarmRestarts(
+        optimizer,
+        T_0=10 * iters,  # First restart after 10 steps
+        T_mult=2,  # Double the period after each restart
+        eta_min=1e-6,
+        last_epoch=-1
+    )
 
     if config.pretrain:
         criterion = torch.nn.CrossEntropyLoss()
@@ -53,13 +70,11 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
 
     early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
 
-    train_loader, val_loader = get_train_data_loaders(config, fold=fold)
-
-    losses = {}
-
     logger.info(f"Starting training fold {fold}")
     start_time = time.time()
     end_time = None
+
+    losses = {}
     best_epoch = 1
     y_true_train_best, y_pred_train_best = None, None
     y_true_val_best, y_pred_val_best = None, None
@@ -94,6 +109,9 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             loss.backward()
             # torch.nn.utils.clip_grad_norm_(model.parameters(), 1)  # TODO try gradient clipping
             optimizer.step()
+            scheduler.step((epoch - 1) + (batch_idx + 1) / iters)
+            aim_run.track(scheduler.get_last_lr(), name='learning_rate_step',
+                          epoch=(epoch - 1) * iters + (batch_idx + 1))
             running_loss += loss.item()
 
         train_loss = running_loss / len(train_loader)
