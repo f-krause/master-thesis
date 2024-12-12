@@ -28,8 +28,7 @@ class PTRnet(nn.Module):
         self.dim_embedding_token = config.dim_embedding_token
 
         # Embedding layers
-        nr_tokens = len(TOKENS) + 1  # +1 for padding
-        if self.pretrain: nr_tokens += 1  # +1 for MASK token
+        nr_tokens = len(TOKENS) + 2  # + 1 for padding, one for pretraining MASK token
 
         self.tissue_encoder = nn.Embedding(len(TISSUES), self.dim_embedding_tissue, max_norm=config.embedding_max_norm)
         self.seq_encoder = nn.Embedding(nr_tokens, self.dim_embedding_token, padding_idx=0,
