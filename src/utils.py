@@ -192,12 +192,32 @@ def set_seed(seed):
 
 def get_model_stats(config: DictConfig, model, device, logger):
     logger.info("Computing model statistics, assuming input is max codon sequence and tissue type (only).")
-    sample_input = [
-        # rna_data_padded (batch_size x max_seq_length)
-        torch.nn.utils.rnn.pad_sequence(torch.randint(1, 64, (1, config.max_seq_length)), batch_first=True),
-        torch.randint(29, (1,)),  # tissue_ids (batch_size x 1)
-        torch.tensor([config.max_seq_length], dtype=torch.int64)  # seq_lengths (batch_size x 1)
-    ]
+    if config.model == "ptrnet":
+        sequences, seq_lengths = [], []
+        for i in range(config.batch_size):
+            length = torch.randint(100, config.max_seq_length + 1, (1,)).item()
+            # Generate each column with its own integer range
+            col0 = torch.randint(low=6, high=10, size=(length,))  # values in [6,9] - seq ohe
+            col1 = torch.randint(low=1, high=6, size=(length,))  # values in [1,5] - coding area
+            col2 = torch.randint(low=10, high=13, size=(length,))  # values in [10,12] - loop type pred
+            col3 = torch.randint(low=13, high=20, size=(length,))  # values in [13,19] - sec structure pred
+
+            seq = torch.stack([col0, col1, col2, col3], dim=-1)
+            sequences.append(seq)
+            seq_lengths.append(length)
+
+        sample_input = [
+            torch.nn.utils.rnn.pad_sequence(sequences, batch_first=True),  # rna_data_padded (B x N x D)
+            torch.randint(29, (config.batch_size,)),  # tissue_ids (B)
+            torch.tensor(seq_lengths, dtype=torch.int64)  # seq_lengths (B)
+        ]
+    else:
+        sample_input = [
+            # rna_data_padded (batch_size x max_seq_length)
+            torch.nn.utils.rnn.pad_sequence(torch.randint(1, 64, (1, config.max_seq_length)), batch_first=True),
+            torch.randint(29, (1,)),  # tissue_ids (batch_size x 1)
+            torch.tensor([config.max_seq_length], dtype=torch.int64)  # seq_lengths (batch_size x 1)
+        ]
 
     sample_input = [x.to(device) for x in sample_input]
     flops = FlopCountAnalysis(model, sample_input)
