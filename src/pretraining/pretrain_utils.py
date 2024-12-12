@@ -1,21 +1,9 @@
 # adapted from https://github.com/CatIIIIIIII/RNAErnie/blob/main/rna_pretrainer.py (last accessed 10.12.2024)
 import os
+import hashlib
 from ahocorapy.keywordtree import KeywordTree
 
 from data_handling.train_data_seq import TOKENS
-
-
-def seq2kmer(seq, k_mer, max_length=None):
-    kmer_text = ""
-    i = 0
-    upper = len(seq) - k_mer + 1
-    if max_length:
-        upper = min(upper, max_length)
-    while i < upper:
-        kmer_text += (seq[i: i + k_mer] + " ")
-        i += 1
-    kmer_text = kmer_text.strip()
-    return kmer_text
 
 
 def load_motif(motif_name):
@@ -60,6 +48,21 @@ def get_motif_tree_dict():
     return motif_tree_dict
 
 
+def hash_sequence(sequence):
+    if sequence.device.type != 'cpu':
+        sequence = sequence.cpu()
+    nonzero_positions = (sequence != 0).nonzero(as_tuple=True)[0]
+    last_nonzero_idx = nonzero_positions[-1].item()
+    sequence = sequence[:last_nonzero_idx + 1]
+    seq_bytes = sequence.numpy().tobytes()
+    return hashlib.sha256(seq_bytes).hexdigest()
+
+
 if __name__ == "__main__":
-    motif_tree_dict = get_motif_tree_dict()
-    print(motif_tree_dict)
+    # motif_tree_dict = get_motif_tree_dict()
+    # print(motif_tree_dict)
+
+    import torch
+
+    sequence = torch.tensor([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0, 0, 0], dtype=torch.int8)
+    print(hash_sequence(sequence))

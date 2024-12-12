@@ -1,13 +1,14 @@
 # ideas from https://github.com/CatIIIIIIII/RNAErnie/blob/main/rna_pretrainer.py (last accessed 10.12.2024)
 import torch
 import random
+import pickle
 from omegaconf import OmegaConf, DictConfig
 
 from data_handling.train_data_seq import TOKENS
-from pretraining.pretrain_utils import get_motif_tree_dict
+from pretraining.pretrain_utils import hash_sequence, get_motif_tree_dict
+from pretraining.store_identified_motifs import precompute_motif_matches
 
 MASK_TOKEN = len(TOKENS) + 1
-motif_tree_dict = get_motif_tree_dict()  # ahocorapy KeywordTree with encoded motifs as values
 
 
 def naive_masking(data, config: DictConfig):
@@ -150,7 +151,13 @@ def subsequence_masking(data, config: DictConfig):
     return [rna_data, tissue_ids, seq_lengths], targets, mask
 
 
-def motif_level_masking(data, config: DictConfig):
+# Load necessary files
+with open("/export/share/krausef99dm/data/data_train/dev_motif_matches_cache.pkl", 'rb') as f:
+    motif_cache = pickle.load(f)
+motif_tree_dict = get_motif_tree_dict()
+
+
+def motif_level_masking(data, config):
     # data = [rna_data: (B, N, D), tissue_ids: (B,), seq_lengths: (B,)]
     rna_data, tissue_ids, seq_lengths = data
     batch_size, max_len, dim = rna_data.shape
@@ -159,47 +166,38 @@ def motif_level_masking(data, config: DictConfig):
     masked_lm_prob = getattr(config, 'masked_lm_prob', 0.15)
     max_predictions_per_seq = getattr(config, 'max_predictions_per_seq', int(max_len * masked_lm_prob))
 
-    # Move token column to CPU for searching to avoid repeated GPU->CPU conversions.
-    # Extract just the token column (assumed at index 0)
+    # Extract tokens and move to CPU once
     token_data_cpu = rna_data[..., 0].cpu()
 
     # Pre-initialize the mask on GPU
     mask = torch.zeros(batch_size, max_len, dtype=torch.bool, device=device)
-
-    motif_tree_db = motif_tree_dict["DataBases"]
-    motif_tree_stats = motif_tree_dict["Statistics"]
 
     for i in range(batch_size):
         length = seq_lengths[i].item()
         if length == 0:
             continue
 
-        # Extract tokens as a CPU list (no GPU->CPU overhead in the loop)
-        tokens_list = token_data_cpu[i, :length].tolist()
+        # Identify sequence by a known ID or hash. Here we assume `sequence_ids[i]`
+        # was passed in and matches what we used in precomputation.
+        sequence = token_data_cpu[i, :length]
 
-        # Compute number of masked tokens for this sequence
+        # Retrieve precomputed candidates
+        seq_hash = hash_sequence(sequence)
+        if seq_hash in motif_cache["DataBases"].keys():
+            # TODO TEST
+            ngram_candidates_db = motif_cache["DataBases"].get(seq_hash, [])
+            ngram_candidates_stat = motif_cache["Statistics"].get(seq_hash, [])
+        else:
+            temp_cache = precompute_motif_matches([sequence], motif_tree_dict)  # this is expensive
+            ngram_candidates_db = temp_cache["DataBases"].get(seq_hash, [])
+            ngram_candidates_stat = temp_cache["Statistics"].get(seq_hash, [])
+
+        random.shuffle(ngram_candidates_db)
+        random.shuffle(ngram_candidates_stat)
+
+        ngram_candidates = ngram_candidates_db + ngram_candidates_stat
+
         num_to_predict = min(max_predictions_per_seq, max(1, int(round(length * masked_lm_prob))))
-
-        # Search motifs in databases
-        db_results = motif_tree_db.search_all(tokens_list)
-        stats_results = motif_tree_stats.search_all(tokens_list)
-
-        # Convert results to a list of ngram indexes
-        # db_results and stats_results are tuples (matched_string, start_index)
-        # Turn them into a flat list of index sequences
-        ngram_candidates = []
-        for res in db_results:
-            motif_len = len(res[0])
-            start_idx = res[1]
-            ngram_candidates.append(list(range(start_idx, start_idx + motif_len)))
-
-        for res in stats_results:
-            motif_len = len(res[0])
-            start_idx = res[1]
-            ngram_candidates.append(list(range(start_idx, start_idx + motif_len)))
-
-        # Shuffle candidates once
-        random.shuffle(ngram_candidates)
 
         # Select motifs without overlap until we reach num_to_predict
         covered_indexes = set()
@@ -223,7 +221,7 @@ def motif_level_masking(data, config: DictConfig):
 
         # Mask them
         if selected_indexes:
-            # Ensure we're not out of range
+            # Ensure we're not out of range (accounting for shorter sequences)
             selected_indexes = [idx for idx in selected_indexes if idx < length]
             if selected_indexes:
                 mask[i, selected_indexes] = True
