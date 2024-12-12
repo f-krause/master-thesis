@@ -48,6 +48,15 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     iters = len(train_loader)
 
     model = get_model(config, device, logger)
+
+    if config.pretrain_path:
+        checkpoint = torch.load(config.pretrain_path)
+        missing_keys, unexpected_keys = model.load_state_dict(checkpoint['state_dict'], strict=False)
+        if missing_keys:
+            print("Missing keys:", missing_keys)
+        if unexpected_keys:
+            print("Unexpected keys:", unexpected_keys)
+
     optimizer = get_optimizer(model, config.optimizer)
 
     # scheduler = GradualWarmupScheduler(

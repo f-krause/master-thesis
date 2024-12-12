@@ -10,6 +10,7 @@ dev: True
 train_data_file: "dev_train_9.0k_data.pkl"
 val_data_file: "dev_val_9.0k_data.pkl"
 test_data_file: "dev_test_9.0k_data.pkl"
+pretrain_path: ""  # TODO implement (latest?)
 
 # Data params
 max_seq_length: 9000
