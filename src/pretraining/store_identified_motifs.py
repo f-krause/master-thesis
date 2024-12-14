@@ -56,11 +56,14 @@ if __name__ == '__main__':
     from data_handling.data_loader import RNADataset
 
     STORE = True
+    STORE_PATH = "/export/share/krausef99dm/data/data_train/motif_matches_cache.pkl"
 
     device = torch.device("cuda:0")
     config_dev = OmegaConf.load("config/PTRnet.yml")
     config_dev_nucl = OmegaConf.load("config/general_nucleotide.yml")
     config_dev = OmegaConf.merge(config_dev, config_dev_nucl)
+    config_dev = OmegaConf.merge(config_dev, {"pretrain": False})
+    OmegaConf.update(config_dev, "binary_class", False)
 
     set_project_path(config_dev)
 
@@ -72,10 +75,12 @@ if __name__ == '__main__':
     val_sequences = [seq.permute(1, 0)[0] for seq in val_dataset.rna_data]
     sequences = train_sequences + val_sequences
 
+    # make unique
+    sequences = list({tuple(tensor.tolist()): tensor for tensor in sequences}.values())
+
     # Load the motif trees
     motif_tree_dict = get_motif_tree_dict()
 
     # Precompute the motif matches
     # TODO remove dev and run for full data!
-    precompute_motif_matches(sequences, motif_tree_dict, STORE,
-                             "/export/share/krausef99dm/data/data_train/dev_motif_matches_cache.pkl")
+    precompute_motif_matches(sequences, motif_tree_dict, STORE, STORE_PATH)

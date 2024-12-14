@@ -1,6 +1,7 @@
 import os
 import torch
 import time
+import pickle
 import aim  # https://aimstack.io/#demos
 import pandas as pd
 import numpy as np
@@ -16,6 +17,7 @@ from data_handling.data_loader import get_train_data_loaders
 from training.optimizer import get_optimizer
 from training.early_stopper import EarlyStopper
 from pretraining.pretrain_mask import get_pretrain_mask_data
+from pretraining.pretrain_utils import get_motif_tree_dict
 from evaluation.evaluate import evaluate
 
 from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
@@ -54,6 +56,13 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             print("Missing keys:", missing_keys)
         if unexpected_keys:
             print("Unexpected keys:", unexpected_keys)
+
+    if config.pretrain:
+        # Load necessary files (expensive, loads ~800MB)
+        logger.info("Loading motif cache")
+        with open("/export/share/krausef99dm/data/data_train/motif_matches_cache.pkl", 'rb') as f:
+            motif_cache = pickle.load(f)
+        motif_tree_dict = get_motif_tree_dict()
 
     optimizer = get_optimizer(model, config.optimizer)
 
@@ -95,7 +104,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             data = [d.to(device) for d in data]
 
             if config.pretrain:
-                mutated_data, targets, mask = get_pretrain_mask_data(data, config)
+                mutated_data, targets, mask = get_pretrain_mask_data(data, config, motif_cache, motif_tree_dict)
                 output = model(mutated_data)
                 # compute combined loss, need to subtract the min token value from the target to get the correct index
                 loss = (criterion(output[0][mask], targets[0] - 6) +
@@ -153,10 +162,8 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             with torch.no_grad():
                 for data, target, target_bin in val_loader:
                     data = [d.to(device) for d in data]
-                    # TODO add pretrain here
-
                     if config.pretrain:
-                        mutated_data, targets, mask = get_pretrain_mask_data(data, config)
+                        mutated_data, targets, mask = get_pretrain_mask_data(data, config, motif_cache, motif_tree_dict)
                         output = model(mutated_data)
                         # compute combined loss, need to subtract the min token value from the target to get the correct index
                         loss = (criterion(output[0][mask], targets[0] - 6) +
@@ -250,7 +257,7 @@ def train(config: DictConfig):
     for fold in range(config.nr_folds):
         results[fold] = train_fold(config, logger, fold)
 
-    if config.final_evaluation:
+    if config.final_evaluation and not config.pretrain:
         metrics_val = [results[fold]["metric_val"] for fold in range(config.nr_folds)]
         metrics_train = [results[fold]["metric_train"] for fold in range(config.nr_folds)]
         results["cv_metrics_val"] = {"mean": float(np.mean(metrics_val)), "std": float(np.std(metrics_val))}

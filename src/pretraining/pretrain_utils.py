@@ -52,8 +52,9 @@ def hash_sequence(sequence):
     if sequence.device.type != 'cpu':
         sequence = sequence.cpu()
     nonzero_positions = (sequence != 0).nonzero(as_tuple=True)[0]
+    first_nonzero_idx = nonzero_positions[0].item()
     last_nonzero_idx = nonzero_positions[-1].item()
-    sequence = sequence[:last_nonzero_idx + 1]
+    sequence = sequence[first_nonzero_idx:last_nonzero_idx + 1]
     seq_bytes = sequence.numpy().tobytes()
     return hashlib.sha256(seq_bytes).hexdigest()
 

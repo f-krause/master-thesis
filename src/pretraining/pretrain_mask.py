@@ -1,7 +1,6 @@
 # ideas from https://github.com/CatIIIIIIII/RNAErnie/blob/main/rna_pretrainer.py (last accessed 10.12.2024)
 import torch
 import random
-import pickle
 from omegaconf import OmegaConf, DictConfig
 
 from data_handling.train_data_seq import TOKENS
@@ -17,18 +16,17 @@ def naive_masking(data, config: DictConfig):
     batch_size, max_len, dim = rna_data.shape
     device = rna_data.device
 
-    mask_fraction = 0.05
     mask = torch.zeros(batch_size, max_len, dtype=torch.bool, device=device)
     for i in range(batch_size):
         length = seq_lengths[i].item()
-        num_to_mask = int(length * mask_fraction)
+        num_to_mask = int(length * config.masked_tokens)
         if num_to_mask > 0:
             positions = torch.randperm(length, device=device)[:num_to_mask]
             mask[i, positions] = True
 
     # Extract original target tokens before modifying rna_data
     # shape after masking: (total_masked_positions, dim)
-    targets = rna_data[mask].permute(1, 0)  # (dim, total_masked_positions)
+    targets = rna_data[mask].permute(1, 0).long()  # (dim, total_masked_positions)
 
     # Replace masked positions with MASK_TOKEN (for all features)
     rna_data[mask] = MASK_TOKEN
@@ -45,10 +43,10 @@ def apply_masking_strategy(rna_data, mask, device):
 
         # Column-specific token ranges (adjust if needed)
         col_ranges = [
-            (6, 10),  # tokens in [6,9] - seq ohe
-            (1, 6),   # tokens in [1,5] - coding area
-            (10, 13), # tokens in [10,12] - loop type pred
-            (13, 20), # tokens in [13,19] - sec structure pred
+            (6, 10),   # tokens in [6,9] - seq ohe
+            (1, 6),    # tokens in [1,5] - coding area
+            (10, 13),  # tokens in [10,12] - loop type pred
+            (13, 20),  # tokens in [13,19] - sec structure pred
         ]
 
         # Create random tokens aligned with column ranges
@@ -57,7 +55,7 @@ def apply_masking_strategy(rna_data, mask, device):
             # draw random tokens within [low, high-1]
             col_random = torch.randint(low=low, high=high, size=(num_masked,), device=device)
             random_cols.append(col_random)
-        random_tokens = torch.stack(random_cols, dim=-1)  # (num_masked, dim)
+        random_tokens = torch.stack(random_cols, dim=-1).int()  # (num_masked, dim)
 
         # Masks for each strategy
         mask80 = rand_replacements < 0.8   # 80% -> [MASK]
@@ -73,7 +71,7 @@ def apply_masking_strategy(rna_data, mask, device):
     return rna_data
 
 
-def base_level_masking(data, config: DictConfig):
+def base_level_masking(data, config: DictConfig, motif_cache=None, motif_tree_dict=None):
     # BERT-style masking:
     # 1. ~15% of tokens are selected for masking
     # 2. Of these selected:
@@ -85,19 +83,18 @@ def base_level_masking(data, config: DictConfig):
     batch_size, max_len, dim = rna_data.shape
     device = rna_data.device
 
-    masked_lm_prob = 0.15  # TODO add to config
     mask = torch.zeros(batch_size, max_len, dtype=torch.bool, device=device)
 
     for i in range(batch_size):
         length = seq_lengths[i].item()
-        num_to_mask = int(length * masked_lm_prob)
+        num_to_mask = int(length * config.masked_tokens)
         if num_to_mask > 0:
             positions = torch.randperm(length, device=device)[:num_to_mask]
             mask[i, positions] = True
 
     # Extract the original tokens that will be predicted
     # targets: (dim, total_masked_positions)
-    targets = rna_data[mask].permute(1, 0).clone()
+    targets = rna_data[mask].permute(1, 0).clone().long()
 
     # Apply the 80/10/10 replacements
     rna_data = apply_masking_strategy(rna_data, mask, device)
@@ -106,7 +103,7 @@ def base_level_masking(data, config: DictConfig):
     return [rna_data, tissue_ids, seq_lengths], targets, mask
 
 
-def subsequence_masking(data, config: DictConfig):
+def subsequence_masking(data, config: DictConfig, motif_cache=None, motif_tree_dict=None):
     # ERNIE-like approach:
     # Instead of single tokens, we mask contiguous subsequences.
     # We'll:
@@ -118,13 +115,12 @@ def subsequence_masking(data, config: DictConfig):
     batch_size, max_len, dim = rna_data.shape
     device = rna_data.device
 
-    masked_lm_prob = 0.15  # TODO add to config
     mask = torch.zeros(batch_size, max_len, dtype=torch.bool, device=device)
 
     # We'll choose subsequence lengths randomly (e.g., lengths 2-5) until we reach num_to_mask
     for i in range(batch_size):
         length = seq_lengths[i].item()
-        num_to_mask = int(length * masked_lm_prob)
+        num_to_mask = int(length * config.masked_tokens)
         if num_to_mask > 0:
             tokens_to_mask = 0
             while tokens_to_mask < num_to_mask:
@@ -143,7 +139,7 @@ def subsequence_masking(data, config: DictConfig):
                 tokens_to_mask += subseq_len
 
     # Targets are original tokens at masked positions
-    targets = rna_data[mask].permute(1, 0).clone()
+    targets = rna_data[mask].permute(1, 0).clone().long()
 
     # Apply the 80/10/10 replacements
     rna_data = apply_masking_strategy(rna_data, mask, device)
@@ -151,20 +147,11 @@ def subsequence_masking(data, config: DictConfig):
     return [rna_data, tissue_ids, seq_lengths], targets, mask
 
 
-# Load necessary files
-with open("/export/share/krausef99dm/data/data_train/dev_motif_matches_cache.pkl", 'rb') as f:
-    motif_cache = pickle.load(f)
-motif_tree_dict = get_motif_tree_dict()
-
-
-def motif_level_masking(data, config):
+def motif_level_masking(data, config, motif_cache, motif_tree_dict):
     # data = [rna_data: (B, N, D), tissue_ids: (B,), seq_lengths: (B,)]
     rna_data, tissue_ids, seq_lengths = data
     batch_size, max_len, dim = rna_data.shape
     device = rna_data.device
-
-    masked_lm_prob = getattr(config, 'masked_lm_prob', 0.15)
-    max_predictions_per_seq = getattr(config, 'max_predictions_per_seq', int(max_len * masked_lm_prob))
 
     # Extract tokens and move to CPU once
     token_data_cpu = rna_data[..., 0].cpu()
@@ -183,21 +170,30 @@ def motif_level_masking(data, config):
 
         # Retrieve precomputed candidates
         seq_hash = hash_sequence(sequence)
+        seq_hash_reversed = hash_sequence(sequence.flip(0))
         if seq_hash in motif_cache["DataBases"].keys():
-            # TODO TEST
             ngram_candidates_db = motif_cache["DataBases"].get(seq_hash, [])
             ngram_candidates_stat = motif_cache["Statistics"].get(seq_hash, [])
+        elif seq_hash_reversed in motif_cache["DataBases"].keys():
+            ngram_candidates_db = motif_cache["DataBases"].get(seq_hash_reversed, [])
+            ngram_candidates_stat = motif_cache["Statistics"].get(seq_hash_reversed, [])
         else:
-            temp_cache = precompute_motif_matches([sequence], motif_tree_dict)  # this is expensive
-            ngram_candidates_db = temp_cache["DataBases"].get(seq_hash, [])
-            ngram_candidates_stat = temp_cache["Statistics"].get(seq_hash, [])
+            print("WARNING: No motifs found in cache, computing on-the-fly")
+            temp_generation = precompute_motif_matches([sequence], motif_tree_dict)  # this is expensive
+            ngram_candidates_db = temp_generation["DataBases"].get(seq_hash, [])
+            ngram_candidates_stat = temp_generation["Statistics"].get(seq_hash, [])
+            motif_cache["DataBases"][seq_hash] = ngram_candidates_db  # Update cache
+            motif_cache["Statistics"][seq_hash] = ngram_candidates_stat
 
         random.shuffle(ngram_candidates_db)
         random.shuffle(ngram_candidates_stat)
 
         ngram_candidates = ngram_candidates_db + ngram_candidates_stat
+        if not ngram_candidates:
+            print("WARNING: No motifs found for sequence")
+            continue
 
-        num_to_predict = min(max_predictions_per_seq, max(1, int(round(length * masked_lm_prob))))
+        num_to_predict = int(length * config.masked_tokens)
 
         # Select motifs without overlap until we reach num_to_predict
         covered_indexes = set()
@@ -219,18 +215,20 @@ def motif_level_masking(data, config):
             if tokens_chosen >= num_to_predict:
                 break
 
-        # Mask them
         if selected_indexes:
             # Ensure we're not out of range (accounting for shorter sequences)
             selected_indexes = [idx for idx in selected_indexes if idx < length]
             if selected_indexes:
                 mask[i, selected_indexes] = True
 
+        # print(mask.sum())
+
     # If too few positions got masked, fallback to base-level masking
-    if mask.sum() < 2:
+    if mask.sum() < 10:
+        print("WARNING: Too few masked entries, falling back to base-level masking instead")
         return base_level_masking(data, config)
 
-    targets = rna_data[mask].permute(1, 0).clone()
+    targets = rna_data[mask].permute(1, 0).clone().long()
 
     # Apply the 80/10/10 replacements
     rna_data = apply_masking_strategy(rna_data, mask, device)
@@ -238,12 +236,13 @@ def motif_level_masking(data, config):
     return [rna_data, tissue_ids, seq_lengths], targets, mask
 
 
-def get_pretrain_mask_data(data, config: DictConfig):
+def get_pretrain_mask_data(data, config: DictConfig, motif_cache, motif_tree_dict):
     # data: [rna_data: (B,N,D), tissue_ids: (B,), seq_lengths: (B,)]
     # motif masking 10 times slower than others, hence in total around 3 times slower as without
+
     masking_strategy = random.choice([base_level_masking, subsequence_masking, motif_level_masking])
     # masking_strategy = motif_level_masking  # for dev
-    return masking_strategy(data, config)
+    return masking_strategy(data, config, motif_cache, motif_tree_dict)
 
 
 if __name__ == "__main__":
