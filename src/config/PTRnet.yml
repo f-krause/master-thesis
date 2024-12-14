@@ -27,3 +27,8 @@ optimizer:
   lr: 0.001
   momentum: 0.9  # sgd only
   weight_decay: 0.1  # ranger only
+
+lr_scheduler:
+  reset_epochs: 10
+  T_mult: 2
+  min_lr: 1e-6

@@ -62,9 +62,9 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     # scheduler = TimmCosineLRScheduler(optimizer, t_initial=config.epochs, lr_min=1e-6)
     scheduler = CosineAnnealingWarmRestarts(
         optimizer,
-        T_0=10 * iters,  # First restart after 10 steps
-        T_mult=2,  # Double the period after each restart
-        eta_min=1e-6,
+        T_0=config.lr_scheduler.reset_epochs * iters,  # First restart after 10 steps
+        T_mult=config.lr_scheduler.T_mult,  # Double the period after each restart
+        eta_min=config.lr_scheduler.min_lr,
         last_epoch=-1
     )
 
