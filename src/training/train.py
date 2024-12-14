@@ -111,6 +111,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                         criterion(output[1][mask], targets[1] - 1) +
                         criterion(output[2][mask], targets[2] - 10) +
                         criterion(output[3][mask], targets[3] - 13))
+                loss = loss / 4  # average loss over the 4 tasks
                 y_true.append(torch.tensor(0))  # dummy
                 y_pred.append(torch.tensor(0))  # dummy
             else:
@@ -170,6 +171,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                                 criterion(output[1][mask], targets[1] - 1) +
                                 criterion(output[2][mask], targets[2] - 10) +
                                 criterion(output[3][mask], targets[3] - 13))
+                        loss = loss / 4  # average loss over the 4 tasks
                         y_true_val.append(torch.tensor(0))  # dummy
                         y_pred_val.append(torch.tensor(0))  # dummy
                     else:
