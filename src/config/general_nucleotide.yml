@@ -10,7 +10,9 @@ test_data_file: "test_9.0k_data.pkl"
 #train_data_file: "dev_train_9.0k_data.pkl"
 #val_data_file: "dev_val_9.0k_data.pkl"
 #test_data_file: "dev_test_9.0k_data.pkl"
-pretrain_path: ""  # TODO implement (latest?)
+
+# pretrain_path: "/export/share/krausef99dm/runs/pretrain/ptrnet/3_ptrnet/weights/checkpoint_27_fold-0.pth.tar"  # TODO implement (latest?)
+pretrain_path: ""
 
 # Data params
 max_seq_length: 9000

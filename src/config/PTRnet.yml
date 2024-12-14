@@ -5,6 +5,7 @@ val_freq: 1
 warmup: 0
 batch_size: 32
 num_workers: 1
+masked_tokens: 0.15  # % of randomly masked tokens during pretraining
 
 # Model
 model: "ptrnet"
@@ -13,13 +14,11 @@ dim_embedding_token: 8  # 64 codons or 4 nucleotides/
 predictor_hidden_dim: 64  # hidden size of the output layer
 predictor_dropout: 0.1  # dropout rate of the output layer
 
-# add model specific parameters here
-# MAMBA
+# PTRnet
 d_state: 16   # SSM state expansion factor
 d_conv: 3      # Local convolution width
 expand: 2      # Block expansion factor
 num_layers: 1  # number of sequential mamba blocks
-
 
 # Optimizer
 optimizer:
@@ -28,6 +27,7 @@ optimizer:
   momentum: 0.9  # sgd only
   weight_decay: 0.1  # ranger only
 
+# Scheduler (Cosine Annealing Warm Restarts)
 lr_scheduler:
   reset_epochs: 10
   T_mult: 2
