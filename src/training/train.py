@@ -127,13 +127,12 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             # torch.nn.utils.clip_grad_norm_(model.parameters(), 1)  # TODO try gradient clipping
             optimizer.step()
             scheduler.step((epoch - 1) + (batch_idx + 1) / iters)
-            aim_run.track(scheduler.get_last_lr(), name='learning_rate_step',
-                          epoch=(epoch - 1) * iters + (batch_idx + 1))
             running_loss += loss.item()
 
         train_loss = running_loss / len(train_loader)
         losses[epoch] = {"epoch": epoch, "train_loss": train_loss}
         y_true, y_pred = np.vstack(y_true), np.vstack(y_pred)
+        aim_run.track(scheduler.get_last_lr(), name='learning_rate_curr', epoch=epoch)
 
         if config.binary_class:
             train_neg_auc = -roc_auc_score(y_true, y_pred)
