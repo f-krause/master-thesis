@@ -8,6 +8,7 @@ from omegaconf import OmegaConf
 
 from data_handling.train_val_test_indices import get_train_val_test_indices, get_train_val_test_indices_from_file
 from data_handling.data_utils import store_data, check_identical
+from knowledge_db import TOKENS
 
 MAX_SEQ_LENGTH = 9000  # Maximum number of codons in CDS (note: 3' and 5' tails (UTR) are removed)
 MAX_DATA = 300_000  # 182_625 seq-tuple pairs in total
@@ -16,8 +17,6 @@ train_identifiers_path = "/export/share/krausef99dm/data/data_train/codon_train_
 val_identifiers_path = "/export/share/krausef99dm/data/data_test/codon_val_2.7k_indices.csv"
 test_identifiers_path = "/export/share/krausef99dm/data/data_test/codon_test_2.7k_indices.csv"
 SEED = 1192  # randomly drawn with np.random.randint(0,2024) on 22.10.2024, 15:00
-
-TOKENS = "01235ACGT().BEHIMSX"
 
 
 def _get_structure_pred(identifier: str, folding_algorithm="linearfold"):
