@@ -10,7 +10,7 @@ from itertools import compress
 from sklearn.model_selection import train_test_split
 from data_handling.train_val_test_indices import get_train_val_test_indices
 from data_handling.data_utils import fit_evaluate_simple_models
-from knowledge_db import CODON_MAP_DNA, TISSUES
+from knowledge_db import CODON_MAP_DNA, TISSUES, TOKENS
 
 
 class RNADataset(torch.utils.data.Dataset):
@@ -98,6 +98,38 @@ class RNADataset(torch.utils.data.Dataset):
         self.tissue_ids = self.tissue_ids.int()
         self.targets_bin = self.targets_bin.int()
 
+        # adding frequencies to rna_data
+        if config.model.lower() == "ptrnet":
+            self.freqs = self._compute_frequencies_nucleotides(self.rna_data)
+        else:
+            self.freqs = self._compute_frequencies_codons(self.rna_data)
+
+    @staticmethod
+    def _compute_frequencies_nucleotides(rna_data_nucleotides):
+        freqs = []
+        for rna in rna_data_nucleotides:
+            rna = rna.permute(1, 0)[0].tolist()
+            rna_decoded = [TOKENS[i - 1] for i in rna]
+            codon_seq = [CODON_MAP_DNA.get(''.join(rna_decoded[i:i + 3]), -1) for i in
+                         range(0, len(rna_decoded), 3)]
+            codon_seq = torch.tensor(codon_seq)
+            codon_seq = codon_seq[codon_seq != -1]
+            counts = torch.bincount(torch.tensor(codon_seq), minlength=len(CODON_MAP_DNA) + 1)[1:len(CODON_MAP_DNA) + 1]
+            freq = counts.float() / counts.sum()
+            freqs.append(freq)
+        return torch.stack(freqs)
+
+    @staticmethod
+    def _compute_frequencies_codons(rna_data_codons):
+        freqs = []
+        for rna in rna_data_codons:
+            # codon_seq = [CODON_MAP_DNA.get(''.join(rna_decoded[i:i + 3]), -1) for i in
+            #                     range(0, len(rna_decoded), 3)]
+            counts = torch.bincount(rna, minlength=len(CODON_MAP_DNA) + 1)[1:len(CODON_MAP_DNA) + 1]
+            freq = counts.float() / counts.sum()
+            freqs.append(freq)
+        return torch.stack(freqs)
+
     def _get_train_val_indices(self, config: DictConfig, mrna_sequences, fold):
         if config.nr_folds == 1:
             # train_indices, val_indices = train_test_split(range(len(mrna_sequences)), test_size=0.2,
@@ -143,23 +175,26 @@ class RNADataset(torch.utils.data.Dataset):
         return len(self.rna_data)
 
     def __getitem__(self, index):
-        return [self.rna_data[index], self.tissue_ids[index]], self.targets[index], self.targets_bin[index]
+        return [self.rna_data[index], self.freqs[index], self.tissue_ids[index]], self.targets[index], self.targets_bin[
+            index]
 
 
 def _pad_sequences(batch):
     data, targets, targets_bin = zip(*batch)
-    rna_data, tissue_ids = zip(*data)
+    rna_data, freqs, tissue_ids = zip(*data)
+    freqs = torch.stack(freqs)
     tissue_ids = torch.tensor(tissue_ids)
     seq_lengths = torch.tensor([seq.size(0) for seq in rna_data])
 
     rna_data_padded = torch.nn.utils.rnn.pad_sequence(rna_data, batch_first=True)
 
-    return [rna_data_padded, tissue_ids, seq_lengths], torch.tensor(targets), torch.tensor(targets_bin)
+    return [rna_data_padded, tissue_ids, seq_lengths, freqs], torch.tensor(targets), torch.tensor(targets_bin)
 
 
 def _pad_sequences_and_reverse(batch):
     data, targets, targets_bin = zip(*batch)
-    rna_data, tissue_ids = zip(*data)
+    rna_data, freqs, tissue_ids = zip(*data)
+    freqs = torch.stack(freqs)
     tissue_ids = torch.tensor(tissue_ids)
     seq_lengths = torch.tensor([seq.size(0) for seq in rna_data])
 
@@ -167,7 +202,7 @@ def _pad_sequences_and_reverse(batch):
 
     rna_data_padded = torch.nn.utils.rnn.pad_sequence(rna_data, batch_first=True)
 
-    return [rna_data_padded, tissue_ids, seq_lengths], torch.tensor(targets), torch.tensor(targets_bin)
+    return [rna_data_padded, tissue_ids, seq_lengths, freqs], torch.tensor(targets), torch.tensor(targets_bin)
 
 
 def get_train_data_loaders(config: DictConfig, fold: int):
@@ -211,11 +246,12 @@ if __name__ == "__main__":
     from utils import set_project_path, set_log_file
 
     dev_config = OmegaConf.create(
-        {"project_path": None, "log_file_path": None, "subproject": "dev/delete_me", "dev": True, "model": "baseline",
-         "train_data_file": "codon_train_2.7k_data.pkl", "val_data_file": "codon_val_2.7k_data.pkl",
-         "test_data_file": "codon_test_2.7k_data.pkl", "batch_size": 4, "num_workers": 4, "val_fraction_of_train": 0.15,
-         "folding_algorithm": "viennarna", "seed": 42, "nr_folds": 3, "random_reverse": True,
-         "tissue_id": -1, "binary_class": True, "frequency_features": False}
+        {"project_path": None, "log_file_path": None, "subproject": "dev/delete_me", "dev": True,
+         # "model": "ptrnet", "train_data_file": "dev_train_9.0k_data.pkl",  # test nucleotide level data
+         "model": "baseline", "train_data_file": "codon_dev_train_2.7k_data.pkl",  # test codon level data
+         "val_data_file": "codon_val_2.7k_data.pkl", "test_data_file": "codon_test_2.7k_data.pkl", "batch_size": 4,
+         "num_workers": 4, "val_fraction_of_train": 0, "folding_algorithm": "viennarna", "seed": 42, "nr_folds": 3,
+         "random_reverse": True, "tissue_id": -1, "binary_class": True, "frequency_features": True}
     )
     set_project_path(dev_config)
     set_log_file(dev_config)

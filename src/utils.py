@@ -12,6 +12,8 @@ from omegaconf import DictConfig, OmegaConf
 from fvcore.nn import FlopCountAnalysis, flop_count_table
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, roc_curve, auc, RocCurveDisplay
 
+from knowledge_db import CODON_MAP_DNA
+
 
 def mkdir(path: str):
     os.makedirs(path, exist_ok=True)
@@ -209,7 +211,8 @@ def get_model_stats(config: DictConfig, model, device, logger):
         sample_input = [
             torch.nn.utils.rnn.pad_sequence(sequences, batch_first=True),  # rna_data_padded (B x N x D)
             torch.randint(29, (config.batch_size,)),  # tissue_ids (B)
-            torch.tensor(seq_lengths, dtype=torch.int64)  # seq_lengths (B)
+            torch.tensor(seq_lengths, dtype=torch.int64),  # seq_lengths (B)
+            torch.randn(config.batch_size, len(CODON_MAP_DNA)),  # frequency_features (B x 64)
         ]
     else:
         sample_input = [
