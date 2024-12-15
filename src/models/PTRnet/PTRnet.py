@@ -35,7 +35,6 @@ class PTRnet(nn.Module):
 
         # Embedding layers of input features
         nr_tokens = len(TOKENS) + 2  # + 1 for padding, one for pretraining MASK token
-
         self.tissue_encoder = nn.Embedding(len(TISSUES), self.dim_embedding_tissue, max_norm=config.embedding_max_norm)
         self.seq_encoder = nn.Embedding(nr_tokens, self.dim_embedding_token, padding_idx=0,
                                         max_norm=config.embedding_max_norm)
@@ -66,8 +65,7 @@ class PTRnet(nn.Module):
             self.predictor = Predictor(config, self.output_dim).to(self.device)
 
     def forward(self, inputs: Tensor, mask: Tensor = None) -> Tensor:
-        # rna_data.append(torch.tensor([sequence_ohe, coding_area_ohe, sec_struc_ohe, loop_type_ohe]))  # 4 x n
-        rna_data_pad, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
+        rna_data, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
 
         tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_token)
         seq_embedding = self.seq_encoder(rna_data)  # (batch_size, seq_len, dim_embedding_token)
@@ -75,10 +73,10 @@ class PTRnet(nn.Module):
         # sum up the embeddings of the 4 features (nucleotide, coding_area, sec_struc, loop_type)
         seq_embedding = seq_embedding.sum(dim=2)
 
-        tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, seq_embedding.size(1), -1)
+        # contextualize with tissue embedding
+        x = seq_embedding + tissue_embedding.unsqueeze(1)  # (batch_size, padded_seq_length, dim_embedding_token)
 
-        x = seq_embedding + tissue_embedding_expanded  # (batch_size, padded_seq_length, dim_embedding_token)
-
+        # Apply padding mask to zero out tissue embedding for padded tokens
         padding_mask = (seq_embedding != 0).to(self.device)
         x *= padding_mask
 
