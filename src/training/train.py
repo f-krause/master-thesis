@@ -44,9 +44,6 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     mkdir(checkpoint_path)
     logger.info(f"Checkpoint path: {checkpoint_path}")
 
-    train_loader, val_loader = get_train_data_loaders(config, fold=fold)
-    iters = len(train_loader)
-
     model = get_model(config, device, logger)
 
     if config.pretrain_path:
@@ -71,7 +68,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     # scheduler = TimmCosineLRScheduler(optimizer, t_initial=config.epochs, lr_min=1e-6)
     scheduler = CosineAnnealingWarmRestarts(
         optimizer,
-        T_0=config.lr_scheduler.reset_epochs * iters,  # First restart after 10 steps
+        T_0=config.lr_scheduler.reset_epochs,  # First restart after 10 steps
         T_mult=config.lr_scheduler.T_mult,  # Double the period after each restart
         eta_min=config.lr_scheduler.min_lr,
         last_epoch=-1
@@ -85,6 +82,8 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
         criterion = torch.nn.MSELoss()
 
     early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
+
+    train_loader, val_loader = get_train_data_loaders(config, fold=fold)
 
     logger.info(f"Starting training fold {fold}")
     start_time = time.time()
@@ -126,9 +125,9 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             loss.backward()
             # torch.nn.utils.clip_grad_norm_(model.parameters(), 1)  # TODO try gradient clipping
             optimizer.step()
-            scheduler.step((epoch - 1) + (batch_idx + 1) / iters)
             running_loss += loss.item()
 
+        scheduler.step(epoch)
         train_loss = running_loss / len(train_loader)
         losses[epoch] = {"epoch": epoch, "train_loss": train_loss}
         y_true, y_pred = np.vstack(y_true), np.vstack(y_pred)
