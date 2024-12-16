@@ -128,10 +128,13 @@ def set_trial_parameters(trial, config):
     params_general = OmegaConf.load('config/param_tuning/general_param.yml')
 
     # set the hyperparameters for the trial
-    config.optimizer.lr = trial.suggest_categorical('lr', params_general.lr)
     # config.batch_size = trial.suggest_categorical('batch_size', params_general.batch_size)
     config.dim_embedding_tissue = trial.suggest_categorical('dim_embedding', params_general.dim_embedding)
     config.dim_embedding_token = config.dim_embedding_tissue
+    config.predictor_hidden = trial.suggest_categorical('predictor_hidden', params_general.predictor_hidden)
+    config.predictor_dropout = trial.suggest_categorical('predictor_dropout', params_general.predictor_dropout)
+    config.optimizer.lr = trial.suggest_categorical('lr', params_general.lr)
+    config.lr_scheduler.reset_epochs = trial.suggest_categorical('reset_epochs', params_general.reset_epochs)
 
     try:
         params_model = OmegaConf.load(f'config/param_tuning/{config.model}_param.yml')
