@@ -1,5 +1,5 @@
 # Training
-epochs: 6
+epochs: 200
 save_freq: 1
 val_freq: 1
 warmup: 0

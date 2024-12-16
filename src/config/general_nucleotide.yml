@@ -17,6 +17,7 @@ pretrain_path: ""
 # Data params
 max_seq_length: 9000
 binary_class: True
+seq_only: True
 frequency_features: False
 random_reverse: True
 tissue_id: -1  # 0-28 or -1 for all tissues
@@ -35,3 +36,11 @@ clean_up_weights: True  # if True, will remove the non-optimal model weights aft
 # Paths
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
+
+# Optuna params
+optuna:
+  storage: 'sqlite:////export/share/krausef99dm/tuning_dbs/'  # will set up subfolder for model
+  study_name: 'seq_only_v1'
+  n_trials: 250
+  n_startup_trials: 20
+  timeout: 86400  # in seconds (86400 = 24h)
