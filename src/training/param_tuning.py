@@ -10,6 +10,7 @@ from models.get_model import get_model
 from data_handling.data_loader import get_train_data_loaders
 from training.optimizer import get_optimizer
 from training.early_stopper import EarlyStopper
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
 
 
 def train_tune_fold(config: DictConfig, train_loader, val_loader, trial):
@@ -18,6 +19,10 @@ def train_tune_fold(config: DictConfig, train_loader, val_loader, trial):
     optimizer = get_optimizer(model, config.optimizer)
     criterion = torch.nn.BCELoss() if config.binary_class else torch.nn.MSELoss()
     early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
+
+    scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=config.lr_scheduler.reset_epochs,
+                                            T_mult=config.lr_scheduler.T_mult,
+                                            eta_min=config.lr_scheduler.min_lr, last_epoch=-1)
 
     losses = {}
 
@@ -42,6 +47,7 @@ def train_tune_fold(config: DictConfig, train_loader, val_loader, trial):
             y_true.append(target.unsqueeze(1).cpu().detach().numpy())
             y_pred.append(output.cpu().detach().numpy())
 
+        scheduler.step(epoch)
         train_loss = running_loss / len(train_loader)
         losses[epoch] = {"epoch": epoch, "train_loss": train_loss}
         y_true, y_pred = np.vstack(y_true), np.vstack(y_pred)
@@ -122,10 +128,13 @@ def set_trial_parameters(trial, config):
     params_general = OmegaConf.load('config/param_tuning/general_param.yml')
 
     # set the hyperparameters for the trial
-    config.optimizer.lr = trial.suggest_categorical('lr', params_general.lr)
     # config.batch_size = trial.suggest_categorical('batch_size', params_general.batch_size)
     config.dim_embedding_tissue = trial.suggest_categorical('dim_embedding', params_general.dim_embedding)
     config.dim_embedding_token = config.dim_embedding_tissue
+    config.predictor_hidden = trial.suggest_categorical('predictor_hidden', params_general.predictor_hidden)
+    config.predictor_dropout = trial.suggest_categorical('predictor_dropout', params_general.predictor_dropout)
+    config.optimizer.lr = trial.suggest_categorical('lr', params_general.lr)
+    config.lr_scheduler.reset_epochs = trial.suggest_categorical('reset_epochs', params_general.reset_epochs)
 
     try:
         params_model = OmegaConf.load(f'config/param_tuning/{config.model}_param.yml')
