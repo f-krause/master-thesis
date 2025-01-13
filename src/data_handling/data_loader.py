@@ -175,13 +175,13 @@ class RNADataset(torch.utils.data.Dataset):
         return len(self.rna_data)
 
     def __getitem__(self, index):
-        return [self.rna_data[index], self.freqs[index], self.tissue_ids[index]], self.targets[index], self.targets_bin[
-            index]
+        return ([self.rna_data[index], self.tissue_ids[index], self.freqs[index]], self.targets[index],
+                self.targets_bin[index])
 
 
 def _pad_sequences(batch):
     data, targets, targets_bin = zip(*batch)
-    rna_data, freqs, tissue_ids = zip(*data)
+    rna_data, tissue_ids, freqs = zip(*data)
     freqs = torch.stack(freqs)
     tissue_ids = torch.tensor(tissue_ids)
     seq_lengths = torch.tensor([seq.size(0) for seq in rna_data])
@@ -193,7 +193,7 @@ def _pad_sequences(batch):
 
 def _pad_sequences_and_reverse(batch):
     data, targets, targets_bin = zip(*batch)
-    rna_data, freqs, tissue_ids = zip(*data)
+    rna_data, tissue_ids, freqs = zip(*data)
     freqs = torch.stack(freqs)
     tissue_ids = torch.tensor(tissue_ids)
     seq_lengths = torch.tensor([seq.size(0) for seq in rna_data])

@@ -12,7 +12,7 @@ MASK_TOKEN = len(TOKENS) + 1
 
 def naive_masking(data, config: DictConfig):
     # Mask 5% of the tokens randomly (just as an example)
-    rna_data, tissue_ids, seq_lengths = data
+    rna_data, tissue_ids, seq_lengths, freq = data
     batch_size, max_len, dim = rna_data.shape
     device = rna_data.device
 
@@ -31,7 +31,7 @@ def naive_masking(data, config: DictConfig):
     # Replace masked positions with MASK_TOKEN (for all features)
     rna_data[mask] = MASK_TOKEN
 
-    return [rna_data, tissue_ids, seq_lengths], targets, mask
+    return [rna_data, tissue_ids, seq_lengths, freq], targets, mask
 
 
 def apply_masking_strategy(rna_data, mask, device):
@@ -78,8 +78,7 @@ def base_level_masking(data, config: DictConfig, motif_cache=None, motif_tree_di
     #    80% -> [MASK]
     #    10% -> original token
     #    10% -> random token from the vocab (per-column aligned)
-
-    rna_data, tissue_ids, seq_lengths = data
+    rna_data, tissue_ids, seq_lengths, freq = data
     batch_size, max_len, dim = rna_data.shape
     device = rna_data.device
 
@@ -100,7 +99,7 @@ def base_level_masking(data, config: DictConfig, motif_cache=None, motif_tree_di
     rna_data = apply_masking_strategy(rna_data, mask, device)
 
     # Return mutated data, targets, and mask
-    return [rna_data, tissue_ids, seq_lengths], targets, mask
+    return [rna_data, tissue_ids, seq_lengths, freq], targets, mask
 
 
 def subsequence_masking(data, config: DictConfig, motif_cache=None, motif_tree_dict=None):
@@ -110,8 +109,7 @@ def subsequence_masking(data, config: DictConfig, motif_cache=None, motif_tree_d
     #  - Select ~15% of tokens to predict.
     #  - Split these tokens into a few contiguous subsequences.
     #  - Mask each subsequence with the same 80/10/10 rule as above.
-
-    rna_data, tissue_ids, seq_lengths = data
+    rna_data, tissue_ids, seq_lengths, freq = data
     batch_size, max_len, dim = rna_data.shape
     device = rna_data.device
 
@@ -144,12 +142,12 @@ def subsequence_masking(data, config: DictConfig, motif_cache=None, motif_tree_d
     # Apply the 80/10/10 replacements
     rna_data = apply_masking_strategy(rna_data, mask, device)
 
-    return [rna_data, tissue_ids, seq_lengths], targets, mask
+    return [rna_data, tissue_ids, seq_lengths, freq], targets, mask
 
 
 def motif_level_masking(data, config, motif_cache, motif_tree_dict):
     # data = [rna_data: (B, N, D), tissue_ids: (B,), seq_lengths: (B,)]
-    rna_data, tissue_ids, seq_lengths = data
+    rna_data, tissue_ids, seq_lengths, freq = data
     batch_size, max_len, dim = rna_data.shape
     device = rna_data.device
 
@@ -233,7 +231,7 @@ def motif_level_masking(data, config, motif_cache, motif_tree_dict):
     # Apply the 80/10/10 replacements
     rna_data = apply_masking_strategy(rna_data, mask, device)
 
-    return [rna_data, tissue_ids, seq_lengths], targets, mask
+    return [rna_data, tissue_ids, seq_lengths, freq], targets, mask
 
 
 def get_pretrain_mask_data(data, config: DictConfig, motif_cache, motif_tree_dict):
