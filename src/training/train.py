@@ -66,13 +66,14 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     # scheduler = GradualWarmupScheduler(
     #     optimizer, multiplier=8, total_epoch=float(config.epochs), after_scheduler=None)
     # scheduler = TimmCosineLRScheduler(optimizer, t_initial=config.epochs, lr_min=1e-6)
-    scheduler = CosineAnnealingWarmRestarts(
-        optimizer,
-        T_0=config.lr_scheduler.reset_epochs,  # First restart after 10 steps
-        T_mult=config.lr_scheduler.T_mult,  # Double the period after each restart
-        eta_min=config.lr_scheduler.min_lr,
-        last_epoch=-1
-    )
+    if config.lr_scheduler.enable:
+        scheduler = CosineAnnealingWarmRestarts(
+            optimizer,
+            T_0=config.lr_scheduler.reset_epochs,  # First restart after 10 steps
+            T_mult=config.lr_scheduler.T_mult,  # Double the period after each restart
+            eta_min=config.lr_scheduler.min_lr,
+            last_epoch=-1
+        )
 
     if config.pretrain:
         criterion = torch.nn.CrossEntropyLoss()
@@ -127,11 +128,14 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             optimizer.step()
             running_loss += loss.item()
 
-        scheduler.step(epoch)
+        if config.lr_scheduler.enable and epoch > config.lr_scheduler.warmup:
+            scheduler.step(epoch - config.lr_scheduler.warmup)
+            aim_run.track(scheduler.get_last_lr(), name='learning_rate_curr', epoch=epoch)
+
         train_loss = running_loss / len(train_loader)
         losses[epoch] = {"epoch": epoch, "train_loss": train_loss}
         y_true, y_pred = np.vstack(y_true), np.vstack(y_pred)
-        aim_run.track(scheduler.get_last_lr(), name='learning_rate_curr', epoch=epoch)
+
 
         if config.binary_class:
             train_neg_auc = -roc_auc_score(y_true, y_pred)

@@ -26,6 +26,7 @@ final_evaluation: True  # if True, will evaluate the model on the train val set 
 clean_up_weights: True  # if True, will remove the non-optimal model weights after training
 
 # Paths
+pretrain_path: ""  # optional, path to pretrain model weights
 project_path: ""  # optional, project path with data and model weights
 log_file_path: "" # optional
 
@@ -36,3 +37,12 @@ optuna:
   n_trials: 150
   n_startup_trials: 10
   timeout: 86400  # in seconds (86400 = 24h)
+
+# Scheduler (Cosine Annealing Warm Restarts)
+lr_scheduler:
+  enable: False  # not used in codon setting
+  warmup: 0
+#  warmup: 20  # for pretrain
+  reset_epochs: 5
+  T_mult: 2
+  min_lr: 1e-6

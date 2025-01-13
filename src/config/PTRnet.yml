@@ -4,6 +4,7 @@ save_freq: 1
 val_freq: 1
 warmup: 0
 batch_size: 32
+#batch_size: 64  # for pretrain
 num_workers: 1
 masked_tokens: 0.15  # % of randomly masked tokens during pretraining
 
@@ -23,10 +24,14 @@ num_layers: 2  # number of sequential mamba blocks
 # Optimizer
 optimizer:
   name: adam  # sgd, adam, ranger
-  lr: 0.001
+  lr: 0.0001
+#  lr: 0.0001  # for pretrain
 
 # Scheduler (Cosine Annealing Warm Restarts)
 lr_scheduler:
+  enable: True
+  warmup: 0
+#  warmup: 20  # for pretrain
   reset_epochs: 5
   T_mult: 2
   min_lr: 1e-6
