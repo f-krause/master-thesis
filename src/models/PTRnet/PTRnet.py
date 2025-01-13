@@ -71,7 +71,7 @@ class PTRnetPure(nn.Module):
             self.predictor = Predictor(config, self.output_dim).to(self.device)
 
     def forward(self, inputs: Tensor) -> Tensor:
-        rna_data, tissue_id, seq_lengths = inputs[0], inputs[1], inputs[2]
+        rna_data, tissue_id, seq_lengths, codon_freqs = inputs[0], inputs[1], inputs[2], inputs[3]
 
         tissue_embedding = self.tissue_encoder(tissue_id)  # (batch_size, dim_embedding_tissue)
         seq_embedding = self.seq_encoder(rna_data)  # (batch_size, seq_len, 4, dim_embedding_token)
@@ -108,7 +108,7 @@ class PTRnetPure(nn.Module):
             idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, x.size(2)))
             x_last = x.gather(1, idx).squeeze(1)
             if self.frequency_features:
-                x_last = torch.cat([x_last, inputs[3]], dim=-1)
+                x_last = torch.cat([x_last, codon_freqs], dim=-1)
             y_pred = self.predictor(x_last)
 
         return y_pred
@@ -141,6 +141,7 @@ if __name__ == "__main__":
         "gpu_id": 0,
         "pretrain": False,
         "frequency_features": True,
+        "seq_only": False,
     })
 
     sequences, seq_lengths = [], []
