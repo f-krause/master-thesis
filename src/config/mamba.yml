@@ -25,6 +25,7 @@ num_layers: 1  # number of sequential mamba blocks
 optimizer:
   name: adam
   lr: 0.01
+  weight_decay: 0
 
 
 #### Best Mamba2 Config
@@ -47,3 +48,4 @@ optimizer:
 #optimizer:
 #  name: adam
 #  lr: 0.01
+#  weight_decay: 0

@@ -21,4 +21,4 @@ optimizer:
   name: adam  # sgd, adam, ranger
   lr: 0.001
   momentum: 0.9  # sgd only
-  weight_decay: 0.1  # ranger only
+  weight_decay: 0  # ranger only

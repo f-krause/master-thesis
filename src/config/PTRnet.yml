@@ -26,6 +26,7 @@ optimizer:
   name: adam  # sgd, adam, ranger
   lr: 0.0001
 #  lr: 0.0001  # for pretrain
+  weight_decay: 0.01
 
 # Scheduler (Cosine Annealing Warm Restarts)
 lr_scheduler:

@@ -7,7 +7,7 @@ def get_optimizer(model, optimizer_config: DictConfig):
     optimizer_name = optimizer_config.name
 
     if optimizer_name == 'adam':
-        return optim.Adam(model.parameters(), lr=optimizer_config.lr)
+        return optim.AdamW(model.parameters(), lr=optimizer_config.lr, weight_decay=optimizer_config.weight_decay)
     elif optimizer_name == 'ranger':
         return Ranger(model.parameters(), lr=optimizer_config.lr, weight_decay=optimizer_config.weight_decay)
     elif optimizer_name == 'sgd':

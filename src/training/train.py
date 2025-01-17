@@ -136,7 +136,6 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
         losses[epoch] = {"epoch": epoch, "train_loss": train_loss}
         y_true, y_pred = np.vstack(y_true), np.vstack(y_pred)
 
-
         if config.binary_class:
             train_neg_auc = -roc_auc_score(y_true, y_pred)
             losses[epoch].update({"train_neg_auc": train_neg_auc})
