@@ -79,6 +79,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
         criterion = torch.nn.CrossEntropyLoss()
     elif config.binary_class:
         criterion = torch.nn.BCELoss()
+        criterion_2 = torch.nn.MSELoss()
     else:
         criterion = torch.nn.MSELoss()
 
@@ -116,11 +117,16 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                 y_pred.append(torch.tensor(0))  # dummy
             else:
                 if config.binary_class:
-                    target = target_bin
-                target = target.to(device)
+                    # target = target_bin  # FIXME for experiments
+                    target = target_bin.to(device)
+                    target = torch.concat([target.unsqueeze(1), data[3]], dim=1)
+                # target = target.to(device)  # FIXME
                 output = model(data)
-                loss = criterion(output.squeeze().float(), target.float())
-                y_true.append(target.unsqueeze(1).cpu().detach().numpy())
+                # target, output = target.detach(), output.detach()
+                loss_bce = criterion(output[:, 0], target[:, 0].float())
+                loss_mse = criterion_2(output[:, 1:], target[:, 1:].float())
+                loss = loss_bce + loss_mse
+                y_true.append(target.cpu().detach().numpy())  # .unsqueeze(1)
                 y_pred.append(output.cpu().detach().numpy())
 
             loss.backward()
@@ -137,7 +143,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
         y_true, y_pred = np.vstack(y_true), np.vstack(y_pred)
 
         if config.binary_class:
-            train_neg_auc = -roc_auc_score(y_true, y_pred)
+            train_neg_auc = -roc_auc_score(y_true[:, 0], y_pred[:, 0])
             losses[epoch].update({"train_neg_auc": train_neg_auc})
             aim_run.track(train_neg_auc, name="train_neg_auc", epoch=epoch)
 
@@ -177,12 +183,17 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                         y_pred_val.append(torch.tensor(0))  # dummy
                     else:
                         if config.binary_class:
-                            target = target_bin
-                        target = target.to(device)
+                            # target = target_bin  # FIXME for experiments
+                            target = target_bin.to(device)
+                            target = torch.concat([target.unsqueeze(1), data[3]], dim=1)
+                        # target = target.to(device)  # FIXME
                         output = model(data)
-                        loss = criterion(output.squeeze().float(), target.float())
-                        y_true_val.append(target.unsqueeze(1).cpu().numpy())
-                        y_pred_val.append(output.cpu().numpy())
+                        # target, output = target.detach(), output.detach()
+                        loss_bce = criterion(output[:, 0], target[:, 0].float())
+                        loss_mse = criterion_2(output[:, 1:], target[:, 1:].float())
+                        loss = loss_bce + loss_mse
+                        y_true_val.append(target.cpu().detach().numpy())  # .unsqueeze(1)
+                        y_pred_val.append(output.cpu().detach().numpy())
 
                     val_loss += loss.item()
 
@@ -194,7 +205,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             aim_run.track(val_loss, name='val_loss', epoch=epoch)
 
             if config.binary_class:
-                val_neg_auc = -roc_auc_score(y_true_val, y_pred_val)
+                val_neg_auc = -roc_auc_score(y_true_val[:, 0], y_pred_val[:, 0])
                 losses[epoch].update({"val_neg_auc": val_neg_auc})
                 logger.info(f'Validation neg AUC:  {val_neg_auc}')
                 aim_run.track(val_neg_auc, name="val_neg_auc", epoch=epoch)

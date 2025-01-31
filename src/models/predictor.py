@@ -14,7 +14,8 @@ class Predictor(nn.Module):
             nn.Linear(input_size, config.predictor_hidden_dim),
             nn.GELU(),
             nn.Dropout(p=config.predictor_dropout),
-            nn.Linear(config.predictor_hidden_dim, 1)
+            # nn.Linear(config.predictor_hidden_dim, 1)  # FIXME for experiments
+            nn.Linear(config.predictor_hidden_dim, 65)
         ]
 
         if config.binary_class:

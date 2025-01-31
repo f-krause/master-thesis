@@ -90,6 +90,9 @@ class PTRnetPure(nn.Module):
         padding_mask = (seq_embedding != 0).to(self.device)
         x *= padding_mask
 
+        # codon_freqs_repeated = codon_freqs.unsqueeze(1).repeat(1, rna_data.shape[1], 1)  # Shape (8, n, 64)
+        # x = torch.cat((codon_freqs_repeated, x), dim=-1)  # Shape (8, n, 192)
+
         # Pass through Mamba layers with residual connections and layer norm
         if self.nr_layers > 1:
             for layer, lnorm in zip(self.mamba_layers, self.mamba_norms):
@@ -108,8 +111,8 @@ class PTRnetPure(nn.Module):
             # Extract last valid time step
             idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, x.size(2)))
             x_last = x.gather(1, idx).squeeze(1)
-            if self.frequency_features:
-                x_last = torch.cat([x_last, codon_freqs], dim=-1)
+            # if self.frequency_features:
+            #     x_last = torch.cat([x_last, codon_freqs], dim=-1)
             y_pred = self.predictor(x_last)
 
         return y_pred
@@ -141,7 +144,7 @@ if __name__ == "__main__":
         "embedding_max_norm": 2,
         "gpu_id": 0,
         "pretrain": False,
-        "frequency_features": True,
+        "frequency_features": False,
         "seq_only": False,
     })
 
