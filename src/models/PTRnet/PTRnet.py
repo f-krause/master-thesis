@@ -29,6 +29,7 @@ class PTRnetPure(nn.Module):
         self.nr_layers = config.num_layers
         self.dim_embedding_tissue = config.dim_embedding_tissue
         self.dim_embedding_token = config.dim_embedding_token
+        self.input_size = self.dim_embedding_token  # + len(CODON_MAP_DNA)
 
         if self.frequency_features:
             self.output_dim = self.dim_embedding_token + len(CODON_MAP_DNA)
@@ -42,14 +43,14 @@ class PTRnetPure(nn.Module):
 
         # Layer norms
         if self.nr_layers > 1:
-            self.mamba_norms = nn.ModuleList([nn.LayerNorm(self.dim_embedding_token) for _ in range(self.nr_layers)])
-            self.layer_norm_final = nn.LayerNorm(self.dim_embedding_token)
+            self.mamba_norms = nn.ModuleList([nn.LayerNorm(self.input_size) for _ in range(self.nr_layers)])
+            self.layer_norm_final = nn.LayerNorm(self.input_size)
 
         # Mamba model
         self.mamba_layers = nn.ModuleList(
             [
                 Mamba(
-                    d_model=self.dim_embedding_token,  # Model dimension d_model
+                    d_model=self.input_size,  # Model dimension d_model (in-/output size)
                     d_state=config.d_state,  # SSM state expansion factor
                     d_conv=config.d_conv,  # Local convolution width
                     expand=config.expand,  # Block expansion factor
