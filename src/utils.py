@@ -247,7 +247,7 @@ def log_pred_true_scatter(y_true, y_pred, binary_class=False):
 
     min_val = min(min(y_true), min(y_pred))
     max_val = max(max(y_true), max(y_pred))
-    plt.plot([min_val, max_val], [min_val, max_val], color='grey', linestyle='--')
+    plt.plot([min_val, max_val], [0.5, 0.5], color='grey', linestyle='--')
 
     # Save the plot to an in-memory buffer
     buffer = io.BytesIO()
