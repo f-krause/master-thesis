@@ -12,7 +12,7 @@ class PositionalEncoding(nn.Module):
         # TODO figure out what is going on here
         # https://medium.com/image-processing-with-python/positional-encoding-in-the-transformer-model-e8e9979df57f
         # https://machinelearningmastery.com/a-gentle-introduction-to-positional-encoding-in-transformer-models-part-1/
-        # Algorithm from: https://pytorch.org/tutorials/intermediate/pipeline_tutorial.html, se vaswani
+        # Algorithm from: https://pytorch.org/tutorials/intermediate/pipeline_tutorial.html, see vaswani
         super(PositionalEncoding, self).__init__()
         # self.dropout = nn.Dropout(p=dropout)  # TODO could include dropout here
         pe = torch.zeros(max_len, d_model)  # (max_len, d_model)
