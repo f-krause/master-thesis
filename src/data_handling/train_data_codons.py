@@ -9,7 +9,7 @@ from knowledge_db import CODON_MAP_DNA
 from train_val_test_indices import get_train_val_test_indices
 from data_utils import store_data, check_identical
 
-MAX_SEQ_LENGTH = 2700  # Maximum number of codons in CDS (note: 3' and 5' tails (UTR) are removed)
+MAX_SEQ_LENGTH = 2700  # Maximum number of nucleotides in CDS (note: 3' and 5' tails (UTR) are removed)
 MAX_DATA = 300_000  # 182_625 seq-tuple pairs in total
 SEED = 1192  # randomly drawn with np.random.randint(0,2024) on 22.10.2024, 15:00
 
@@ -96,8 +96,9 @@ if __name__ == '__main__':
         FILE_NAME += "_"
 
     dev_config = OmegaConf.create(
-        {"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
-         "batch_size": 32, "num_workers": 4})
+        {"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline", "pretrain": False,
+         "batch_size": 32, "num_workers": 4, "train_data_file": "", "dev": True, "binary_class": False,
+         "frequency_features": False})
     set_project_path(dev_config)
 
     get_train_data_file(FILE_NAME, check_reproduce=CHECK_REPRODUCTION)
