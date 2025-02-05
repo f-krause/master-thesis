@@ -246,10 +246,12 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                               os.environ["SUBPROJECT"], logger, aim_run)
         metric_train = evaluate(y_true_train_best, y_pred_train_best, "train", best_epoch, fold,
                                 config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
+        aim_run.close()
         return {"metric_val": float(metric_val), "metric_train": float(metric_train), "best_epoch": best_epoch,
                 "training_time_min": training_time}
-
-    return {"best_epoch": best_epoch, "training_time_min": training_time}
+    else:
+        aim_run.close()
+        return {"best_epoch": best_epoch, "training_time_min": training_time}
 
 
 @discord_sender(webhook_url="https://discord.com/api/webhooks/1308890399942774946/"
