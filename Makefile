@@ -10,4 +10,4 @@
 # packing
 pack:
 	@echo "🗂️ Packaging code into flatfile - use as knowledge base for Claude/aider/etc."
-	@uvx repopack "$(CURDIR)/src" --ignore *lock*,.github/*,.mypy_cache/*,architecture-diagram*,*.svg,*.ipynb,pretraining/motif_db/* --output "codebase.txt"
+	@uvx repopack "$(CURDIR)/src" --ignore *lock*,.github/*,.mypy_cache/*,architecture-diagram*,*.svg,*.ipynb,pretraining/motif_db/*,data_handling/folding_algorithms/* --output "codebase.txt"
