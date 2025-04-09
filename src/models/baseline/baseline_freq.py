@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from omegaconf import DictConfig
-from knowledge_db import TISSUES, CODON_MAP_DNA
+from utils.knowledge_db import TISSUES, CODON_MAP_DNA
 
 
 class ModelBaseline(nn.Module):

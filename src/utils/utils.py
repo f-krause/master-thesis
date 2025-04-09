@@ -12,7 +12,7 @@ from omegaconf import DictConfig, OmegaConf
 from fvcore.nn import FlopCountAnalysis, flop_count_table
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, roc_curve, auc, RocCurveDisplay
 
-from knowledge_db import CODON_MAP_DNA
+from utils.knowledge_db import CODON_MAP_DNA
 
 
 def mkdir(path: str):
@@ -89,23 +89,23 @@ def get_config(args):
     if args.custom_path:
         config_path = args.custom_path
     elif args.baseline:
-        config_path = "config/baseline.yml"
+        config_path = "../config/baseline.yml"
     elif args.cnn:
-        config_path = "config/cnn.yml"
+        config_path = "../config/cnn.yml"
     elif args.gru:
-        config_path = "config/gru.yml"
+        config_path = "../config/gru.yml"
     elif args.lstm:
-        config_path = "config/lstm.yml"
+        config_path = "../config/lstm.yml"
     elif args.xlstm:
-        config_path = "config/xlstm.yml"
+        config_path = "../config/xlstm.yml"
     elif args.mamba:
-        config_path = "config/mamba.yml"
+        config_path = "../config/mamba.yml"
     elif args.transformer:
-        config_path = "config/transformer.yml"
+        config_path = "../config/transformer.yml"
     elif args.legnet:
-        config_path = "config/LEGnet.yml"
+        config_path = "../config/LEGnet.yml"
     elif args.ptrnet:
-        config_path = "config/PTRnet.yml"
+        config_path = "../config/PTRnet.yml"
     else:
         raise ValueError("No config file specified.")
 
@@ -113,10 +113,10 @@ def get_config(args):
 
     if args.ptrnet:  # TODO add more cases
         # Config for nucleotide sequence based models
-        general_config = OmegaConf.load("config/general_nucleotide.yml")
+        general_config = OmegaConf.load("../config/general_nucleotide.yml")
     else:
         # Config for codon based models
-        general_config = OmegaConf.load("config/general_codon.yml")
+        general_config = OmegaConf.load("../config/general_codon.yml")
 
     config = OmegaConf.merge(general_config, model_config)
 

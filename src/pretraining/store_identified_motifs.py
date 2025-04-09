@@ -51,7 +51,7 @@ def precompute_motif_matches(sequences, motif_tree, store: bool = False, cache_p
 if __name__ == '__main__':
     import torch
     from omegaconf import OmegaConf
-    from utils import set_project_path
+    from utils.utils import set_project_path
     from pretraining.pretrain_utils import get_motif_tree_dict
     from data_handling.data_loader import RNADataset
 

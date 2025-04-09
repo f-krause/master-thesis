@@ -11,7 +11,7 @@ from omegaconf import OmegaConf, DictConfig
 from knockknock import discord_sender
 
 from log.logger import setup_logger
-from utils import save_checkpoint, mkdir, get_device, get_model_stats, clean_model_weights
+from utils.utils import save_checkpoint, mkdir, get_device, get_model_stats, clean_model_weights
 from models.get_model import get_model
 from data_handling.data_loader import get_train_data_loaders
 from training.optimizer import get_optimizer

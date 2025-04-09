@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.model_selection import cross_validate
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
-from knowledge_db import CODON_MAP_DNA, TISSUES
+from utils.knowledge_db import CODON_MAP_DNA, TISSUES
 
 
 def fit_evaluate_simple_models(train_dataset, val_dataset, binary_class=False):

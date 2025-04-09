@@ -8,7 +8,7 @@ from omegaconf import OmegaConf
 
 from data_handling.train_val_test_indices import get_train_val_test_indices, get_train_val_test_indices_from_file
 from data_handling.data_utils import store_data, check_identical
-from knowledge_db import TOKENS
+from utils.knowledge_db import TOKENS
 
 MAX_SEQ_LENGTH = 9000  # Maximum number of codons in CDS (note: 3' and 5' tails (UTR) are removed)
 MAX_DATA = 300_000  # 182_625 seq-tuple pairs in total
@@ -122,7 +122,7 @@ def get_train_data_file(file_name: str, check_reproduce=False):
 
 
 if __name__ == '__main__':
-    from utils import set_project_path
+    from utils.utils import set_project_path
 
     CHECK_REPRODUCTION = True
     FILE_NAME = ""

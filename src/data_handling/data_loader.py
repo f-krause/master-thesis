@@ -7,10 +7,10 @@ from torch.utils.data import DataLoader
 from log.logger import setup_logger
 from itertools import compress
 
-from sklearn.model_selection import train_test_split
 from data_handling.train_val_test_indices import get_train_val_test_indices
-from data_handling.data_utils import fit_evaluate_simple_models
-from knowledge_db import CODON_MAP_DNA, TISSUES, TOKENS
+from utils.knowledge_db import CODON_MAP_DNA, TISSUES, TOKENS
+# from sklearn.model_selection import train_test_split
+# from data_handling.data_utils import fit_evaluate_simple_models
 
 
 class RNADataset(torch.utils.data.Dataset):
@@ -243,7 +243,7 @@ def get_test_data_loader(config: DictConfig):
 
 if __name__ == "__main__":
     # for debugging
-    from utils import set_project_path, set_log_file
+    from utils.utils import set_project_path, set_log_file
 
     dev_config = OmegaConf.create(
         {"project_path": None, "log_file_path": None, "subproject": "dev/delete_me", "dev": True,

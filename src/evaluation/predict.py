@@ -6,7 +6,7 @@ from omegaconf import OmegaConf, DictConfig
 from tqdm import tqdm
 
 from evaluation.evaluate import evaluate
-from utils import mkdir, set_project_path, get_device
+from utils.utils import mkdir, set_project_path, get_device
 from models.get_model import get_model
 from log.logger import setup_logger
 from data_handling.data_loader import get_train_data_loaders, get_val_data_loader, get_test_data_loader

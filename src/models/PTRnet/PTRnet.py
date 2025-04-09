@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
 from omegaconf import DictConfig, OmegaConf
-from knowledge_db import TISSUES, CODON_MAP_DNA
+from utils.knowledge_db import TISSUES, CODON_MAP_DNA
 
 from models.predictor import Predictor
 from mamba_ssm import Mamba, Mamba2

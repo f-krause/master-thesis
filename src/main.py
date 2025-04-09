@@ -5,7 +5,7 @@ from omegaconf import DictConfig
 from knockknock import discord_sender
 
 from log.logger import setup_logger
-from utils import set_log_file, set_project_path, get_config, set_seed
+from utils.utils import set_log_file, set_project_path, get_config, set_seed
 
 parser = argparse.ArgumentParser(prog='main.py', description='Trains DL models on mRNA data to predict PTR ratios.')
 

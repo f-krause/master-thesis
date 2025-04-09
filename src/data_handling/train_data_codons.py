@@ -5,7 +5,7 @@ import torch
 import numpy as np
 from omegaconf import OmegaConf, DictConfig
 
-from knowledge_db import CODON_MAP_DNA
+from utils.knowledge_db import CODON_MAP_DNA
 from train_val_test_indices import get_train_val_test_indices
 from data_utils import store_data, check_identical
 
@@ -87,7 +87,7 @@ def get_train_data_file(file_name: str, check_reproduce=False):
 
 
 if __name__ == '__main__':
-    from utils import set_project_path
+    from utils.utils import set_project_path
 
     CHECK_REPRODUCTION = True
     FILE_NAME = "codon"

@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.metrics import confusion_matrix, roc_auc_score, accuracy_score, precision_score, recall_score, f1_score, \
     mean_absolute_error, mean_squared_error, root_mean_squared_error, r2_score
 
-from utils import mkdir, log_pred_true_scatter, log_confusion_matrix, log_roc_curve
+from utils.utils import mkdir, log_pred_true_scatter, log_confusion_matrix, log_roc_curve
 
 
 def evaluate(y_true, y_pred, dataset, best_epoch, fold, binary_class, subproject, logger, aim_tracker=None):

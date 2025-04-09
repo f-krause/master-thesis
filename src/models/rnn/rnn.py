@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 from omegaconf import DictConfig, OmegaConf
-from knowledge_db import TISSUES, CODON_MAP_DNA
+from utils.knowledge_db import TISSUES, CODON_MAP_DNA
 
 from models.predictor import Predictor
 

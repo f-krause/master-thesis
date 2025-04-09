@@ -3,7 +3,7 @@ import pandas as pd
 from omegaconf import OmegaConf
 from collections import defaultdict
 
-from knowledge_db import TISSUES
+from utils.knowledge_db import TISSUES
 
 
 def get_train_val_test_indices(mrna_sequences, val_frac=0.15, test_frac=0.15, num_bins=10, random_state=None):
@@ -124,7 +124,7 @@ def get_train_val_test_indices_from_file(identifiers, train_identifiers_path, va
 
 
 if __name__ == "__main__":
-    from utils import set_project_path, set_log_file
+    from utils.utils import set_project_path
 
     dev_config = OmegaConf.create({"project_path": None, "subproject": "dev"})
     set_project_path(dev_config)

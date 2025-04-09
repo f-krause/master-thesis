@@ -5,7 +5,7 @@ from tqdm import tqdm
 from sklearn.metrics import roc_auc_score, root_mean_squared_error
 from omegaconf import OmegaConf, DictConfig
 
-from utils import get_device, set_seed
+from utils.utils import get_device, set_seed
 from models.get_model import get_model
 from data_handling.data_loader import get_train_data_loaders
 from training.optimizer import get_optimizer
