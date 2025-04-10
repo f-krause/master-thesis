@@ -48,7 +48,7 @@ def InvSqrt(optimizer, warmup_step):
     return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
 
 
-def Constant(optimizer, warmup_step):
+def constant(optimizer, warmup_step):
     def lr_lambda(step):
         if step == warmup_step:  # also covers the case where both are 0
             return 1.
