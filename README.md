@@ -67,6 +67,10 @@ Data path
 /export/share/krausef99dm/
 ```
 
+Download a file from remote
+```shell
+scp krausef99dm@rey.dm.univie.ac.at:/export/share/krausef99dm/data/FILE C:/Users/Felix/code/uni/UniVie/master-thesis/data/FILE
+```
 
 ### Environment
 Export environment dependencies
@@ -94,6 +98,12 @@ Count files in a directory
 ```shell
 ls -1 | wc -l
 ```
+
+### Aider
+```bash
+aider --model o3-mini --api-key openai=<key> --no-auto-commits
+```
+
 
 
 ## More
