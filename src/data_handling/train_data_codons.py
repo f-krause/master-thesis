@@ -1,9 +1,9 @@
 import os
-import json
 import pickle
 import torch
 import numpy as np
-from omegaconf import OmegaConf, DictConfig
+from omegaconf import OmegaConf
+from tqdm import tqdm
 
 from utils.knowledge_db import CODON_MAP_DNA
 from train_val_test_indices import get_train_val_test_indices
@@ -16,6 +16,7 @@ SEED = 1192  # randomly drawn with np.random.randint(0,2024) on 22.10.2024, 15:0
 
 def get_train_data_file(file_name: str, check_reproduce=False):
     """Store data for training, validation and testing"""
+    print("Loading data")
     with open(os.path.join(os.environ["PROJECT_PATH"], "data/ptr_data/ptr_data.pkl"), 'rb') as f:
         raw_data = pickle.load(f)
 
@@ -26,7 +27,8 @@ def get_train_data_file(file_name: str, check_reproduce=False):
     targets = []
     targets_bin = []
 
-    for identifier, content in raw_data.items():
+    print("Starting data processing")
+    for identifier, content in tqdm(raw_data.items()):
         sequence = content['fasta']
         bed_annotation = content['bed_annotation']
 
@@ -68,20 +70,21 @@ def get_train_data_file(file_name: str, check_reproduce=False):
 
     if check_reproduce:
         check_identical(train_indices, identifiers, tissue_ids,
-                         f"data/data_train/{file_name}train_{max_seq_len_logging}")
+                        f"data/data_train/{file_name}train_{max_seq_len_logging}")
         check_identical(val_indices, identifiers, tissue_ids,
-                         f"data/data_test/{file_name}val_{max_seq_len_logging}")
+                        f"data/data_test/{file_name}val_{max_seq_len_logging}")
         check_identical(test_indices, identifiers, tissue_ids,
-                         f"data/data_test/{file_name}test_{max_seq_len_logging}")
+                        f"data/data_test/{file_name}test_{max_seq_len_logging}")
     else:
+        print("Storing data")
         store_data(identifiers, rna_data, tissue_ids, targets, targets_bin, train_indices,
-                    f"data/data_train/{file_name}train_{max_seq_len_logging}")
+                   f"data/data_train/{file_name}train_{max_seq_len_logging}")
 
         store_data(identifiers, rna_data, tissue_ids, targets, targets_bin, val_indices,
-                    f"data/data_test/{file_name}val_{max_seq_len_logging}")
+                   f"data/data_test/{file_name}val_{max_seq_len_logging}")
 
         store_data(identifiers, rna_data, tissue_ids, targets, targets_bin, test_indices,
-                    f"data/data_test/{file_name}test_{max_seq_len_logging}")
+                   f"data/data_test/{file_name}test_{max_seq_len_logging}")
 
         print("Data successfully created")
 
