@@ -6,7 +6,8 @@ from collections import defaultdict
 from utils.knowledge_db import TISSUES
 
 
-def get_train_val_test_indices(mrna_sequences, val_frac=0.15, test_frac=0.15, num_bins=10, random_state=None):
+def get_train_val_test_indices(mrna_sequences, tissue_ids=None, targets_bin=None, val_frac=0.15, test_frac=0.15,
+                               num_bins=10, random_state=None):
     """
         Splits mRNA sequences into train, validation, and test sets without overlapping sequences.
         Stratification is based on sequence lengths.
@@ -14,6 +15,8 @@ def get_train_val_test_indices(mrna_sequences, val_frac=0.15, test_frac=0.15, nu
 
         Parameters:
         - mrna_seq (list): List of coding mRNA sequences (sequences may repeat if they have multiple targets).
+        - tissue_ids (list): List of tissue IDs (0-28) for each sequence.
+        - targets_bin (list): List of binary targets for each sequence (low/high PTR).
         - train_frac (float): Fraction of data for training set.
         - val_frac (float): Fraction of data for validation set.
         - test_frac (float): Fraction of data for test set.
