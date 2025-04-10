@@ -1,3 +1,5 @@
+# Create train, validation and test data for NUCLEOTIDE dataset (regression and binary classification task)
+
 import os
 import json
 import pickle

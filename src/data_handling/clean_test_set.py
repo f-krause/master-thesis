@@ -78,6 +78,6 @@ def main(data_path, seq_file_name, cod_file_name):
 if __name__ == "__main__":
     data_path = "/export/share/krausef99dm/data/data_test/"
     seq_file_name = "test_9.0k"
-    cod_file_name = "codon_test_2.7k"
+    cod_file_name = "codon_test_8.1k"
 
     main(data_path, seq_file_name, cod_file_name)

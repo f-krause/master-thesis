@@ -64,7 +64,7 @@ def check_identical(indices: list, identifiers: list, tissue_ids: list, path: st
         persistence = pd.read_csv(os.path.join(os.environ["PROJECT_PATH"], path + "_indices.csv"))
         persistence_set = set(zip(persistence["identifier"].tolist(), persistence["target_id"].tolist()))
         if selected_set != persistence_set:
-            raise Exception("REPRODUCTION ISSUE DETECTED")
+            raise Exception("REPRODUCTION ISSUE DETECTED:", path)
         else:
             print("Reproducibility check passed!")
     except FileNotFoundError:

@@ -1,3 +1,5 @@
+# Create train, validation and test data for CODON dataset (regression and binary classification task)
+
 import os
 import pickle
 import torch
@@ -9,7 +11,7 @@ from utils.knowledge_db import CODON_MAP_DNA
 from train_val_test_indices import get_train_val_test_indices
 from data_utils import store_data, check_identical
 
-MAX_SEQ_LENGTH = 2700  # Maximum number of nucleotides in CDS (note: 3' and 5' tails (UTR) are removed)
+MAX_SEQ_LENGTH = 8_100  # Maximum number of nucleotides in CDS (note: 3' and 5' tails (UTR) are removed)
 MAX_DATA = 300_000  # 182_625 seq-tuple pairs in total
 SEED = 1192  # randomly drawn with np.random.randint(0,2024) on 22.10.2024, 15:00
 
