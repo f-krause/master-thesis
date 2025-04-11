@@ -29,11 +29,18 @@ def _get_structure_pred(identifier: str, folding_algorithm="linearfold"):
         return None, None, None
 
 
-def get_train_data_file(file_name: str, check_reproduce=False):
+def get_train_data_file(file_name: str, check_reproduce=False, balanced=False):
     """Store data for training, validation and testing.
     The data is processed from the raw data, split stratified by sequence length and in a way to assure that identical
     mRNA sequences are always in the same set.
     """
+    # check if file_name path already exists
+    max_seq_len_logging = str(MAX_SEQ_LENGTH_NUCLE / 1000) + "k"
+    if os.path.isfile(os.path.join(os.environ["PROJECT_PATH"], f"data/data_train/{file_name}train_{max_seq_len_logging}_data.pkl")) or \
+            os.path.isfile(os.path.join(os.environ["PROJECT_PATH"], f"data/data_test/{file_name}val_{max_seq_len_logging}_data.pkl")) or \
+            os.path.isfile(os.path.join(os.environ["PROJECT_PATH"], f"data/data_test/{file_name}test_{max_seq_len_logging}_data.pkl")):
+        print("WARNING: Data files already exist. Files might be overwritten!")
+
     print("Loading data")
     with open(os.path.join(os.environ["PROJECT_PATH"], "data/ptr_data/ptr_data.pkl"), 'rb') as f:
         raw_data = pickle.load(f)
@@ -81,6 +88,7 @@ def get_train_data_file(file_name: str, check_reproduce=False):
 
                 nucleotide_rna_data = torch.tensor([sequence_ohe, coding_area_ohe, sec_struc_ohe, loop_type_ohe],
                                                    dtype=torch.int8)  # 4 x n
+                nucleotide_rna_data = nucleotide_rna_data.permute(1, 0)  # change rna_data to n x 4
                 codon_rna_data = torch.tensor(encoded_sequence)
 
                 identifiers.append(identifier)
@@ -95,9 +103,11 @@ def get_train_data_file(file_name: str, check_reproduce=False):
             if len(rna_data) >= MAX_DATA:
                 break
 
-    # train_indices, val_indices, test_indices = get_train_val_test_indices(sequences, tissue_ids, targets_bin,
-    #                                                                       random_state=SEED)
-    train_indices, val_indices, test_indices = get_train_val_test_indices(sequences, random_state=SEED)
+    if balanced:
+        train_indices, val_indices, test_indices = get_train_val_test_indices(sequences, tissue_ids, targets_bin,
+                                                                              random_state=SEED)
+    else:
+        train_indices, val_indices, test_indices = get_train_val_test_indices(sequences, random_state=SEED)
 
     print("Num seq-tuple pairs TRAIN:", len(train_indices))
     print("Num seq-tuple pairs VAL:", len(val_indices))
@@ -106,8 +116,6 @@ def get_train_data_file(file_name: str, check_reproduce=False):
     # sanity checks
     assert max([len(s) for s in sequences]) <= MAX_SEQ_LENGTH_NUCLE
     assert max([len(s["codon_rna_data"]) for s in rna_data]) <= MAX_SEQ_LENGTH_CODON
-
-    max_seq_len_logging = str(MAX_SEQ_LENGTH_NUCLE / 1000) + "k"
 
     if check_reproduce:
         check_identical(train_indices, identifiers, tissue_ids,
@@ -134,7 +142,8 @@ if __name__ == '__main__':
     from utils.utils import set_project_path
 
     CHECK_REPRODUCTION = True
-    FILE_NAME = "binary_class"  # TODO make balanced by class per tissue_id
+    BALANCED = True
+    FILE_NAME = "binary_class_balanced"
 
     if FILE_NAME:
         FILE_NAME += "_"
@@ -145,4 +154,4 @@ if __name__ == '__main__':
          "frequency_features": False})
     set_project_path(dev_config)
 
-    get_train_data_file(FILE_NAME, check_reproduce=CHECK_REPRODUCTION)
+    get_train_data_file(FILE_NAME, check_reproduce=CHECK_REPRODUCTION, balanced=BALANCED)
