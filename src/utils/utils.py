@@ -234,20 +234,50 @@ def get_model_stats(config: DictConfig, model, device, logger):
     return nr_params, flops_nr
 
 
-def log_pred_true_scatter(y_true, y_pred, binary_class=False):
+def log_pred_true_scatter(y_true, y_pred, tissue_ids, limits, binary_class=False):
+    selected_tissues = np.array(range(limits[0], limits[1]))  # Convert to NumPy array for efficient filtering
+
+    # Filter y_true, y_pred, and tissue_ids
+    mask = np.isin(tissue_ids, selected_tissues)
+    y_true = np.array(y_true)[mask]
+    y_pred = np.array(y_pred)[mask]
+    tissue_ids = np.array(tissue_ids)[mask]
+
+    # Generate plot
     plt.figure(figsize=(10, 10))
+
+    # Generate y_true (adding a small uniform noise) and y_pred
     if binary_class:
-        # add small random variation to scatter plot to make it more readable
-        y_true = y_true + np.random.normal(0, 0.02, len(y_true))
-    plt.scatter(y_true, y_pred, alpha=0.5, s=10)
+        y_true = y_true + np.random.uniform(0, 0.8, len(y_true))
+
+    # Get unique tissue ids and sort them
+    unique_tissues = sorted(np.unique(tissue_ids))
+
+    # Define a list of markers to cycle through
+    markers = ['o', 's', '^', 'D']  # , 'v', 'P', '*', 'X', 'h', 'H', '8', 'p', 'd']
+    cmap = plt.get_cmap('nipy_spectral', len(unique_tissues))
+
+    for i, tissue in enumerate(unique_tissues):
+        mask = tissue_ids == tissue
+        plt.scatter(
+            y_true[mask],
+            y_pred[mask],
+            label=f'{tissue}',
+            alpha=0.5,
+            s=40,
+            c=[cmap(i)],
+            marker=markers[i % len(markers)]
+        )
 
     plt.xlabel('True Values')
     plt.ylabel('Predicted Values')
-    plt.title('y_true vs y_pred')
+    plt.title('y_true vs y_pred by Selected Tissue IDs')
+    plt.legend(title='Tissue ID', bbox_to_anchor=(1.05, 1), loc='upper left')
 
-    min_val = min(min(y_true), min(y_pred))
-    max_val = max(max(y_true), max(y_pred))
+    min_val = min(np.min(y_true), np.min(y_pred))
+    max_val = max(np.max(y_true), np.max(y_pred))
     plt.plot([min_val, max_val], [0.5, 0.5], color='grey', linestyle='--')
+    plt.tight_layout()
 
     # Save the plot to an in-memory buffer
     buffer = io.BytesIO()

@@ -21,6 +21,8 @@ from pretraining.pretrain_utils import get_motif_tree_dict
 from evaluation.evaluate import evaluate
 
 from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
+
+
 # from training.lr_scheduler import GradualWarmupScheduler, TimmCosineLRScheduler
 
 
@@ -43,6 +45,8 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     checkpoint_path = os.path.join(os.environ["PROJECT_PATH"], os.environ["SUBPROJECT"], "weights")
     mkdir(checkpoint_path)
     logger.info(f"Checkpoint path: {checkpoint_path}")
+
+    train_loader, val_loader = get_train_data_loaders(config, fold=fold)
 
     model = get_model(config, device, logger)
 
@@ -84,8 +88,6 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
 
     early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
 
-    train_loader, val_loader = get_train_data_loaders(config, fold=fold)
-
     logger.info(f"Starting training fold {fold}")
     start_time = time.time()
     end_time = None
@@ -98,7 +100,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
         model.train()
 
         running_loss = 0.0
-        y_true, y_pred = [], []
+        y_true, y_pred, tissue_ids = [], [], []
         for batch_idx, (data, target, target_bin) in enumerate(tqdm(train_loader)):
             optimizer.zero_grad()
             data = [d.to(device) for d in data]
@@ -114,6 +116,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                 loss = loss / 4  # average loss over the 4 tasks
                 y_true.append(torch.tensor(0))  # dummy
                 y_pred.append(torch.tensor(0))  # dummy
+                tissue_ids.append(torch.tensor(0))  # dummy
             else:
                 if config.binary_class:
                     target = target_bin
@@ -122,6 +125,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                 loss = criterion(output.squeeze().float(), target.float())
                 y_true.append(target.unsqueeze(1).cpu().detach().numpy())
                 y_pred.append(output.cpu().detach().numpy())
+                tissue_ids.append(data[1].cpu().detach().numpy())
 
             loss.backward()
             # torch.nn.utils.clip_grad_norm_(model.parameters(), 1)  # TODO try gradient clipping
@@ -134,7 +138,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
 
         train_loss = running_loss / len(train_loader)
         losses[epoch] = {"epoch": epoch, "train_loss": train_loss}
-        y_true, y_pred = np.vstack(y_true), np.vstack(y_pred)
+        y_true, y_pred, tissue_ids = np.vstack(y_true), np.vstack(y_pred), np.hstack(tissue_ids)
 
         if config.binary_class:
             train_neg_auc = -roc_auc_score(y_true, y_pred)
@@ -160,7 +164,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             model.eval()
 
             val_loss = 0.0
-            y_true_val, y_pred_val = [], []
+            y_true_val, y_pred_val, tissue_ids_val = [], [], []
             with torch.no_grad():
                 for data, target, target_bin in val_loader:
                     data = [d.to(device) for d in data]
@@ -183,12 +187,14 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                         loss = criterion(output.squeeze().float(), target.float())
                         y_true_val.append(target.unsqueeze(1).cpu().numpy())
                         y_pred_val.append(output.cpu().numpy())
+                        tissue_ids_val.append(data[1].cpu().numpy())
 
                     val_loss += loss.item()
 
             val_loss /= len(val_loader)
             losses[epoch].update({"val_loss": val_loss})
-            y_true_val, y_pred_val = np.vstack(y_true_val), np.vstack(y_pred_val)
+            y_true_val, y_pred_val, tissue_ids_val = np.vstack(y_true_val), np.vstack(y_pred_val), np.hstack(
+                tissue_ids_val)
 
             logger.info(f'Validation loss: {val_loss}')
             aim_run.track(val_loss, name='val_loss', epoch=epoch)
@@ -239,12 +245,11 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
         clean_model_weights(best_epoch, fold, checkpoint_path, logger)
 
     logger.info(f"Weights path: {checkpoint_path}")
-    aim_run.close()
 
     if config.final_evaluation and not config.pretrain:
-        metric_val = evaluate(y_true_val_best, y_pred_val_best, "val", best_epoch, fold, config.binary_class,
-                              os.environ["SUBPROJECT"], logger, aim_run)
-        metric_train = evaluate(y_true_train_best, y_pred_train_best, "train", best_epoch, fold,
+        metric_val = evaluate(y_true_val_best, y_pred_val_best, tissue_ids_val, "val", best_epoch, fold,
+                              config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
+        metric_train = evaluate(y_true_train_best, y_pred_train_best, tissue_ids, "train", best_epoch, fold,
                                 config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
         aim_run.close()
         return {"metric_val": float(metric_val), "metric_train": float(metric_train), "best_epoch": best_epoch,
