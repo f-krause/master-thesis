@@ -11,12 +11,12 @@ from utils.knowledge_db import CODON_MAP_DNA
 from train_val_test_indices import get_train_val_test_indices
 from data_utils import store_data, check_identical
 
-MAX_SEQ_LENGTH = 8_100  # Maximum number of nucleotides in CDS (note: 3' and 5' tails (UTR) are removed)
+MAX_SEQ_LENGTH = 8_100  # Maximum number of NUCLEOTIDES in CDS (note: 3' and 5' tails (UTR) are removed)
 MAX_DATA = 300_000  # 182_625 seq-tuple pairs in total
 SEED = 1192  # randomly drawn with np.random.randint(0,2024) on 22.10.2024, 15:00
 
 
-def get_train_data_file(file_name: str, check_reproduce=False):
+def get_train_data_file(file_name: str, regression=False, check_reproduce=False):
     """Store data for training, validation and testing"""
     print("Loading data")
     with open(os.path.join(os.environ["PROJECT_PATH"], "data/ptr_data/ptr_data.pkl"), 'rb') as f:
@@ -46,19 +46,28 @@ def get_train_data_file(file_name: str, check_reproduce=False):
         if len(coding_sequence) > MAX_SEQ_LENGTH:
             continue
         else:
-            for tissue_id, target in enumerate(content['targets']):
-                if np.isnan(target):
-                    continue
-
+            if regression:
                 identifiers.append(identifier)
                 sequences.append("".join(coding_sequence))
                 rna_data.append(torch.tensor(encoded_sequence))
-                tissue_ids.append(tissue_id)
-                targets.append(target)
-                targets_bin.append(int(data_targets_bin[tissue_id]))
+                targets.append(np.nanmean(content['targets']))
 
-                if len(rna_data) >= MAX_DATA:
-                    break
+                tissue_ids.append(torch.tensor(0))  # dummy legacy
+                targets_bin.append(torch.tensor(0))  # dummy legacy
+            else:
+                for tissue_id, target in enumerate(content['targets']):
+                    if np.isnan(target):
+                        continue
+
+                    identifiers.append(identifier)
+                    sequences.append("".join(coding_sequence))
+                    rna_data.append(torch.tensor(encoded_sequence))
+                    tissue_ids.append(tissue_id)
+                    targets.append(target)
+                    targets_bin.append(int(data_targets_bin[tissue_id]))
+
+                    if len(rna_data) >= MAX_DATA:
+                        break
             if len(rna_data) >= MAX_DATA:
                 break
 
@@ -94,7 +103,8 @@ def get_train_data_file(file_name: str, check_reproduce=False):
 if __name__ == '__main__':
     from utils.utils import set_project_path
 
-    CHECK_REPRODUCTION = True
+    CHECK_REPRODUCTION = False
+    MEAN_REGRESSION = False  # create regression dataset with mean target across tissues
     FILE_NAME = "codon"
 
     if FILE_NAME:
@@ -106,4 +116,4 @@ if __name__ == '__main__':
          "frequency_features": False})
     set_project_path(dev_config)
 
-    get_train_data_file(FILE_NAME, check_reproduce=CHECK_REPRODUCTION)
+    get_train_data_file(FILE_NAME, regression=MEAN_REGRESSION, check_reproduce=CHECK_REPRODUCTION)
