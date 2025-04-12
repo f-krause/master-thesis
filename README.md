@@ -92,6 +92,12 @@ aim up
 ssh -f -N -L 43800:localhost:43800 krausef99dm@jyn.dm.univie.ac.at
 ```
 
+### Use Optuna dashboard
+From within the data folder for optuna, run:
+```shell
+optuna-dashboard sqlite:///baseline.db
+```
+
 
 ### Other 
 Count files in a directory
