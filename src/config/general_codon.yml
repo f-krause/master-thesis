@@ -42,7 +42,7 @@ tissue_id: -1  # 0-28 or -1 for all tissues
 
 # Misc
 nr_folds: 3  # if 1, will use val_fraction_of_train or val_data_file as validation set (see below)
-val_fraction: 0.15  # only if nr_folds == 1, if 0, will use val_data_file as validation set
+val_fraction_of_train: 0.15  # only if nr_folds == 1, if 0, will use val_data_file as validation set
 embedding_max_norm: 2
 
 early_stopper_patience: 5  # disabled if < 0
