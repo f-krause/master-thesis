@@ -1,3 +1,5 @@
+# PTRnet - nucleotide level model
+
 # Training
 epochs: 200
 save_freq: 1
