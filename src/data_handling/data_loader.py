@@ -165,7 +165,7 @@ class RNADataset(torch.utils.data.Dataset):
 
         if self.config.tissue_id in range(len(TISSUES)):
             mask = tissue_ids == self.config.tissue_id
-            self.logger.warning(f"Only keeping data for tissue {TISSUES[self.config.tissue_id]}")
+            self.logger.warning(f"Only keeping data for TISSUE {TISSUES[self.config.tissue_id]}")
 
         if self.config.binary_class:
             mask_bin = targets_bin > 0  # only keep low-/high-PTR samples
