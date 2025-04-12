@@ -5,7 +5,8 @@ import numpy as np
 from sklearn.metrics import confusion_matrix, roc_auc_score, accuracy_score, precision_score, recall_score, f1_score, \
     mean_absolute_error, mean_squared_error, root_mean_squared_error, r2_score
 
-from utils.utils import mkdir, log_pred_true_scatter, log_confusion_matrix, log_roc_curve
+from utils.utils import mkdir
+from utils.evaluation_plots import log_pred_true_scatter, log_confusion_matrix, log_roc_curve
 
 
 def evaluate(y_true, y_pred, tissue_ids, dataset, best_epoch, fold, binary_class, subproject, logger, aim_tracker=None):
