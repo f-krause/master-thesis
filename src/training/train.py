@@ -240,7 +240,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     aim_run.track(training_time / best_epoch, name='avg_epoch_time')
 
     if config.model != "mamba2":
-        # FIXME, not possible to copute stats for mamba2
+        # Note: not possible to copute stats for mamba2
         nr_params, nr_flops = get_model_stats(config, model, device, logger)
         aim_run.track(nr_params, name='nr_params')
         aim_run.track(nr_flops, name='nr_flops')
