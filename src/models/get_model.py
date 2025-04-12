@@ -20,6 +20,8 @@ def get_model(config: DictConfig, device: torch.device, logger=None):
         if logger: logger.info("Using GRU model")
         from models.rnn.rnn import ModelRNN
         return ModelRNN(config, device, model="gru").to(device)
+        # from models.rnn.rnn_mean_regression import ModelGRUMeanRegression
+        # return ModelGRUMeanRegression(config, device).to(device)
     elif config.model.lower() == "lstm":
         if logger: logger.info("Using LSTM model")
         from models.rnn.rnn import ModelRNN
