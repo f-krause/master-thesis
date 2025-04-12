@@ -1,7 +1,7 @@
 # General
 seed: 2024
 gpu_id: 0
-dev: False
+dev: True
 
 # Data paths
 # note that file names might trigger certain behaviour (e.g. binary_class and codon)
