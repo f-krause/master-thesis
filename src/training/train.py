@@ -1,6 +1,7 @@
 import os
 import torch
 import time
+import pickle
 import aim  # https://aimstack.io/#demos
 import pandas as pd
 import numpy as np
@@ -10,14 +11,19 @@ from omegaconf import OmegaConf, DictConfig
 from knockknock import discord_sender
 
 from log.logger import setup_logger
-from utils import save_checkpoint, mkdir, get_device, get_model_stats, clean_model_weights
+from utils.utils import save_checkpoint, mkdir, get_device, get_model_stats, clean_model_weights
 from models.get_model import get_model
 from data_handling.data_loader import get_train_data_loaders
 from training.optimizer import get_optimizer
 from training.early_stopper import EarlyStopper
+from pretraining.pretrain_mask import get_pretrain_mask_data
+from pretraining.pretrain_utils import get_motif_tree_dict
 from evaluation.evaluate import evaluate
 
-# from training.lr_scheduler import GradualWarmupScheduler
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
+
+
+# from training.lr_scheduler import GradualWarmupScheduler, TimmCosineLRScheduler
 
 
 def train_fold(config: DictConfig, logger, fold: int = 0):
@@ -40,23 +46,53 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     mkdir(checkpoint_path)
     logger.info(f"Checkpoint path: {checkpoint_path}")
 
+    train_loader, val_loader = get_train_data_loaders(config, fold=fold)
+
     model = get_model(config, device, logger)
+
+    if config.pretrain_path:
+        checkpoint = torch.load(config.pretrain_path)
+        missing_keys, unexpected_keys = model.load_state_dict(checkpoint['state_dict'], strict=False)
+        if missing_keys:
+            print("Missing keys:", missing_keys)
+        if unexpected_keys:
+            print("Unexpected keys:", unexpected_keys)
+
+    if config.pretrain:
+        # Load necessary files (expensive, loads ~800MB)
+        logger.info("Loading motif cache")
+        with open("/export/share/krausef99dm/data/data_train/motif_matches_cache.pkl", 'rb') as f:
+            motif_cache = pickle.load(f)
+        motif_tree_dict = get_motif_tree_dict()
+
     optimizer = get_optimizer(model, config.optimizer)
 
-    if config.binary_class:
+    # scheduler = GradualWarmupScheduler(
+    #     optimizer, multiplier=8, total_epoch=float(config.epochs), after_scheduler=None)
+    # scheduler = TimmCosineLRScheduler(optimizer, t_initial=config.epochs, lr_min=1e-6)
+    if config.lr_scheduler.enable:
+        scheduler = CosineAnnealingWarmRestarts(
+            optimizer,
+            T_0=config.lr_scheduler.reset_epochs,  # First restart after 10 steps
+            T_mult=config.lr_scheduler.T_mult,  # Double the period after each restart
+            eta_min=config.lr_scheduler.min_lr,
+            last_epoch=-1
+        )
+
+    if config.pretrain:
+        criterion = torch.nn.CrossEntropyLoss()
+    elif config.binary_class:
         criterion = torch.nn.BCELoss()
     else:
         criterion = torch.nn.MSELoss()
 
     early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
 
-    train_loader, val_loader = get_train_data_loaders(config, fold=fold)
-
-    losses = {}
-
     logger.info(f"Starting training fold {fold}")
     start_time = time.time()
     end_time = None
+
+    losses = {}
     best_epoch = 1
     y_true_train_best, y_pred_train_best = None, None
     y_true_val_best, y_pred_val_best = None, None
@@ -64,24 +100,45 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
         model.train()
 
         running_loss = 0.0
-        y_true, y_pred = [], []
+        y_true, y_pred, tissue_ids = [], [], []
         for batch_idx, (data, target, target_bin) in enumerate(tqdm(train_loader)):
-            data = [d.to(device) for d in data]
-            if config.binary_class:
-                target = target_bin
-            target = target.to(device)
             optimizer.zero_grad()
-            output = model(data)
-            loss = criterion(output.squeeze().float(), target.float())
+            data = [d.to(device) for d in data]
+
+            if config.pretrain:
+                mutated_data, targets, mask = get_pretrain_mask_data(data, config, motif_cache, motif_tree_dict)
+                output = model(mutated_data)
+                # compute combined loss, need to subtract the min token value from the target to get the correct index
+                loss = (criterion(output[0][mask], targets[0] - 6) +
+                        criterion(output[1][mask], targets[1] - 1) +
+                        criterion(output[2][mask], targets[2] - 10) +
+                        criterion(output[3][mask], targets[3] - 13))
+                loss = loss / 4  # average loss over the 4 tasks
+                y_true.append(torch.tensor(0))  # dummy
+                y_pred.append(torch.tensor(0))  # dummy
+                tissue_ids.append(torch.tensor(0))  # dummy
+            else:
+                if config.binary_class:
+                    target = target_bin
+                target = target.to(device)
+                output = model(data)
+                loss = criterion(output.squeeze().float(), target.float())
+                y_true.append(target.unsqueeze(1).cpu().detach().numpy())
+                y_pred.append(output.cpu().detach().numpy())
+                tissue_ids.append(data[1].cpu().detach().numpy())
+
             loss.backward()
+            # torch.nn.utils.clip_grad_norm_(model.parameters(), 1)  # TODO try gradient clipping
             optimizer.step()
             running_loss += loss.item()
-            y_true.append(target.unsqueeze(1).cpu().detach().numpy())
-            y_pred.append(output.cpu().detach().numpy())
+
+        if config.lr_scheduler.enable and epoch > config.lr_scheduler.warmup:
+            scheduler.step(epoch - config.lr_scheduler.warmup)
+            aim_run.track(scheduler.get_last_lr(), name='learning_rate_curr', epoch=epoch)
 
         train_loss = running_loss / len(train_loader)
         losses[epoch] = {"epoch": epoch, "train_loss": train_loss}
-        y_true, y_pred = np.vstack(y_true), np.vstack(y_pred)
+        y_true, y_pred, tissue_ids = np.vstack(y_true), np.vstack(y_pred), np.hstack(tissue_ids)
 
         if config.binary_class:
             train_neg_auc = -roc_auc_score(y_true, y_pred)
@@ -107,24 +164,37 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             model.eval()
 
             val_loss = 0.0
-            y_true_val, y_pred_val = [], []
+            y_true_val, y_pred_val, tissue_ids_val = [], [], []
             with torch.no_grad():
                 for data, target, target_bin in val_loader:
                     data = [d.to(device) for d in data]
-                    if config.binary_class:
-                        target = target_bin
-                    target = target.to(device)
+                    if config.pretrain:
+                        mutated_data, targets, mask = get_pretrain_mask_data(data, config, motif_cache, motif_tree_dict)
+                        output = model(mutated_data)
+                        # compute combined loss, need to subtract the min token value from the target to get the correct index
+                        loss = (criterion(output[0][mask], targets[0] - 6) +
+                                criterion(output[1][mask], targets[1] - 1) +
+                                criterion(output[2][mask], targets[2] - 10) +
+                                criterion(output[3][mask], targets[3] - 13))
+                        loss = loss / 4  # average loss over the 4 tasks
+                        y_true_val.append(torch.tensor(0))  # dummy
+                        y_pred_val.append(torch.tensor(0))  # dummy
+                    else:
+                        if config.binary_class:
+                            target = target_bin
+                        target = target.to(device)
+                        output = model(data)
+                        loss = criterion(output.squeeze().float(), target.float())
+                        y_true_val.append(target.unsqueeze(1).cpu().numpy())
+                        y_pred_val.append(output.cpu().numpy())
+                        tissue_ids_val.append(data[1].cpu().numpy())
 
-                    output = model(data)
-                    loss = criterion(output.squeeze().float(), target.float())
                     val_loss += loss.item()
-
-                    y_true_val.append(target.unsqueeze(1).cpu().numpy())
-                    y_pred_val.append(output.cpu().numpy())
 
             val_loss /= len(val_loader)
             losses[epoch].update({"val_loss": val_loss})
-            y_true_val, y_pred_val = np.vstack(y_true_val), np.vstack(y_pred_val)
+            y_true_val, y_pred_val, tissue_ids_val = np.vstack(y_true_val), np.vstack(y_pred_val), np.hstack(
+                tissue_ids_val)
 
             logger.info(f'Validation loss: {val_loss}')
             aim_run.track(val_loss, name='val_loss', epoch=epoch)
@@ -147,6 +217,9 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                     y_true_val_best, y_pred_val_best = y_true_val.flatten(), y_pred_val.flatten()
                     y_true_train_best, y_pred_train_best = y_true.flatten(), y_pred.flatten()
 
+                    evaluate(y_true_val_best, y_pred_val_best, tissue_ids_val, "val", best_epoch,
+                             fold, config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
+
             if early_stopper.early_stop(val_loss):
                 logger.info(f"Early stopping at epoch {epoch}")
                 aim_run.track(1, name='early_stopping', epoch=epoch)
@@ -166,27 +239,27 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     aim_run.track(training_time, name='training_time_min')
     aim_run.track(training_time / best_epoch, name='avg_epoch_time')
 
-    if config.model != "best" and config.model != "mamba2":
+    if config.model != "mamba2":
+        # Note: not possible to copute stats for mamba2
         nr_params, nr_flops = get_model_stats(config, model, device, logger)
         aim_run.track(nr_params, name='nr_params')
         aim_run.track(nr_flops, name='nr_flops')
-
-    if config.final_evaluation:
-        metric_val = evaluate(y_true_val_best, y_pred_val_best, "val", best_epoch, fold, config.binary_class,
-                              os.environ["SUBPROJECT"], logger, aim_run)
-        metric_train = evaluate(y_true_train_best, y_pred_train_best, "train", best_epoch, fold,
-                                config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
 
     if config.clean_up_weights:
         clean_model_weights(best_epoch, fold, checkpoint_path, logger)
 
     logger.info(f"Weights path: {checkpoint_path}")
-    aim_run.close()
 
-    if config.final_evaluation:
+    if config.final_evaluation and not config.pretrain:
+        metric_val = evaluate(y_true_val_best, y_pred_val_best, tissue_ids_val, "val", best_epoch, fold,
+                              config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
+        metric_train = evaluate(y_true_train_best, y_pred_train_best, tissue_ids, "train", best_epoch, fold,
+                                config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
+        aim_run.close()
         return {"metric_val": float(metric_val), "metric_train": float(metric_train), "best_epoch": best_epoch,
                 "training_time_min": training_time}
     else:
+        aim_run.close()
         return {"best_epoch": best_epoch, "training_time_min": training_time}
 
 
@@ -198,7 +271,7 @@ def train(config: DictConfig):
     for fold in range(config.nr_folds):
         results[fold] = train_fold(config, logger, fold)
 
-    if config.final_evaluation:
+    if config.final_evaluation and not config.pretrain:
         metrics_val = [results[fold]["metric_val"] for fold in range(config.nr_folds)]
         metrics_train = [results[fold]["metric_train"] for fold in range(config.nr_folds)]
         results["cv_metrics_val"] = {"mean": float(np.mean(metrics_val)), "std": float(np.std(metrics_val))}

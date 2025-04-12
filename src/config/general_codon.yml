@@ -1,20 +1,48 @@
 # General
 seed: 2024
 gpu_id: 0
-dev: False
+dev: True
 
-# Data
-train_data_file: "codon_train_2.7k_data.pkl"
+# Data paths
+# note that file names might trigger certain behaviour (e.g. binary_class and codon)
+
 #train_data_file: "codon_dev_train_2.7k_data.pkl"  # DEV (also: codon_dev_1k_data.pkl)
-max_seq_length: 2700
+train_data_file: "codon_train_8.1k_data.pkl"  # full dataset
+val_data_file: "codon_val_8.1k_data.pkl"
+test_data_file: "codon_test_8.1k_data.pkl"
+
+#train_data_file: "dev_binary_class_balanced_train_9.0k_data.pkl"  # binary, balanced across tissues
+#val_data_file: "dev_binary_class_balanced_val_9.0k_data.pkl"
+#test_data_file: "dev_binary_class_balanced_test_9.0k_data.pkl"
+
+#train_data_file: "binary_class_balanced_train_9.0k_data.pkl"
+#val_data_file: "binary_class_balanced_val_9.0k_data.pkl"
+#test_data_file: "binary_class_balanced_test_9.0k_data.pkl"
+
+#train_data_file: "dev_codon_mean_regression_train_8.1k_data.pkl"  # regression, mean across tissues
+#val_data_file: "dev_codon_mean_regression_val_8.1k_data.pkl"
+#test_data_file: "dev_codon_mean_regression_test_8.1k_data.pkl"
+
+#train_data_file: "codon_mean_regression_train_8.1k_data.pkl"
+#val_data_file: "codon_mean_regression_val_8.1k_data.pkl"
+#test_data_file: "codon_mean_regression_test_8.1k_data.pkl"
+
+pretrain_path: ""  # optional, path to pretrain model weights
+project_path: ""  # optional, project path with data and model weights
+log_file_path: "" # optional
+
+
+# Data params
+max_seq_length: 2700  # IN CODONS => 8100 nucleotides
 binary_class: True
 frequency_features: False
 random_reverse: True
 tissue_id: -1  # 0-28 or -1 for all tissues
 
+
 # Misc
-nr_folds: 3  # if 1, will take val_fraction % of the train data as validation set during training ("train val")
-val_fraction: 0.15  # only if nr_folds == 1
+nr_folds: 3  # if 1, will use val_fraction_of_train or val_data_file as validation set (see below)
+val_fraction_of_train: 0.15  # only if nr_folds == 1, if 0, will use val_data_file as validation set
 embedding_max_norm: 2
 
 early_stopper_patience: 5  # disabled if < 0
@@ -23,9 +51,6 @@ early_stopper_delta: 0.01
 final_evaluation: True  # if True, will evaluate the model on the train val set after training
 clean_up_weights: True  # if True, will remove the non-optimal model weights after training
 
-# Paths
-project_path: ""  # optional, project path with data and model weights
-log_file_path: "" # optional
 
 # Optuna params
 optuna:
@@ -34,3 +59,12 @@ optuna:
   n_trials: 150
   n_startup_trials: 10
   timeout: 86400  # in seconds (86400 = 24h)
+
+# Scheduler (Cosine Annealing Warm Restarts)
+lr_scheduler:
+  enable: False  # not used in codon setting
+  warmup: 0
+#  warmup: 20  # for pretrain
+  reset_epochs: 5
+  T_mult: 2
+  min_lr: 1e-6

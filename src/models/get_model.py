@@ -3,7 +3,7 @@ from omegaconf import DictConfig
 
 
 def get_model(config: DictConfig, device: torch.device, logger=None):
-    if config.frequency_features and config.model not in ["baseline", "transformer"]:
+    if config.frequency_features and config.model.lower() not in ["baseline", "transformer", "ptrnet"]:
         raise ValueError(f"Frequency features only supported for baseline and transformer models, not {config.model}")
     elif config.model.lower() == "baseline":
         if config.frequency_features:
@@ -20,6 +20,8 @@ def get_model(config: DictConfig, device: torch.device, logger=None):
         if logger: logger.info("Using GRU model")
         from models.rnn.rnn import ModelRNN
         return ModelRNN(config, device, model="gru").to(device)
+        # from models.rnn.rnn_mean_regression import ModelGRUMeanRegression
+        # return ModelGRUMeanRegression(config, device).to(device)
     elif config.model.lower() == "lstm":
         if logger: logger.info("Using LSTM model")
         from models.rnn.rnn import ModelRNN

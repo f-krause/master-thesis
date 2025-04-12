@@ -67,6 +67,10 @@ Data path
 /export/share/krausef99dm/
 ```
 
+Download a file from remote
+```shell
+scp krausef99dm@rey.dm.univie.ac.at:/export/share/krausef99dm/data/FILE C:/Users/Felix/code/uni/UniVie/master-thesis/data/FILE
+```
 
 ### Environment
 Export environment dependencies
@@ -88,12 +92,24 @@ aim up
 ssh -f -N -L 43800:localhost:43800 krausef99dm@jyn.dm.univie.ac.at
 ```
 
+### Use Optuna dashboard
+From within the data folder for optuna, run:
+```shell
+optuna-dashboard sqlite:///baseline.db
+```
+
 
 ### Other 
 Count files in a directory
 ```shell
 ls -1 | wc -l
 ```
+
+### Aider
+```bash
+aider --model o3-mini --api-key openai=<key> --no-auto-commits
+```
+
 
 
 ## More

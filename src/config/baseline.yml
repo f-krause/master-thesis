@@ -20,6 +20,7 @@ dropout: 0.1
 optimizer:
   name: adam
   lr: 0.001
+  weight_decay: 0
 
 
 # FOR FREQUENCY DATA
@@ -36,3 +37,4 @@ optimizer:
 #optimizer:
 #  name: adam
 #  lr: 0.01
+#  weight_decay: 0

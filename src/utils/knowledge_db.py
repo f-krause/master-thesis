@@ -1,3 +1,5 @@
+TOKENS = "01235ACGT().BEHIMSX"
+
 TISSUES = ['Adrenal', 'Appendices', 'Brain', 'Colon', 'Duodenum', 'Uterus',
            'Esophagus', 'Fallopiantube', 'Fat', 'Gallbladder', 'Heart', 'Kidney',
            'Liver', 'Lung', 'Lymphnode', 'Ovary', 'Pancreas', 'Placenta',

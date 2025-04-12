@@ -5,7 +5,7 @@ from omegaconf import DictConfig
 from knockknock import discord_sender
 
 from log.logger import setup_logger
-from utils import set_log_file, set_project_path, get_config, set_seed
+from utils.utils import set_log_file, set_project_path, get_config, set_seed
 
 parser = argparse.ArgumentParser(prog='main.py', description='Trains DL models on mRNA data to predict PTR ratios.')
 
@@ -20,7 +20,9 @@ parser.add_argument('-m', "--mamba", help="Use mamba config", action="store_true
 parser.add_argument('-t', "--transformer", help="Use transformer config", action="store_true")
 parser.add_argument("--legnet", help="Use LEGnet config", action="store_true")
 parser.add_argument("--ptrnet", help="Use PTRNet config", action="store_true")
+parser.add_argument("--pretrain", help="pretrain model in MLM setting", action="store_true")
 parser.add_argument("--tune", help="Run optuna based hyperparameter tuning", action="store_true")
+
 
 args = parser.parse_args()
 

@@ -1,3 +1,5 @@
+# Create train, validation and test data for NUCLEOTIDE dataset (regression and binary classification task)
+
 import os
 import json
 import pickle
@@ -6,13 +8,16 @@ import torch
 import numpy as np
 from omegaconf import OmegaConf
 
-from train_val_test_indices import get_train_val_test_indices
-from data_utils import store_data, check_identical
+from data_handling.train_val_test_indices import get_train_val_test_indices, get_train_val_test_indices_from_file
+from data_handling.data_utils import store_data, check_identical
+from utils.knowledge_db import TOKENS
 
-MAX_SEQ_LENGTH = 8100  # Maximum number of codons in CDS (note: 3' and 5' tails (UTR) are removed)
+MAX_SEQ_LENGTH = 9_000  # Maximum number of codons in CDS (note: 3' and 5' tails (UTR) are removed)
 MAX_DATA = 300_000  # 182_625 seq-tuple pairs in total
 FOLDING_ALG = "linearfold"
-TOKENS = "01235ACGT().BEHIMSX"
+train_identifiers_path = "/export/share/krausef99dm/data/data_train/codon_train_8.1k_indices.csv"
+val_identifiers_path = "/export/share/krausef99dm/data/data_test/codon_val_8.1k_indices.csv"
+test_identifiers_path = "/export/share/krausef99dm/data/data_test/codon_test_8.1k_indices.csv"
 SEED = 1192  # randomly drawn with np.random.randint(0,2024) on 22.10.2024, 15:00
 
 
@@ -65,7 +70,8 @@ def get_train_data_file(file_name: str, check_reproduce=False):
                 sec_struc_ohe = [TOKENS.index(c) + 1 for c in sec_struc]
                 loop_type_ohe = [TOKENS.index(c) + 1 for c in loop_type]
 
-                rna_data.append(torch.tensor([sequence_ohe, coding_area_ohe, sec_struc_ohe, loop_type_ohe]))  # 4 x n
+                rna_data.append(torch.tensor([sequence_ohe, coding_area_ohe, sec_struc_ohe, loop_type_ohe],
+                                             dtype=torch.int8))  # 4 x n
 
                 identifiers.append(identifier)
                 sequences.append(sequence)
@@ -79,13 +85,23 @@ def get_train_data_file(file_name: str, check_reproduce=False):
             if len(rna_data) >= MAX_DATA:
                 break
 
-    train_indices, val_indices, test_indices = get_train_val_test_indices(sequences, random_state=SEED)
+    rna_data = [ts.permute(1, 0) for ts in rna_data]  # change rna_data to n x 4
+
+    # NOTE: can create train-val-test split with either random_state or from codon split files for max comparability
+    # indices = get_train_val_test_indices(sequences, random_state=SEED)
+    indices = get_train_val_test_indices_from_file(identifiers, train_identifiers_path, val_identifiers_path,
+                                                   test_identifiers_path)
+    train_indices, val_indices, test_indices = indices
 
     print("Num seq-tuple pairs TRAIN:", len(train_indices))
     print("Num seq-tuple pairs VAL:", len(val_indices))
     print("Num seq-tuple pairs TEST:", len(test_indices))
 
     max_seq_len_logging = str(MAX_SEQ_LENGTH / 1000) + "k"
+
+    # assert len(train_indices) > 1000, "Not enough data for training"
+    # assert len(val_indices) > 100, "Not enough data for validation"
+    # assert len(test_indices) > 100, "Not enough data for testing"
 
     if check_reproduce:
         check_identical(train_indices, identifiers, tissue_ids,
@@ -108,7 +124,7 @@ def get_train_data_file(file_name: str, check_reproduce=False):
 
 
 if __name__ == '__main__':
-    from utils import set_project_path
+    from utils.utils import set_project_path
 
     CHECK_REPRODUCTION = True
     FILE_NAME = ""
@@ -119,7 +135,7 @@ if __name__ == '__main__':
     dev_config = OmegaConf.create(
         {"project_path": None, "log_file_path": None, "subproject": "dev", "model": "baseline",
          "batch_size": 32, "num_workers": 4, "train_data_file": "NONONONO", "dev": True, "binary_class": False,
-         "frequency_features": False})
+         "frequency_features": False, "pretrain": False})
     set_project_path(dev_config)
 
     get_train_data_file(FILE_NAME, check_reproduce=CHECK_REPRODUCTION)

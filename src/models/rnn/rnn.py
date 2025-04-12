@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 from omegaconf import DictConfig, OmegaConf
-from knowledge_db import TISSUES, CODON_MAP_DNA
+from utils.knowledge_db import TISSUES, CODON_MAP_DNA
 
 from models.predictor import Predictor
 
@@ -50,19 +50,19 @@ class ModelRNN(nn.Module):
                                                            enforce_sorted=False)
 
         if isinstance(self.rnn, nn.LSTM):
-            h, _ = self.rnn(x_packed)
+            out, _ = self.rnn(x_packed)
         elif isinstance(self.rnn, nn.GRU):
-            h, _ = self.rnn(x_packed)
+            out, _ = self.rnn(x_packed)
         else:
             raise ValueError(f"RNN type {type(self.rnn)} not supported")
 
-        h_unpacked, _ = torch.nn.utils.rnn.pad_packed_sequence(h, batch_first=True, padding_value=0)
+        out_unpacked, _ = torch.nn.utils.rnn.pad_packed_sequence(out, batch_first=True, padding_value=0)
 
         # Extract outputs corresponding to the last valid time step
-        idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, h_unpacked.size(2)))
-        h_last = h_unpacked.gather(1, idx).squeeze(1)
+        idx = ((seq_lengths - 1).unsqueeze(1).unsqueeze(2).expand(-1, 1, out_unpacked.size(2)))
+        out_last = out_unpacked.gather(1, idx).squeeze(1)
 
-        y_pred = self.predictor(h_last)
+        y_pred = self.predictor(out_last)
 
         return y_pred
 

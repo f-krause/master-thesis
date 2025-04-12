@@ -1,16 +1,14 @@
 import os
-import io
 import datetime
 import platform
 import torch
 import random
 import numpy as np
-from PIL import Image
-import matplotlib.pyplot as plt
-from log.logger import setup_logger
 from omegaconf import DictConfig, OmegaConf
 from fvcore.nn import FlopCountAnalysis, flop_count_table
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, roc_curve, auc, RocCurveDisplay
+
+from log.logger import setup_logger
+from utils.knowledge_db import CODON_MAP_DNA
 
 
 def mkdir(path: str):
@@ -39,6 +37,8 @@ def get_run_path(config, project_path, runs_folder="runs"):
 
     if config.binary_class:
         path_components.append("binary")
+    elif config.pretrain:
+        path_components.append("pretrain")
     else:
         path_components.append("regr")
 
@@ -100,6 +100,8 @@ def get_config(args):
         config_path = "config/transformer.yml"
     elif args.legnet:
         config_path = "config/LEGnet.yml"
+    elif args.ptrnet:
+        config_path = "config/PTRnet.yml"
     else:
         raise ValueError("No config file specified.")
 
@@ -107,7 +109,7 @@ def get_config(args):
 
     if args.ptrnet:  # TODO add more cases
         # Config for nucleotide sequence based models
-        general_config = OmegaConf.load("config/general_base.yml")
+        general_config = OmegaConf.load("config/general_nucleotide.yml")
     else:
         # Config for codon based models
         general_config = OmegaConf.load("config/general_codon.yml")
@@ -116,6 +118,11 @@ def get_config(args):
 
     if args.gpu_id is not None:
         OmegaConf.update(config, "gpu_id", args.gpu_id)
+
+    OmegaConf.update(config, "pretrain", args.pretrain)
+    if args.pretrain:
+        # If pretraining, force model to not be in binary classification mode
+        OmegaConf.update(config, "binary_class", False)
 
     return config
 
@@ -183,12 +190,33 @@ def set_seed(seed):
 
 def get_model_stats(config: DictConfig, model, device, logger):
     logger.info("Computing model statistics, assuming input is max codon sequence and tissue type (only).")
-    sample_input = [
-        # rna_data_padded (batch_size x max_seq_length)
-        torch.nn.utils.rnn.pad_sequence(torch.randint(1, 64, (1, config.max_seq_length)), batch_first=True),
-        torch.randint(29, (1,)),  # tissue_ids (batch_size x 1)
-        torch.tensor([config.max_seq_length], dtype=torch.int64)  # seq_lengths (batch_size x 1)
-    ]
+    if config.model == "ptrnet":
+        sequences, seq_lengths = [], []
+        for i in range(config.batch_size):
+            length = torch.randint(100, config.max_seq_length + 1, (1,)).item()
+            # Generate each column with its own integer range
+            col0 = torch.randint(low=6, high=10, size=(length,))  # values in [6,9] - seq ohe
+            col1 = torch.randint(low=1, high=6, size=(length,))  # values in [1,5] - coding area
+            col2 = torch.randint(low=10, high=13, size=(length,))  # values in [10,12] - loop type pred
+            col3 = torch.randint(low=13, high=20, size=(length,))  # values in [13,19] - sec structure pred
+
+            seq = torch.stack([col0, col1, col2, col3], dim=-1)
+            sequences.append(seq)
+            seq_lengths.append(length)
+
+        sample_input = [
+            torch.nn.utils.rnn.pad_sequence(sequences, batch_first=True),  # rna_data_padded (B x N x D)
+            torch.randint(29, (config.batch_size,)),  # tissue_ids (B)
+            torch.tensor(seq_lengths, dtype=torch.int64),  # seq_lengths (B)
+            torch.randn(config.batch_size, len(CODON_MAP_DNA)),  # frequency_features (B x 64)
+        ]
+    else:
+        sample_input = [
+            # rna_data_padded (batch_size x max_seq_length)
+            torch.nn.utils.rnn.pad_sequence(torch.randint(1, 64, (1, config.max_seq_length)), batch_first=True),
+            torch.randint(29, (1,)),  # tissue_ids (batch_size x 1)
+            torch.tensor([config.max_seq_length], dtype=torch.int64)  # seq_lengths (batch_size x 1)
+        ]
 
     sample_input = [x.to(device) for x in sample_input]
     flops = FlopCountAnalysis(model, sample_input)
@@ -200,61 +228,3 @@ def get_model_stats(config: DictConfig, model, device, logger):
     logger.info(f"Model: FLOPs table: \n{flop_count_table(flops)}")
 
     return nr_params, flops_nr
-
-
-def log_pred_true_scatter(y_true, y_pred, binary_class=False):
-    plt.figure(figsize=(10, 10))
-    if binary_class:
-        # add small random variation to scatter plot to make it more readable
-        y_true = y_true + np.random.normal(0, 0.02, len(y_true))
-    plt.scatter(y_true, y_pred, alpha=0.5, s=10)
-
-    plt.xlabel('True Values')
-    plt.ylabel('Predicted Values')
-    plt.title('y_true vs y_pred')
-
-    min_val = min(min(y_true), min(y_pred))
-    max_val = max(max(y_true), max(y_pred))
-    plt.plot([min_val, max_val], [min_val, max_val], color='grey', linestyle='--')
-
-    # Save the plot to an in-memory buffer
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png')
-    buffer.seek(0)
-    plt.close()
-
-    return Image.open(buffer)
-
-
-def log_confusion_matrix(y_true, y_pred):
-    y_pred = [1 if target > 0.5 else 0 for target in y_pred]  # make target binary, tau = 0.5
-
-    plt.figure(figsize=(10, 10))
-    cm = confusion_matrix(y_true, y_pred)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-    disp.plot()
-
-    # Save the plot to an in-memory buffer
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png')
-    buffer.seek(0)
-    plt.close()
-
-    return Image.open(buffer)
-
-
-def log_roc_curve(y_true, y_pred):
-    plt.figure(figsize=(10, 10))
-    fpr, tpr, thresholds = roc_curve(y_true, y_pred)
-    roc_auc = auc(fpr, tpr)
-    disp = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name='estimator')
-    disp.plot()
-    plt.plot([0, 1], [0, 1], 'k--', label='No Skill')
-
-    # Save the plot to an in-memory buffer
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png')
-    buffer.seek(0)
-    plt.close()
-
-    return Image.open(buffer)
