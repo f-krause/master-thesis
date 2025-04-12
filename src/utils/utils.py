@@ -277,9 +277,11 @@ def log_pred_true_scatter(y_true, y_pred, tissue_ids, limits, binary_class=False
     plt.title('y_true vs y_pred by Selected Tissue IDs')
     plt.legend(title='Tissue ID', bbox_to_anchor=(1.05, 1), loc='upper left')
 
-    min_val = min(np.min(y_true), np.min(y_pred))
-    max_val = max(np.max(y_true), np.max(y_pred))
-    plt.plot([min_val, max_val], [0.5, 0.5], color='grey', linestyle='--')
+    if binary_class:
+        min_val = min(np.min(y_true), np.min(y_pred))
+        max_val = max(np.max(y_true), np.max(y_pred))
+        plt.plot([min_val, max_val], [0.5, 0.5], color='grey', linestyle='--')
+
     plt.tight_layout()
 
     # Save the plot to an in-memory buffer
