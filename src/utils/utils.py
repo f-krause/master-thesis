@@ -239,6 +239,9 @@ def log_pred_true_scatter(y_true, y_pred, tissue_ids, limits, binary_class=False
 
     # Filter y_true, y_pred, and tissue_ids
     mask = np.isin(tissue_ids, selected_tissues)
+    if sum(mask) == 0:
+        # handle regression case without tissue_ids
+        mask = np.ones_like(mask)
     y_true = np.array(y_true)[mask]
     y_pred = np.array(y_pred)[mask]
     tissue_ids = np.array(tissue_ids)[mask]
