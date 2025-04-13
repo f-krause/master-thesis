@@ -23,7 +23,7 @@ def evaluate(y_true, y_pred, tissue_ids, dataset, best_epoch, fold, binary_class
     # store scatter of predictions
     for limits in [(0, 10), (10, 20), (20, 29), (0, 29)]:
         img_buffer = log_pred_true_scatter(y_true, y_pred, tissue_ids, limits, binary_class)
-        if aim_tracker: aim_tracker.track(aim.Image(img_buffer), name=f"pred_true_scatter_{dataset}_{limits[1]}")
+        if aim_tracker: aim_tracker.track(aim.Image(img_buffer), name=f"pred_scatter_{dataset}_{limits[0]}-{limits[1]}")
 
     if binary_class:
         Y = np.where(np.array(y_pred) > 0.5, 1, 0)
