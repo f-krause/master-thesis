@@ -34,7 +34,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     experiment_name = os.environ["SUBPROJECT"].replace("runs/", "", 1)
     if config.nr_folds > 1:
         experiment_name += f"_fold-{fold}"
-    aim_run = aim.Run(experiment=experiment_name, repo="~/master-thesis", log_system_params=True)
+    aim_run = aim.Run(experiment=experiment_name, repo="/export/share/krausef99dm", log_system_params=True)
     aim_run['model_config'] = OmegaConf.to_container(config)
 
     # gpu selection
