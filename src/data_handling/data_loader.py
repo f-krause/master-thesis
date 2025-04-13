@@ -60,7 +60,7 @@ class RNADataset(torch.utils.data.Dataset):
                 rna_data_full, tissue_ids_full, targets_full, targets_bin_full = \
                     self._filter_data(rna_data_full, tissue_ids_full, targets_full, targets_bin_full)
 
-            if config.val_fraction_of_train > 0:
+            if config.val_fraction_of_train > 0 or config.nr_folds > 1:
                 inverted_codon_map = {value: key for key, value in CODON_MAP_DNA.items()}
                 rna_data_full_inverted = [[inverted_codon_map[int(idx)] for idx in rna_data] for rna_data in
                                           rna_data_full]
