@@ -97,7 +97,7 @@ class SELayer(nn.Module):
         return x * y
 
 
-class LEGnet(nn.Module):
+class LegNet(nn.Module):
     """
     NoGINet neural network.
 
@@ -277,7 +277,7 @@ class LEGnet(nn.Module):
 
 if __name__ == "__main__":
     # Test forward pass
-    config_dev = OmegaConf.load("config/LEGnet.yml")
+    config_dev = OmegaConf.load("config/LegNet.yml")
     config_dev = OmegaConf.merge(config_dev,
                                  {"binary_class": True, "max_seq_length": 2700, "embedding_max_norm": 2})
 
@@ -290,6 +290,6 @@ if __name__ == "__main__":
         # seq_lengths (batch_size x 1)
     ]
 
-    model = LEGnet(config_dev, torch.device("cpu"))
+    model = LegNet(config_dev, torch.device("cpu"))
 
     print(model(sample_batch))
