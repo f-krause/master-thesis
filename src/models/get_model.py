@@ -47,13 +47,13 @@ def get_model(config: DictConfig, device: torch.device, logger=None):
             from models.transformer.transformer import ModelTransformer
         return ModelTransformer(config, device).to(device)
     elif config.model.lower() == "legnet":
-        if logger: logger.info("Using LEGnet model")
-        from models.LEGnet.LEGnet import LEGnet
-        return LEGnet(config, device).to(device)
+        if logger: logger.info("Using LegNet model")
+        from models.LegNet.LegNet import LegNet
+        return LegNet(config, device).to(device)
     elif config.model.lower() == "ptrnet":
         if logger: logger.info("Using PTRnet model")
         from models.PTRnet.PTRnet import PTRnet
         return PTRnet(config, device).to(device)
     else:
         raise ValueError(f"Model {config.model} not implemented! Choose from: "
-                         f"baseline, cnn, gru, lstm, xlstm, mamba, transformer, LEGnet, best")  # TODO update
+                         f"baseline, cnn, gru, lstm, xlstm, mamba, transformer, LegNet, best")  # TODO update

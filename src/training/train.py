@@ -34,7 +34,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     experiment_name = os.environ["SUBPROJECT"].replace("runs/", "", 1)
     if config.nr_folds > 1:
         experiment_name += f"_fold-{fold}"
-    aim_run = aim.Run(experiment=experiment_name, repo="~/master-thesis", log_system_params=True)
+    aim_run = aim.Run(experiment=experiment_name, repo="/export/share/krausef99dm", log_system_params=True)
     aim_run['model_config'] = OmegaConf.to_container(config)
 
     # gpu selection
@@ -210,6 +210,9 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                     end_time = time.time()
                     y_true_val_best, y_pred_val_best = y_true_val.flatten(), y_pred_val.flatten()
                     y_true_train_best, y_pred_train_best = y_true.flatten(), y_pred.flatten()
+
+                    evaluate(y_true_val_best, y_pred_val_best, tissue_ids_val, "val", best_epoch,
+                             fold, config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
             else:
                 if val_loss <= losses[best_epoch].get("val_loss", np.inf):
                     best_epoch = epoch

@@ -22,7 +22,7 @@ cd Ranger-Deep-Learning-Optimizer
 pip install -e . 
 ```
 
-## Create project folder structure (OLD)
+## Data Structure (UPDATE)
 Create project structure, and specify project path and subproject in ``main.py``
 ```
 root
@@ -49,9 +49,39 @@ root
 Install BPP prediction folding algorithms. Follow [arnie tutorial](https://github.com/DasLab/arnie/blob/master/docs/setup_doc.md).
 
 
+## File Structure
+### 📦 Repository Overview
+
+This repository supports a deep learning benchmark study for predicting protein-to-mRNA (PTR) ratios using mRNA sequence and structure features.
+
+#### 🔧 Configuration
+- `config/`: YAML configs for model architecture, training, and hyperparameter tuning (e.g., for Mamba, LSTM, Transformer, etc.).
+
+#### 📊 Data Handling
+- `data_handling/`: Scripts for preprocessing, structure prediction, codon/nucleotide dataset creation, and stratified splitting.
+
+#### 🧠 Models
+- `models/`: Implementation of deep learning models (MLP, CNN, RNNs, Transformer, xLSTM, Mamba, LEGnet, PTRnet).
+- Modularized by model type with shared predictor logic.
+
+#### 🎓 Pretraining
+- `pretraining/`: Tools for masked language model (MLM) pretraining and motif discovery.
+
+#### 🏋️ Training
+- `training/`: Training logic, early stopping, learning rate scheduling, and Optuna-based tuning.
+
+#### 📈 Evaluation
+- `evaluation/`: Model evaluation, metrics, predictions, and plotting utilities.
+
+#### 🛠️ Utilities
+- `utils/`, `log/`: Helper functions, logging setup, and device management.
+
+#### 🚀 Entry Point
+- `main.py`: Main script for running training or tuning, configurable via CLI flags.
+- `multi_run*.sh`: Example scripts to train multiple models sequentially.
 
 
-## Command collection
+## Command Collection
 ### SSH connection
 Connect to the university server with the following command:
 ```shell
