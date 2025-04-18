@@ -9,9 +9,6 @@ from models.predictor import Predictor
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, max_len):
-        # TODO figure out what is going on here
-        # https://medium.com/image-processing-with-python/positional-encoding-in-the-transformer-model-e8e9979df57f
-        # https://machinelearningmastery.com/a-gentle-introduction-to-positional-encoding-in-transformer-models-part-1/
         # Algorithm from: https://pytorch.org/tutorials/intermediate/pipeline_tutorial.html, see vaswani
         super(PositionalEncoding, self).__init__()
         # self.dropout = nn.Dropout(p=dropout)  # TODO could include dropout here
