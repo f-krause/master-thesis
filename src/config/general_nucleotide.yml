@@ -30,6 +30,7 @@ log_file_path: ""
 # Data params
 max_seq_length: 9000
 binary_class: True
+scale_targets: True  # only works for binary_class == False
 seq_only: False
 frequency_features: False
 random_reverse: True
