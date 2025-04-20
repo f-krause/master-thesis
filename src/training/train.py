@@ -11,7 +11,7 @@ from omegaconf import OmegaConf, DictConfig
 from knockknock import discord_sender
 
 from log.logger import setup_logger
-from utils.utils import save_checkpoint, mkdir, get_device, get_model_stats, clean_model_weights
+from utils.utils import *
 from models.get_model import get_model
 from data_handling.data_loader import get_train_data_loaders
 from training.optimizer import get_optimizer
@@ -47,6 +47,15 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     logger.info(f"Checkpoint path: {checkpoint_path}")
 
     train_loader, val_loader = get_train_data_loaders(config, fold=fold)
+
+    scale_data_path = os.path.join(os.environ["PROJECT_PATH"], os.environ["SUBPROJECT"])
+    if config.scale_targets and fold == 0:  # new flag in config/general_*.yml
+        mu, sigma = fit_target_scaler(train_loader.dataset.targets.float())
+        logger.info(f"Saving scaler data to {scale_data_path}: mu={mu}, sigma={sigma}")
+        torch.save({'mu': mu, 'sigma': sigma}, os.path.join(scale_data_path, 'scaler_data.pt'))
+
+    if config.scale_targets:
+        scaler_cfg = torch.load(os.path.join(scale_data_path, 'scaler_data.pt'))
 
     model = get_model(config, device, logger)
 
@@ -105,6 +114,9 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             optimizer.zero_grad()
             data = [d.to(device) for d in data]
 
+            if config.scale_targets and not config.binary_class:
+                target = scale_y(target, **scaler_cfg)
+
             if config.pretrain:
                 mutated_data, targets, mask = get_pretrain_mask_data(data, config, motif_cache, motif_tree_dict)
                 output = model(mutated_data)
@@ -123,6 +135,11 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                 target = target.to(device)
                 output = model(data)
                 loss = criterion(output.squeeze().float(), target.float())
+
+                if config.scale_targets and not config.binary_class:
+                    target = scale_y(target, **scaler_cfg, inverse=True)
+                    output = scale_y(output, **scaler_cfg, inverse=True)
+
                 y_true.append(target.unsqueeze(1).cpu().detach().numpy())
                 y_pred.append(output.cpu().detach().numpy())
                 tissue_ids.append(data[1].cpu().detach().numpy())
@@ -168,6 +185,10 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             with torch.no_grad():
                 for data, target, target_bin in val_loader:
                     data = [d.to(device) for d in data]
+
+                    if config.scale_targets and not config.binary_class:
+                        target = scale_y(target, **scaler_cfg)
+
                     if config.pretrain:
                         mutated_data, targets, mask = get_pretrain_mask_data(data, config, motif_cache, motif_tree_dict)
                         output = model(mutated_data)
@@ -185,6 +206,11 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                         target = target.to(device)
                         output = model(data)
                         loss = criterion(output.squeeze().float(), target.float())
+
+                        if config.scale_targets and not config.binary_class:
+                            target = scale_y(target, **scaler_cfg, inverse=True)
+                            output = scale_y(output, **scaler_cfg, inverse=True)
+
                         y_true_val.append(target.unsqueeze(1).cpu().numpy())
                         y_pred_val.append(output.cpu().numpy())
                         tissue_ids_val.append(data[1].cpu().numpy())

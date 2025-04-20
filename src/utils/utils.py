@@ -228,3 +228,11 @@ def get_model_stats(config: DictConfig, model, device, logger):
     logger.info(f"Model: FLOPs table: \n{flop_count_table(flops)}")
 
     return nr_params, flops_nr
+
+
+def fit_target_scaler(t: torch.Tensor):
+    return t.mean().item(), t.std().item()
+
+
+def scale_y(t: torch.Tensor, mu: float, sigma: float, inverse=False):
+    return (t * sigma + mu) if inverse else (t - mu) / sigma
