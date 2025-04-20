@@ -46,6 +46,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     mkdir(checkpoint_path)
     logger.info(f"Checkpoint path: {checkpoint_path}")
 
+    # DATA
     train_loader, val_loader = get_train_data_loaders(config, fold=fold)
 
     scale_data_path = os.path.join(os.environ["PROJECT_PATH"], os.environ["SUBPROJECT"])
@@ -57,8 +58,10 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     if config.scale_targets:
         scaler_cfg = torch.load(os.path.join(scale_data_path, 'scaler_data.pt'))
 
+    # MODEL
     model = get_model(config, device, logger)
 
+    # PRETRAINING
     if config.pretrain_path:
         checkpoint = torch.load(config.pretrain_path)
         missing_keys, unexpected_keys = model.load_state_dict(checkpoint['state_dict'], strict=False)
@@ -74,6 +77,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             motif_cache = pickle.load(f)
         motif_tree_dict = get_motif_tree_dict()
 
+    # OPTIMIZER
     optimizer = get_optimizer(model, config.optimizer)
 
     # scheduler = GradualWarmupScheduler(
@@ -88,6 +92,9 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             last_epoch=-1
         )
 
+    early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
+
+    # LOSS
     if config.pretrain:
         criterion = torch.nn.CrossEntropyLoss()
     elif config.binary_class:
@@ -95,8 +102,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     else:
         criterion = torch.nn.MSELoss()
 
-    early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
-
+    # TRAINING
     logger.info(f"Starting training fold {fold}")
     start_time = time.time()
     end_time = None
