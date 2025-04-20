@@ -92,7 +92,8 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             last_epoch=-1
         )
 
-    early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
+    use_amp = config.get('mixed_precision', True) and device.type == 'cuda'
+    amp_scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
 
     # LOSS
     if config.pretrain:
@@ -103,6 +104,8 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
         criterion = torch.nn.MSELoss()
 
     # TRAINING
+    early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
+
     logger.info(f"Starting training fold {fold}")
     start_time = time.time()
     end_time = None
@@ -150,12 +153,19 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                 y_pred.append(output.cpu().detach().numpy())
                 tissue_ids.append(data[1].cpu().detach().numpy())
 
-            loss.backward()
-            if config.grad_clip_norm:
+            amp_scaler.scale(loss).backward()
+
+            if config.grad_clip_norm > 0:
+                if use_amp:
+                    # grads are still scaled → unscale first
+                    amp_scaler.unscale_(optimizer)
                 torch.nn.utils.clip_grad_norm_(model.parameters(),
                                                max_norm=config.grad_clip_norm,
                                                error_if_nonfinite=True)
-            optimizer.step()
+
+            amp_scaler.step(optimizer)
+            amp_scaler.update()
+            optimizer.zero_grad()
             running_loss += loss.item()
 
         if config.lr_scheduler.enable and epoch > config.lr_scheduler.warmup:
