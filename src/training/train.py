@@ -151,7 +151,10 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                 tissue_ids.append(data[1].cpu().detach().numpy())
 
             loss.backward()
-            # torch.nn.utils.clip_grad_norm_(model.parameters(), 1)  # TODO try gradient clipping
+            if config.grad_clip_norm:
+                torch.nn.utils.clip_grad_norm_(model.parameters(),
+                                               max_norm=config.grad_clip_norm,
+                                               error_if_nonfinite=True)
             optimizer.step()
             running_loss += loss.item()
 

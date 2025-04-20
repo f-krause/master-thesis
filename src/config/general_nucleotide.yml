@@ -41,6 +41,7 @@ tissue_id: -1  # 0-28 or -1 for all tissues
 nr_folds: 1  # only 1 supported, as cross validation only for codon based models supported
 val_fraction_of_train: 0  # use val_data_file as validation set
 embedding_max_norm: 2
+grad_clip_norm: 1.0  # 0 or negative → no clipping
 
 early_stopper_patience: 8  # disabled if < 0
 early_stopper_delta: 0.01
