@@ -169,4 +169,5 @@ if __name__ == "__main__":
 
     model = PTRnet(config_dev, device).to(device)
 
+    print("Parameters:", sum(p.numel() for p in model.parameters()))
     print(model(sample_batch))
