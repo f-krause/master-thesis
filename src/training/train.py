@@ -56,7 +56,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
         torch.save({'mu': mu, 'sigma': sigma}, os.path.join(scale_data_path, 'scaler_data.pt'))
 
     if config.scale_targets:
-        scaler_cfg = torch.load(os.path.join(scale_data_path, 'scaler_data.pt'))
+        scaler_cfg = torch.load(os.path.join(scale_data_path, 'scaler_data.pt'), weights_only=False)
 
     # MODEL
     model = get_model(config, device, logger)
@@ -92,8 +92,8 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             last_epoch=-1
         )
 
-    use_amp = config.get('mixed_precision', True) and device.type == 'cuda'
-    amp_scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
+    use_amp = config.mixed_precision and device.type == 'cuda' and not config.binary_class
+    amp_scaler = torch.amp.GradScaler(device.type, enabled=use_amp)
 
     # LOSS
     if config.pretrain:
@@ -120,38 +120,38 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
         running_loss = 0.0
         y_true, y_pred, tissue_ids = [], [], []
         for batch_idx, (data, target, target_bin) in enumerate(tqdm(train_loader)):
-            optimizer.zero_grad()
             data = [d.to(device) for d in data]
 
             if config.scale_targets and not config.binary_class:
                 target = scale_y(target, **scaler_cfg)
 
-            if config.pretrain:
-                mutated_data, targets, mask = get_pretrain_mask_data(data, config, motif_cache, motif_tree_dict)
-                output = model(mutated_data)
-                # compute combined loss, need to subtract the min token value from the target to get the correct index
-                loss = (criterion(output[0][mask], targets[0] - 6) +
-                        criterion(output[1][mask], targets[1] - 1) +
-                        criterion(output[2][mask], targets[2] - 10) +
-                        criterion(output[3][mask], targets[3] - 13))
-                loss = loss / 4  # average loss over the 4 tasks
-                y_true.append(torch.tensor(0))  # dummy
-                y_pred.append(torch.tensor(0))  # dummy
-                tissue_ids.append(torch.tensor(0))  # dummy
-            else:
-                if config.binary_class:
-                    target = target_bin
-                target = target.to(device)
-                output = model(data)
-                loss = criterion(output.squeeze().float(), target.float())
+            with torch.amp.autocast(device_type=device.type, enabled=use_amp):
+                if config.pretrain:
+                    mutated_data, targets, mask = get_pretrain_mask_data(data, config, motif_cache, motif_tree_dict)
+                    output = model(mutated_data)
+                    # compute combined loss, need to subtract the min token value from the target to get the correct index
+                    loss = (criterion(output[0][mask], targets[0] - 6) +
+                            criterion(output[1][mask], targets[1] - 1) +
+                            criterion(output[2][mask], targets[2] - 10) +
+                            criterion(output[3][mask], targets[3] - 13))
+                    loss = loss / 4  # average loss over the 4 tasks
+                    y_true.append(torch.tensor(0))  # dummy
+                    y_pred.append(torch.tensor(0))  # dummy
+                    tissue_ids.append(torch.tensor(0))  # dummy
+                else:
+                    if config.binary_class:
+                        target = target_bin
+                    target = target.to(device)
+                    output = model(data)
+                    loss = criterion(output.squeeze().float(), target.float())
 
-                if config.scale_targets and not config.binary_class:
-                    target = scale_y(target, **scaler_cfg, inverse=True)
-                    output = scale_y(output, **scaler_cfg, inverse=True)
+                    if config.scale_targets and not config.binary_class:
+                        target = scale_y(target, **scaler_cfg, inverse=True)
+                        output = scale_y(output, **scaler_cfg, inverse=True)
 
-                y_true.append(target.unsqueeze(1).cpu().detach().numpy())
-                y_pred.append(output.cpu().detach().numpy())
-                tissue_ids.append(data[1].cpu().detach().numpy())
+                    y_true.append(target.unsqueeze(1).cpu().detach().numpy())
+                    y_pred.append(output.cpu().detach().numpy())
+                    tissue_ids.append(data[1].cpu().detach().numpy())
 
             amp_scaler.scale(loss).backward()
 
