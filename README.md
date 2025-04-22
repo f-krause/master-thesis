@@ -61,7 +61,7 @@ This repository supports a deep learning benchmark study for predicting protein-
 - `data_handling/`: Scripts for preprocessing, structure prediction, codon/nucleotide dataset creation, and stratified splitting.
 
 #### 🧠 Models
-- `models/`: Implementation of deep learning models (MLP, CNN, RNNs, Transformer, xLSTM, Mamba, LEGnet, PTRnet).
+- `models/`: Implementation of deep learning models (MLP, CNN, RNNs, Transformer, xLSTM, Mamba, LegNet, PTRnet).
 - Modularized by model type with shared predictor logic.
 
 #### 🎓 Pretraining
@@ -125,7 +125,7 @@ ssh -f -N -L 43800:localhost:43800 krausef99dm@jyn.dm.univie.ac.at
 ### Use Optuna dashboard
 From within the data folder for optuna, run:
 ```shell
-optuna-dashboard sqlite:///baseline.db
+optuna-dashboard sqlite:////export/share/krausef99dm/tuning_dbs/baseline.db
 ```
 
 
