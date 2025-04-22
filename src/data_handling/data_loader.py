@@ -9,9 +9,9 @@ from log.logger import setup_logger
 from itertools import compress
 
 from data_handling.train_val_test_indices import get_train_val_test_indices
+from data_handling.data_utils import fit_evaluate_simple_models
 from utils.knowledge_db import CODON_MAP_DNA, TISSUES, TOKENS
 # from sklearn.model_selection import train_test_split
-# from data_handling.data_utils import fit_evaluate_simple_models
 
 
 class RNADataset(torch.utils.data.Dataset):
@@ -27,22 +27,23 @@ class RNADataset(torch.utils.data.Dataset):
             raise ValueError("Of train_val, val and test only one at a time can be true.")
 
         if val:
+            self.logger.info(f"Loading val data from: {config.val_data_file}")
             with (open(os.path.join(os.environ["PROJECT_PATH"], "data/data_test", config.val_data_file), 'rb') as f):
-                self.logger.info(f"Loading data from: {config.val_data_file}")
                 self.rna_data, self.tissue_ids, self.targets, self.targets_bin = pickle.load(f)
-                self.rna_data = self._set_codon_or_nucl_setting(self.rna_data)
-                self.rna_data, self.tissue_ids, self.targets, self.targets_bin = \
-                    self._filter_data(self.rna_data, self.tissue_ids, self.targets, self.targets_bin)
+            self.rna_data = self._set_codon_or_nucl_setting(self.rna_data)
+            self.rna_data, self.tissue_ids, self.targets, self.targets_bin = \
+                self._filter_data(self.rna_data, self.tissue_ids, self.targets, self.targets_bin)
 
             self.logger.info(f"Validation dataset with {len(self.rna_data)} samples loaded")
             self._get_dataset_stats()
 
         elif test:
+            self.logger.info(f"Loading test data from: {config.test_data_file}")
             with open(os.path.join(os.environ["PROJECT_PATH"], "data/data_test", config.test_data_file), 'rb') as f:
                 self.rna_data, self.tissue_ids, self.targets, self.targets_bin = pickle.load(f)
-                self.rna_data = self._set_codon_or_nucl_setting(self.rna_data)
-                self.rna_data, self.tissue_ids, self.targets, self.targets_bin = \
-                    self._filter_data(self.rna_data, self.tissue_ids, self.targets, self.targets_bin)
+            self.rna_data = self._set_codon_or_nucl_setting(self.rna_data)
+            self.rna_data, self.tissue_ids, self.targets, self.targets_bin = \
+                self._filter_data(self.rna_data, self.tissue_ids, self.targets, self.targets_bin)
 
             self.logger.info(f"Test dataset with {len(self.rna_data)} samples loaded")
             self._get_dataset_stats()
@@ -51,16 +52,31 @@ class RNADataset(torch.utils.data.Dataset):
             # Actual train data needed
             with open(os.path.join(os.environ["PROJECT_PATH"], "data/data_train", config.train_data_file),
                       'rb') as f:
-                self.logger.info(f"Loading data from: {config.train_data_file}")
+                self.logger.info(f"Loading train data from: {config.train_data_file}")
                 rna_data_full, tissue_ids_full, targets_full, targets_bin_full = pickle.load(f)  # n x 3, n, n
-                rna_data_full = self._set_codon_or_nucl_setting(rna_data_full)
-                if len(rna_data_full) < 10000:
-                    self.logger.warning(f"DATASET HAS ONLY {len(rna_data_full)} SAMPLES")
+            rna_data_full = self._set_codon_or_nucl_setting(rna_data_full)
 
-                rna_data_full, tissue_ids_full, targets_full, targets_bin_full = \
-                    self._filter_data(rna_data_full, tissue_ids_full, targets_full, targets_bin_full)
+            rna_data_full, tissue_ids_full, targets_full, targets_bin_full = \
+                self._filter_data(rna_data_full, tissue_ids_full, targets_full, targets_bin_full)
 
-            if config.val_fraction_of_train > 0 or config.nr_folds > 1:
+            if config.concat_train_val:
+                self.logger.info(f"Loading val data from: {config.val_data_file}")
+                with (open(os.path.join(os.environ["PROJECT_PATH"], "data/data_test", config.val_data_file),
+                           'rb') as f):
+                    val_rna_data, val_tissue_ids, val_targets, val_targets_bin = pickle.load(f)
+                val_rna_data = self._set_codon_or_nucl_setting(val_rna_data)
+                val_rna_data, val_tissue_ids, val_targets, val_targets_bin = \
+                    self._filter_data(val_rna_data, val_tissue_ids, val_targets, val_targets_bin)
+
+                rna_data_full += val_rna_data
+                tissue_ids_full = torch.cat((tissue_ids_full, val_tissue_ids))
+                targets_full = torch.cat((targets_full, val_targets))
+                targets_bin_full = torch.cat((targets_bin_full, val_targets_bin))
+
+                self.logger.info(f"Adding validation dataset with {len(val_rna_data)} samples to train")
+
+            if config.nr_folds > 1:
+                # Run Cross validation
                 inverted_codon_map = {value: key for key, value in CODON_MAP_DNA.items()}
                 rna_data_full_inverted = [[inverted_codon_map[int(idx)] for idx in rna_data] for rna_data in
                                           rna_data_full]
@@ -78,7 +94,7 @@ class RNADataset(torch.utils.data.Dataset):
                     self.targets = targets_full[val_indices]
                     self.targets_bin = targets_bin_full[val_indices]
 
-                    self.logger.info(f"Train validation dataset")
+                    self.logger.info(f"Train validation dataset with {len(self.rna_data)} samples loaded")
                     self._get_dataset_stats()
 
                 else:
@@ -91,6 +107,7 @@ class RNADataset(torch.utils.data.Dataset):
                     self._get_dataset_stats()
 
             else:
+                # No cross validation, just load the full data
                 self.rna_data = rna_data_full
                 self.tissue_ids = tissue_ids_full
                 self.targets = targets_full
@@ -98,6 +115,9 @@ class RNADataset(torch.utils.data.Dataset):
 
                 self.logger.info(f"Train dataset with {len(self.rna_data)} samples loaded")
                 self._get_dataset_stats()
+
+            if len(rna_data_full) < 10000:
+                self.logger.warning(f"TRAIN DATASET HAS ONLY {len(rna_data_full)} SAMPLES")
 
         # cast from int8 to int for computations
         self.rna_data = [r.int() for r in self.rna_data]  # TODO isn't this only necessary for nucleotide data?
@@ -137,17 +157,10 @@ class RNADataset(torch.utils.data.Dataset):
         return torch.stack(freqs)
 
     def _get_train_val_indices(self, config: DictConfig, mrna_sequences, fold):
-        if config.nr_folds == 1:
-            # train_indices, val_indices = train_test_split(range(len(mrna_sequences)), test_size=0.2,
-            #                                               random_state=random_state)  # legacy
-            train_indices, val_indices, _ = get_train_val_test_indices(mrna_sequences,
-                                                                       val_frac=config.val_fraction_of_train,
-                                                                       test_frac=0, random_state=config.seed)
-
-        elif config.nr_folds == 3:
+        if config.nr_folds == 3:
             train_indices, val_indices = self._get_3_fold_indices(mrna_sequences, fold, random_state=config.seed)
         else:
-            raise ValueError("Only 1 and 3 folds are currently supported")
+            raise ValueError("Only 3 folds are currently supported for cross validation.")
         return train_indices, val_indices
 
     @staticmethod
@@ -235,8 +248,11 @@ def _pad_sequences_and_reverse(batch):
 
 def get_train_data_loaders(config: DictConfig, fold: int):
     train_dataset = RNADataset(config, fold)
-    if config.val_fraction_of_train > 0:
+    if config.nr_folds > 0:
+        # Running cross validation
         val_dataset = RNADataset(config, fold, train_val=True)
+    elif config.evaluate_on_test:
+        val_dataset = RNADataset(config, fold, test=True)
     else:
         val_dataset = RNADataset(config, fold, val=True)
 
@@ -271,16 +287,25 @@ def get_test_data_loader(config: DictConfig):
 
 if __name__ == "__main__":
     # for debugging
-    from utils.utils import set_project_path, set_log_file
+    from utils.utils import set_project_path, set_log_file, check_config
 
     dev_config = OmegaConf.create(
-        {"project_path": None, "log_file_path": None, "subproject": "dev/delete_me", "dev": True,
-         # "model": "ptrnet", "train_data_file": "dev_train_9.0k_data.pkl",  # test nucleotide level data
-         "model": "baseline", "train_data_file": "codon_dev_train_2.7k_data.pkl",  # test codon level data
-         "val_data_file": "codon_val_2.7k_data.pkl", "test_data_file": "codon_test_2.7k_data.pkl", "batch_size": 4,
-         "num_workers": 4, "val_fraction_of_train": 0, "folding_algorithm": "viennarna", "seed": 42, "nr_folds": 3,
-         "random_reverse": True, "tissue_id": -1, "binary_class": True, "frequency_features": True}
+        {
+            "project_path": None, "log_file_path": None, "subproject": "dev/delete_me", "dev": True,
+            # "model": "ptrnet", "train_data_file": "dev_train_9.0k_data.pkl",  # test nucleotide level data
+            "model": "baseline", "train_data_file": "dev_codon_train_8.1k_data.pkl",  # test codon level data
+            "val_data_file": "codon_val_8.1k_data.pkl", "test_data_file": "dev_codon_test_8.1k_data.pkl",
+            "batch_size": 4, "num_workers": 4, "folding_algorithm": "viennarna", "seed": 42,
+            "nr_folds": 0,
+            "random_reverse": True,
+            "tissue_id": -1,
+            "binary_class": True,
+            "frequency_features": True,
+            "concat_train_val": True,
+            "evaluate_on_test": True
+         }
     )
+    check_config(dev_config)
     set_project_path(dev_config)
     set_log_file(dev_config)
 

@@ -124,7 +124,16 @@ def get_config(args):
         # If pretraining, force model to not be in binary classification mode
         OmegaConf.update(config, "binary_class", False)
 
+    check_config(config)
+
     return config
+
+
+def check_config(config: DictConfig):
+    if config.nr_folds > 1 and not config.concat_train_val:
+        raise ValueError("If running cv, concat_train_val should be True to run on train + val data.")
+    if config.nr_folds > 1 and config.evaluate_on_test:
+        raise ValueError("If running cv, evaluate_on_test should be False to evaluate on validation fold.")
 
 
 def check_path_exists(file_path, create_unique=False):

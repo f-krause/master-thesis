@@ -11,9 +11,9 @@ dev: True
 #val_data_file: "dev_val_9.0k_data.pkl"
 #test_data_file: "dev_test_9.0k_data.pkl"
 
-#train_data_file: "train_9.0k_data.pkl"
-#val_data_file: "val_9.0k_data.pkl"
-#test_data_file: "test_9.0k_data.pkl"
+train_data_file: "train_9.0k_data.pkl"
+val_data_file: "val_9.0k_data.pkl"
+test_data_file: "test_9.0k_data.pkl"
 
 #train_data_file: "dev_binary_class_balanced_train_9.0k_data.pkl"  # binary, balanced across tissues
 #val_data_file: "dev_binary_class_balanced_val_9.0k_data.pkl"
@@ -30,7 +30,7 @@ log_file_path: ""
 # Data params
 max_seq_length: 9000
 binary_class: True
-scale_targets: True  # only works for binary_class == False
+scale_targets: False  # only works for binary_class == False
 seq_only: False
 frequency_features: False
 random_reverse: True
@@ -39,10 +39,11 @@ tissue_id: -1  # 0-28 or -1 for all tissues
 
 # Misc
 nr_folds: 1  # only 1 supported, as cross validation only for codon based models supported
-val_fraction_of_train: 0  # use val_data_file as validation set
+concat_train_val: False
+evaluate_on_test: False
 embedding_max_norm: 2
-grad_clip_norm: 1.0  # 0 or negative → no clipping
-mixed_precision: True  # enables torch.cuda.amp if CUDA is available
+grad_clip_norm: 0  # 0 or negative → no clipping
+mixed_precision: True  # enables torch.cuda.amp for regression setting and if CUDA is available
 
 early_stopper_patience: 8  # disabled if < 0
 early_stopper_delta: 0.01
