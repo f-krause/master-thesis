@@ -12,7 +12,7 @@ class Predictor(nn.Module):
         layers = [
             nn.LayerNorm(input_size),
             nn.Linear(input_size, config.predictor_hidden_dim),
-            nn.GELU(),
+            nn.ReLU(),
             nn.Dropout(p=config.predictor_dropout),
             nn.Linear(config.predictor_hidden_dim, 1)
         ]
