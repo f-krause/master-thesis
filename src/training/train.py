@@ -159,6 +159,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                 if use_amp:
                     # grads are still scaled → unscale first
                     amp_scaler.unscale_(optimizer)
+                # does not seem to work properly, introduces nan loss, could also be AMP though
                 torch.nn.utils.clip_grad_norm_(model.parameters(),
                                                max_norm=config.grad_clip_norm,
                                                error_if_nonfinite=True)
@@ -290,7 +291,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     if config.model != "mamba2":
         # Note: not possible to copute stats for mamba2
         nr_params, nr_flops = get_model_stats(config, model, device, logger)
-        logger.info("FULL PARAMS:", sum(p.numel() for p in model.parameters()))
+        logger.info(f"FULL PARAMS: {sum(p.numel() for p in model.parameters())}")
         aim_run.track(nr_params, name='nr_params')
         aim_run.track(nr_flops, name='nr_flops')
 
