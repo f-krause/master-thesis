@@ -1,6 +1,6 @@
 num_kernels_conv1: [32, 64, 128, 256]
-num_kernels_conv2: [16, 32, 64, 128]
+num_kernels_conv2: [8, 16, 32, 64]
 kernel_size_conv1: [3, 6, 9, 15]
 kernel_size_conv2: [3, 9, 15]
 max_pool1: [10, 20, 30]
-max_pool2: [5, 10, 20]
+max_pool2: [3, 5, 10]
