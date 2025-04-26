@@ -145,6 +145,11 @@ def set_trial_parameters(trial, config):
                 config.num_kernels_conv1 = config.num_kernels_conv2 * 2
             if config.max_pool1 < config.max_pool2:
                 config.max_pool1 = config.max_pool2 + 10
+        if config.model == "xlstm":
+            if config.num_blocks == 5 or config.num_blocks == 6:
+                config.slstm_at = "all"
+            else:
+                config.slstm_at = []
         if config.model == "mamba2":
             if (config.dim_embedding_token * config.expand / config.head_dim) % 8 != 0:
                 print("WARNING: Infeasible combination of parameters")

@@ -1,6 +1,6 @@
 conv1d_kernel_size: [4, 6, 9]
-qkv_proj_blocksize: [2, 4, 8]
+m_qkv_proj_blocksize: [2, 4, 8]
 num_heads: [2, 4, 8]
 proj_factor: [1, 1.25, 2]
-num_blocks: [6, 7, 9]
-dropout: [0.0, 0.2, 0.5]
+num_blocks: [5, 6, 9]  # will set slstm_at = "all" for 5, 6 and 0 for 9 - as in Bio-xLSTM paper
+dropout: [0.0, 0.1, 0.2, 0.4]
