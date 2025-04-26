@@ -130,7 +130,7 @@ def set_trial_parameters(trial, config):
     # set the hyperparameters for the trial
     # config.batch_size = trial.suggest_categorical('batch_size', params_general.batch_size)
     config.dim_embedding_tissue = trial.suggest_categorical('dim_embedding', params_general.dim_embedding)
-    config.dim_embedding_token = config.dim_embedding_tissue
+    config.dim_embedding_token = config.dim_embedding_tissue  # needs to be of same size as summed
     config.predictor_hidden = trial.suggest_categorical('predictor_hidden', params_general.predictor_hidden)
     # config.predictor_dropout = trial.suggest_categorical('predictor_dropout', params_general.predictor_dropout)
     config.lr = trial.suggest_float('lr', params_general.lr.min, params_general.lr.max, log=True)
@@ -139,21 +139,25 @@ def set_trial_parameters(trial, config):
 
     try:
         params_model = OmegaConf.load(f'config/param_tuning/{config.model}_param.yml')
-        for key, values in params_model.items():
-            config[key] = trial.suggest_categorical(key, values)
-        if config.model == "cnn":
-            if config.num_kernels_conv1 < config.num_kernels_conv2:
-                config.num_kernels_conv1 = config.num_kernels_conv2 * 2
-            if config.max_pool1 < config.max_pool2:
-                config.max_pool1 = config.max_pool2 + 10
-        if config.model == "xlstm":
-            if config.num_blocks == 5 or config.num_blocks == 6:
-                config.slstm_at = "all"
-            else:
-                config.slstm_at = []
-        if config.model == "mamba2":
-            if (config.dim_embedding_token * config.expand / config.head_dim) % 8 != 0:
-                print("WARNING: Infeasible combination of parameters")
-                raise optuna.exceptions.TrialPruned()
     except FileNotFoundError:
         raise Exception(f"No yml file for {config.model} found at config/param_tuning for hyperparameter tuning.")
+
+    for key, values in params_model.items():
+        config[key] = trial.suggest_categorical(key, values)
+
+    if config.model == "cnn":
+        if config.num_kernels_conv1 < config.num_kernels_conv2:
+            config.num_kernels_conv1 = config.num_kernels_conv2 * 2
+        if config.max_pool1 < config.max_pool2:
+            config.max_pool1 = config.max_pool2 + 10
+
+    if config.model == "xlstm":
+        if config.num_blocks == 5 or config.num_blocks == 6:
+            config.slstm_at = "all"
+        else:
+            config.slstm_at = []
+
+    if config.model == "mamba2":
+        if (config.dim_embedding_token * config.expand / config.head_dim) % 8 != 0:
+            print("WARNING: Infeasible combination of parameters")
+            raise optuna.exceptions.TrialPruned()
