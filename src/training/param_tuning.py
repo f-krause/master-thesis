@@ -135,6 +135,7 @@ def set_trial_parameters(trial, config):
     # config.predictor_dropout = trial.suggest_categorical('predictor_dropout', params_general.predictor_dropout)
     config.lr = trial.suggest_float('lr', params_general.lr.min, params_general.lr.max, log=True)
     # config.lr_scheduler.reset_epochs = trial.suggest_categorical('reset_epochs', params_general.reset_epochs)
+    config.random_reverse = trial.suggest_categorical('random_reverse', [True, False])
 
     try:
         params_model = OmegaConf.load(f'config/param_tuning/{config.model}_param.yml')
