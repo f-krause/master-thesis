@@ -133,7 +133,7 @@ def set_trial_parameters(trial, config):
     config.dim_embedding_token = config.dim_embedding_tissue
     config.predictor_hidden = trial.suggest_categorical('predictor_hidden', params_general.predictor_hidden)
     # config.predictor_dropout = trial.suggest_categorical('predictor_dropout', params_general.predictor_dropout)
-    config.optimizer.lr = trial.suggest_categorical('lr', params_general.lr)
+    config.lr = trial.suggest_float('lr', params_general.lr.min, params_general.lr.max, log=True)
     # config.lr_scheduler.reset_epochs = trial.suggest_categorical('reset_epochs', params_general.reset_epochs)
 
     try:
