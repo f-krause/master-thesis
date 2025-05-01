@@ -248,7 +248,7 @@ def _pad_sequences_and_reverse(batch):
 
 def get_train_data_loaders(config: DictConfig, fold: int):
     train_dataset = RNADataset(config, fold)
-    if config.nr_folds > 0:
+    if config.nr_folds > 1:
         # Running cross validation
         val_dataset = RNADataset(config, fold, train_val=True)
     elif config.evaluate_on_test:

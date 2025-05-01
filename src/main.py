@@ -61,9 +61,11 @@ def main_param_tune(config: DictConfig):
     set_seed(config.seed)
 
     if config.dev or "dev" in config.train_data_file:
+        print("WARNING: Running in dev mode!")
         storage_path = os.path.join(config.optuna.storage, "dev", config.model + '.db')
     else:
         storage_path = os.path.join(config.optuna.storage, config.model + '.db')
+    print("Storage path:", storage_path)
 
     study = optuna.create_study(
         direction='maximize' if config.binary_class else 'minimize',
