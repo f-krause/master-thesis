@@ -117,6 +117,7 @@ def create_objective(config):
             score = train_tune_fold(config, train_loader, val_loader, trial)
         except RuntimeError as e:  # skip CUDA out of memory
             print(e)
+            trial.set_user_attr("failure_reason", str(e))
             raise optuna.exceptions.TrialPruned()
         return score
 
