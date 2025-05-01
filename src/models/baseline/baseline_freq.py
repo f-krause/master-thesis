@@ -16,7 +16,7 @@ class ModelBaseline(nn.Module):
 
         layers = [
             nn.Linear(config.dim_embedding_tissue + len(CODON_MAP_DNA), config.hidden_size),
-            nn.GELU(),
+            nn.ReLU(),
             nn.Dropout(p=config.dropout),
             nn.Linear(config.hidden_size, 1)
         ]

@@ -19,10 +19,10 @@ class ModelBaseline(nn.Module):
 
         layers = [
             nn.Linear(self.max_seq_length * config.dim_embedding_token, config.hidden_size),
-            nn.GELU(),
+            nn.ReLU(),
             nn.Dropout(p=config.dropout),
             nn.Linear(config.hidden_size, config.hidden_size // 2),
-            nn.GELU(),
+            nn.ReLU(),
             nn.Dropout(p=config.dropout),
             nn.Linear(config.hidden_size // 2, 1)
         ]
