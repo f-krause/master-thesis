@@ -147,6 +147,9 @@ def set_trial_parameters(trial, config):
         raise Exception(f"No yml file for {config.model} found at config/param_tuning for hyperparameter tuning.")
 
     for key, values in params_model.items():
+        if config.model == "RiboNN" and key == "grad_clip_norm":
+            # Edge case handling
+            continue
         config[key] = trial.suggest_categorical(key, values)
 
     if config.model == "cnn":
@@ -160,6 +163,10 @@ def set_trial_parameters(trial, config):
             config.slstm_at = "all"
         else:
             config.slstm_at = []
+
+    if config.model == "RiboNN":
+        config.grad_clip_norm = trial.suggest_float("grad_clip_norm", params_model.grad_clip_norm.min,
+                                                    params_model.grad_clip_norm.max, log=True)
 
     if config.model == "mamba2":
         if (config.dim_embedding_token * config.expand / config.head_dim) % 8 != 0:
