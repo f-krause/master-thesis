@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.16 Chrome/132.0.6834.196 Electron/34.2.0 Safari/537.36" version="26.0.16">
   <diagram name="Page-1" id="jc_JW6g522YRJNJkjJi_">
-    <mxGraphModel dx="2156" dy="1269" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1772" pageHeight="787" math="1" shadow="0">
+    <mxGraphModel dx="1833" dy="1079" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1772" pageHeight="787" math="1" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -25,7 +25,7 @@
         <mxCell id="h03nUzt6KyVFCFQYHyld-14" value="Test (15%)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=23;fillColor=#f8cecc;strokeColor=#b85450;fontFamily=Source Sans Pro;" parent="1" vertex="1">
           <mxGeometry x="6" y="663.7580499999999" width="179.13" height="97.2439" as="geometry" />
         </mxCell>
-        <mxCell id="h03nUzt6KyVFCFQYHyld-15" value="&lt;font&gt;Backbone &lt;br&gt;Architecture&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Source Sans Pro;fontSize=20;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=0" parent="1" vertex="1">
+        <mxCell id="h03nUzt6KyVFCFQYHyld-15" value="&lt;font&gt;Backbone &lt;br&gt;Architecture&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Source Sans Pro;fontSize=20;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=0;arcSize=4;" parent="1" vertex="1">
           <mxGeometry x="956" y="369.92" width="177" height="88.26" as="geometry" />
         </mxCell>
         <mxCell id="h03nUzt6KyVFCFQYHyld-27" value="AUGGCCUACGAA...; 12; 1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Courier New;fontSize=11;fontColor=#D0C6A7;" parent="1" vertex="1">
@@ -43,10 +43,10 @@
         <mxCell id="h03nUzt6KyVFCFQYHyld-32" value="&lt;font&gt;- MLP&lt;/font&gt;&lt;div&gt;&lt;font&gt;- CNN&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font&gt;- LegNet&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font&gt;- LSTM&lt;/font&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=13;fontFamily=Source Sans Pro;fontColor=#666666;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="969.5" y="463" width="63" height="69.94" as="geometry" />
         </mxCell>
-        <mxCell id="h03nUzt6KyVFCFQYHyld-54" value="&lt;font&gt;Nucleotide Embedding&amp;nbsp;&lt;/font&gt;&lt;div&gt;&lt;font&gt;Layer&lt;/font&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Source Sans Pro;fontSize=20;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+        <mxCell id="h03nUzt6KyVFCFQYHyld-54" value="&lt;font&gt;Nucleotide Embedding&amp;nbsp;&lt;/font&gt;&lt;div&gt;&lt;font&gt;Layer&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Source Sans Pro;fontSize=20;fillColor=#e1d5e7;strokeColor=#9673a6;align=center;verticalAlign=middle;arcSize=4;fontColor=default;fontStyle=0;" parent="1" vertex="1">
           <mxGeometry x="498" y="232.09" width="123" height="92" as="geometry" />
         </mxCell>
-        <mxCell id="h03nUzt6KyVFCFQYHyld-55" value="&lt;font&gt;Tissue Embedding&lt;/font&gt;&lt;div&gt;&lt;font&gt;Layer&lt;/font&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Source Sans Pro;fontSize=20;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+        <mxCell id="h03nUzt6KyVFCFQYHyld-55" value="&lt;font&gt;Tissue Embedding&lt;/font&gt;&lt;div&gt;&lt;font&gt;Layer&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontFamily=Source Sans Pro;fontSize=20;fillColor=#e1d5e7;strokeColor=#9673a6;align=center;verticalAlign=middle;arcSize=4;fontColor=default;fontStyle=0;" parent="1" vertex="1">
           <mxGeometry x="498" y="503.05999999999995" width="123" height="92" as="geometry" />
         </mxCell>
         <mxCell id="h03nUzt6KyVFCFQYHyld-74" value="" style="group" parent="1" vertex="1" connectable="0">
