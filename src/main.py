@@ -19,6 +19,7 @@ parser.add_argument('-x', "--xlstm", help="Use xlstm config", action="store_true
 parser.add_argument('-m', "--mamba", help="Use mamba config", action="store_true")
 parser.add_argument('-t', "--transformer", help="Use transformer config", action="store_true")
 parser.add_argument("--legnet", help="Use LegNet config", action="store_true")
+parser.add_argument("--ribonn", help="Use RiboNN config", action="store_true")
 parser.add_argument("--ptrnet", help="Use PTRNet config", action="store_true")
 parser.add_argument("--pretrain", help="pretrain model in MLM setting", action="store_true")
 parser.add_argument("--tune", help="Run optuna based hyperparameter tuning", action="store_true")

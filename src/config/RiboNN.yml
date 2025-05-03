@@ -1,0 +1,23 @@
+# Training
+epochs: 100
+save_freq: 1
+val_freq: 1
+warmup: 0
+batch_size: 64
+num_workers: 1
+
+# Model
+model: "RiboNN"
+dim_embedding_tissue: 64  # max 29 tissues
+dim_embedding_token: 64  # 64 codons or 4 nucleotides/
+predictor_hidden_dim: 64  # hidden size of the output layer
+predictor_dropout: 0.1  # dropout rate of the output layer
+
+num_layers: 2  # number of layers in the model, more than 8 not possible for seq len 2700
+dropout: 0.1  # dropout rate of the model
+
+# Optimizer
+optimizer:
+  name: adam  # sgd, adam, ranger
+  lr: 0.001
+  weight_decay: 0.01

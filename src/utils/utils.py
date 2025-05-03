@@ -100,6 +100,8 @@ def get_config(args):
         config_path = "config/transformer.yml"
     elif args.legnet:
         config_path = "config/LegNet.yml"
+    elif args.ribonn:
+        config_path = "config/RiboNN.yml"
     elif args.ptrnet:
         config_path = "config/PTRnet.yml"
     else:

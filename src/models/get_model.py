@@ -50,10 +50,14 @@ def get_model(config: DictConfig, device: torch.device, logger=None):
         if logger: logger.info("Using LegNet model")
         from models.LegNet.LegNet import LegNet
         return LegNet(config, device).to(device)
+    elif config.model.lower() == "ribonn":
+        if logger: logger.info("Using RiboNN model")
+        from models.RiboNN.RiboNN import RiboNN
+        return RiboNN(config, device).to(device)
     elif config.model.lower() == "ptrnet":
         if logger: logger.info("Using PTRnet model")
         from models.PTRnet.PTRnet import PTRnet
         return PTRnet(config, device).to(device)
     else:
         raise ValueError(f"Model {config.model} not implemented! Choose from: "
-                         f"baseline, cnn, gru, lstm, xlstm, mamba, transformer, LegNet, best")  # TODO update
+                         f"baseline, cnn, gru, lstm, xlstm, mamba, transformer, LegNet, RiboNN, best")  # TODO update
