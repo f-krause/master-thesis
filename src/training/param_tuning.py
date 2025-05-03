@@ -20,9 +20,10 @@ def train_tune_fold(config: DictConfig, train_loader, val_loader, trial):
     criterion = torch.nn.BCELoss() if config.binary_class else torch.nn.MSELoss()
     early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
 
-    scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=config.lr_scheduler.reset_epochs,
-                                            T_mult=config.lr_scheduler.T_mult,
-                                            eta_min=config.lr_scheduler.min_lr, last_epoch=-1)
+    if config.lr_scheduler.enable:
+        scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=config.lr_scheduler.reset_epochs,
+                                                T_mult=config.lr_scheduler.T_mult,
+                                                eta_min=config.lr_scheduler.min_lr, last_epoch=-1)
 
     losses = {}
 
@@ -47,7 +48,9 @@ def train_tune_fold(config: DictConfig, train_loader, val_loader, trial):
             y_true.append(target.unsqueeze(1).cpu().detach().numpy())
             y_pred.append(output.cpu().detach().numpy())
 
-        scheduler.step(epoch)
+        if config.lr_scheduler.enable:
+            scheduler.step(epoch)
+
         train_loss = running_loss / len(train_loader)
         losses[epoch] = {"epoch": epoch, "train_loss": train_loss}
         y_true, y_pred = np.vstack(y_true), np.vstack(y_pred)
@@ -101,7 +104,7 @@ def train_tune_fold(config: DictConfig, train_loader, val_loader, trial):
                 break
 
     if y_true_val_best is None and y_pred_val_best is None:
-        return None
+        raise optuna.exceptions.TrialPruned()
     if config.binary_class:
         return roc_auc_score(y_true_val_best, y_pred_val_best)
     else:
