@@ -292,9 +292,13 @@ if __name__ == "__main__":
     dev_config = OmegaConf.create(
         {
             "project_path": None, "log_file_path": None, "subproject": "dev/delete_me", "dev": True,
-            # "model": "ptrnet", "train_data_file": "dev_train_9.0k_data.pkl",  # test nucleotide level data
-            "model": "baseline", "train_data_file": "dev_codon_train_8.1k_data.pkl",  # test codon level data
-            "val_data_file": "codon_val_8.1k_data.pkl", "test_data_file": "dev_codon_test_8.1k_data.pkl",
+
+            "model": "ptrnet", "train_data_file": "dev_train_9.0k_data.pkl", "val_data_file": "dev_val_9.0k_data.pkl",
+            "test_data_file": "dev_test_9.0k_data.pkl",  # test nucleotide level data
+
+            # "model": "baseline", "train_data_file": "dev_codon_train_8.1k_data.pkl",
+            # "val_data_file": "dev_codon_val_8.1k_data.pkl", "test_data_file": "dev_codon_test_8.1k_data.pkl", # test codon level data
+
             "batch_size": 4, "num_workers": 4, "folding_algorithm": "viennarna", "seed": 42,
             "nr_folds": 0,
             "random_reverse": True,
