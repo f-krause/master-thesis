@@ -41,6 +41,25 @@ def train_tune_fold(config: DictConfig, train_loader, val_loader, trial):
             target = target.to(device)
             optimizer.zero_grad()
             output = model(data)
+
+            # FOR DEBUGGING - why training fails
+            temp_output = output.cpu().detach().numpy()
+            if np.isnan(temp_output).any():
+                for name, param in model.named_parameters():
+                    if param.grad is not None:
+                        trial.set_user_attr(f"grad_{name}_max", param.grad.max().item())
+                        trial.set_user_attr(f"grad_{name}_min", param.grad.min().item())
+                    else:
+                        trial.set_user_attr(f"grad_{name}_max", None)
+                        trial.set_user_attr(f"grad_{name}_min", None)
+                trial.set_user_attr("data input to model:", str(data))
+                trial.set_user_attr("temp_output contains NaN:", str(temp_output))
+                print(f"WARNING: temp_output contains NaN: {temp_output}")
+                raise RuntimeError("temp_output contains NaN")
+            if (temp_output > 1).any() or (temp_output < 0).any():
+                trial.set_user_attr("probs_out_of_bounds", str(temp_output))
+                print(f"WARNING: probs out of bounds: min={temp_output.min().item():.2f}, max={temp_output.max().item():.2f}")
+
             loss = criterion(output.squeeze().float(), target.float())
             loss.backward()
             optimizer.step()
