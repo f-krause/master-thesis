@@ -116,7 +116,7 @@ def get_config(args):
         # Config for codon based models
         general_config = OmegaConf.load("config/general_codon.yml")
 
-    config = OmegaConf.merge(general_config, model_config)
+    config = OmegaConf.merge(general_config, model_config) # with model_config on the right, overwrites general
 
     if args.gpu_id is not None:
         OmegaConf.update(config, "gpu_id", args.gpu_id)
