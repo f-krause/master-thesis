@@ -51,7 +51,7 @@ nr_folds: 1  # if 1, will use val_fraction_of_train or val_data_file as validati
 concat_train_val: False
 evaluate_on_test: False
 embedding_max_norm: 2
-grad_clip_norm: 0  # 0 or negative → no clipping
+grad_clip_norm: 0.0  # 0 or negative → no clipping
 mixed_precision: True  # enables torch.cuda.amp if CUDA is available
 
 early_stopper_patience: 8  # disabled if < 0
@@ -64,14 +64,14 @@ clean_up_weights: True  # if True, will remove the non-optimal model weights aft
 # Optuna params
 optuna:
   storage: 'sqlite:////export/share/krausef99dm/tuning_dbs/'  # will set up subfolder for model
-  study_name: 'codon_final'
+  study_name: 'codon_final_2'
   n_trials: 150
   n_startup_trials: 10
   timeout: 86400  # in seconds (86400 = 24h)
 
 # Scheduler (Cosine Annealing Warm Restarts)
 lr_scheduler:
-  enable: False  # not used in codon setting
+  enable: True
   warmup: 0
 #  warmup: 20  # for pretrain
   reset_epochs: 5

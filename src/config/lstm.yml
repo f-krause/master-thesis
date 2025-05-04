@@ -8,18 +8,19 @@ num_workers: 1
 
 # Model
 model: "lstm"
-dim_embedding_tissue: 64  # max 29 tissues
-dim_embedding_token: 64  # 64 codons or 4 nucleotides
-predictor_hidden_dim: 64
+dim_embedding_tissue: 128  # max 29 tissues
+dim_embedding_token: 128  # 64 codons or 4 nucleotides
+predictor_hidden_dim: 32
 predictor_dropout: 0.1
+random_reverse: False
 
 bidirectional: True
-rnn_hidden_size: 128
+rnn_hidden_size: 512
 num_layers: 2
-dropout: 0.0
+dropout: 0.1
 
 # Optimizer
 optimizer:
   name: adam
-  lr: 0.0001
+  lr: 0.00015599959855408808
   weight_decay: 0

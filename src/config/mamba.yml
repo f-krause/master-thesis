@@ -10,25 +10,26 @@ num_workers: 0  # TODO seems faster than 1
 ### Best Mamba Config
 # Model
 model: "mamba"  # mamba or mamba2
-dim_embedding_token: 16  # Embedding dimension for tokens
-dim_embedding_tissue: 16  # Embedding dimension for tissues
-predictor_hidden_dim: 64
+dim_embedding_token: 128  # Embedding dimension for tokens
+dim_embedding_tissue: 128  # Embedding dimension for tissues
+predictor_hidden_dim: 128
 predictor_dropout: 0.1
+random_reverse: True
 
 # Requirement: dim_embedding * expand / headdim = multiple of 8
 d_state: 16   # SSM state expansion factor
-d_conv: 3      # Local convolution width
+d_conv: 2      # Local convolution width
 expand: 2      # Block expansion factor
-num_layers: 1  # number of sequential mamba blocks
+num_layers: 2  # number of sequential mamba blocks; 270.465 params with 64 dimension
 
 # Optimizer
 optimizer:
   name: adam
-  lr: 0.01
+  lr: 0.00021643583369462338
   weight_decay: 0
 
 
-#### Best Mamba2 Config
+#### Best Mamba2 Config (legacy from old tuning run)
 ## Model
 #model: "mamba2"  # mamba or mamba2
 #dim_embedding_token: 64  # Embedding dimension for tokens
