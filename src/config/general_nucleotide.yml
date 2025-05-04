@@ -7,11 +7,11 @@ dev: True
 # Data paths
 # note that file names might trigger certain behaviour (e.g. binary_class and codon)
 
-#train_data_file: "dev_train_9.0k_data.pkl"  # full dataset
+#train_data_file: "dev_train_9.0k_data.pkl"  # dev dataset
 #val_data_file: "dev_val_9.0k_data.pkl"
 #test_data_file: "dev_test_9.0k_data.pkl"
 
-train_data_file: "train_9.0k_data.pkl"
+train_data_file: "train_9.0k_data.pkl"  # full dataset
 val_data_file: "val_9.0k_data.pkl"
 test_data_file: "test_9.0k_data.pkl"
 
