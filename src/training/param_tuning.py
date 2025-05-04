@@ -138,6 +138,8 @@ def set_trial_parameters(trial, config):
     config.predictor_hidden = trial.suggest_categorical('predictor_hidden', params_general.predictor_hidden)
     # config.predictor_dropout = trial.suggest_categorical('predictor_dropout', params_general.predictor_dropout)
     config.lr = trial.suggest_float('lr', params_general.lr.min, params_general.lr.max, log=True)
+    # config.weight_decay = trial.suggest_float('weight_decay', params_general.weight_decay.min,
+    #                                            params_general.weight_decay.max, log=True)
     # config.lr_scheduler.reset_epochs = trial.suggest_categorical('reset_epochs', params_general.reset_epochs)
     config.random_reverse = trial.suggest_categorical('random_reverse', params_general.random_reverse)
 
