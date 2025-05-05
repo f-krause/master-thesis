@@ -24,5 +24,5 @@ activation: "gelu"
 # Optimizer
 optimizer:
   name: adam
-  lr: 0.0010919470279424945
+  lr: 0.00010919470279424945  # Note: lr was decreased by x10 as Optuna set lr lead to oscillating losses
   weight_decay: 0
