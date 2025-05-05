@@ -9,7 +9,7 @@ from log.logger import setup_logger
 from itertools import compress
 
 from data_handling.train_val_test_indices import get_train_val_test_indices
-from data_handling.data_utils import fit_evaluate_simple_models
+from data_handling.data_utils import cv_simple_models, train_validate_simple_model
 from utils.knowledge_db import CODON_MAP_DNA, TISSUES, TOKENS
 # from sklearn.model_selection import train_test_split
 
@@ -256,7 +256,8 @@ def get_train_data_loaders(config: DictConfig, fold: int):
     else:
         val_dataset = RNADataset(config, fold, val=True)
 
-    # fit_evaluate_simple_models(train_dataset, val_dataset, config.binary_class)
+    # cv_simple_models(train_dataset, val_dataset, config.binary_class)
+    # train_validate_simple_model(train_dataset, val_dataset, config.binary_class)
 
     if config.random_reverse:
         train_loader = DataLoader(dataset=train_dataset, batch_size=config.batch_size, shuffle=True,

@@ -1,16 +1,22 @@
 import os
 import torch
 import pickle
+import time
 import pandas as pd
 from sklearn.model_selection import cross_validate
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.metrics import (
+    roc_auc_score, mean_squared_error, accuracy_score,
+    precision_score, recall_score, f1_score
+)
 
 from utils.knowledge_db import CODON_MAP_DNA, TISSUES
 
 
-def fit_evaluate_simple_models(train_dataset, val_dataset, binary_class=False):
+def cv_simple_models(train_dataset, val_dataset, binary_class=False):
     """ FOR DEVELOPMENT ONLY
-    Computes a cv score for baseline models (RandomForest) using the frequency of codons and tissue one-hot encoding
+    Computes a 3-fold cross validation score for baseline models (RandomForest) using the frequency of codons and
+    tissue one-hot encoding
     """
     if binary_class:
         clf1 = RandomForestClassifier(random_state=42)
@@ -24,7 +30,7 @@ def fit_evaluate_simple_models(train_dataset, val_dataset, binary_class=False):
             freq = counts.float() / counts.sum()
             tissue_one_hot = [1 if i == tissue_id else 0 for i in range(len(TISSUES))]
             x.append(freq.tolist() + tissue_one_hot)
-        y.append(dataset.targets_bin.tolist())
+        y.append(dataset.targets_bin.tolist())  # FIXME currently only binary targets supported?
     y = y[0] + y[1]
 
     for clf in [clf1]:
@@ -38,6 +44,60 @@ def fit_evaluate_simple_models(train_dataset, val_dataset, binary_class=False):
             print(type(clf).__name__)
             print("Mean Test RMSE:", cv_scores['test_neg_root_mean_squared_error'].mean())
         print(cv_scores)
+
+
+def train_validate_simple_model(train_dataset, val_dataset, binary_class=False):
+    """ FOR DEVELOPMENT ONLY
+    Train on train set, validate on the validation set
+    """
+    if binary_class:
+        model = RandomForestClassifier(random_state=42)
+    else:
+        model = RandomForestRegressor(random_state=42)
+
+    def extract_features(dataset):
+        x, y = [], []
+        for tissue_id, rna, target in zip(dataset.tissue_ids, dataset.rna_data, dataset.targets_bin if binary_class else dataset.targets):
+            counts = torch.bincount(rna, minlength=len(CODON_MAP_DNA) + 1)[1:len(CODON_MAP_DNA) + 1]
+            freq = counts.float() / counts.sum()
+            tissue_one_hot = [1 if i == tissue_id else 0 for i in range(len(TISSUES))]
+            x.append(freq.tolist() + tissue_one_hot)
+            y.append(target)
+        return x, y
+
+    x_train, y_train = extract_features(train_dataset)
+    x_val, y_val = extract_features(val_dataset)
+
+    start_time = time.time()
+    model.fit(x_train, y_train)
+    training_time = time.time() - start_time
+
+    print(type(model).__name__)
+    print("Training Time (s):", training_time)
+
+    if binary_class:
+        y_train_pred = model.predict(x_train)
+        y_val_proba = model.predict_proba(x_val)[:, 1]
+        y_val_pred = (y_val_proba >= 0.5).astype(int)
+
+        print("Train Accuracy:", accuracy_score(y_train, y_train_pred))
+        print("Train Precision:", precision_score(y_train, y_train_pred))
+        print("Train Recall:", recall_score(y_train, y_train_pred))
+        print("Train F1:", f1_score(y_train, y_train_pred))
+
+        print("Validation ROC AUC:", roc_auc_score(y_val, y_val_proba))
+        print("Validation Accuracy:", accuracy_score(y_val, y_val_pred))
+        print("Validation Precision:", precision_score(y_val, y_val_pred))
+        print("Validation Recall:", recall_score(y_val, y_val_pred))
+        print("Validation F1:", f1_score(y_val, y_val_pred))
+    else:
+        y_train_pred = model.predict(x_train)
+        y_val_pred = model.predict(x_val)
+
+        print("Train RMSE:", mean_squared_error(y_train, y_train_pred, squared=False))
+        print("Validation RMSE:", mean_squared_error(y_val, y_val_pred, squared=False))
+
+    return model
 
 
 def store_data(identifiers: list, rna_data: list, tissue_ids: list, targets: list, targets_bin: list, indices: list,
