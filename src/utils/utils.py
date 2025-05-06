@@ -126,7 +126,7 @@ def get_config(args):
         # If pretraining, force model to not be in binary classification mode
         OmegaConf.update(config, "binary_class", False)
 
-    check_config(config)
+    config = check_config(config)
 
     return config
 
@@ -136,6 +136,19 @@ def check_config(config: DictConfig):
         raise ValueError("If running cv, concat_train_val should be True to run on train + val data.")
     if config.nr_folds > 1 and config.evaluate_on_test:
         raise ValueError("If running cv, evaluate_on_test should be False to evaluate on validation fold.")
+    if config.align_aug and config.random_reverse:
+        raise ValueError("If using alignment augmentation, random reverse should be False.")
+    if config.scale_targets and config.binary_class:
+        raise ValueError("If using target scaling, binary classification should be False.")
+    if not config.get("nucleotide_data", False):
+        # Add nucleotide data specific params to config automatically for codon case
+        config.nucleotide_data = False
+        config.seq_encoding = "embedding"
+        config.align_aug = False
+    if config.align_aug:
+        # Set new max_seq_length for alignment augmentation
+        config.max_seq_length = config.max_seq_length_aug_alignment
+    return config
 
 
 def check_path_exists(file_path, create_unique=False):
@@ -201,7 +214,7 @@ def set_seed(seed):
 
 def get_model_stats(config: DictConfig, model, device, logger):
     logger.info("Computing model statistics, assuming input is max codon sequence and tissue type (only).")
-    if config.model == "ptrnet":
+    if config.nucleotide_data:
         sequences, seq_lengths = [], []
         for i in range(config.batch_size):
             length = torch.randint(100, config.max_seq_length + 1, (1,)).item()
