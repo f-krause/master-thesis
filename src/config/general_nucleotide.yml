@@ -28,21 +28,19 @@ log_file_path: ""
 
 
 # Data params
-max_seq_length: 9000
+nucleotide_data: True
 binary_class: True
-scale_targets: False  # only works for binary_class == False
-seq_only: False
-frequency_features: False
-random_reverse: True
 tissue_id: -1  # 0-28 or -1 for all tissues
+max_seq_length: 9000  # max length of the sequence (including padding)
+max_seq_length_aug_alignment: 13637  # with padding utr_5 to align AUGs max sequences increases
+max_utr_5_len: 4695  # max length of the 5' UTR in train, val and test data of 9.0k data
+
 
 
 # Misc
 nr_folds: 1  # only 1 supported, as cross validation only for codon based models supported
 concat_train_val: False
 evaluate_on_test: False
-embedding_max_norm: 2
-grad_clip_norm: 0  # 0 or negative → no clipping
 mixed_precision: True  # enables torch.cuda.amp for regression setting and if CUDA is available
 
 early_stopper_patience: 8  # disabled if < 0
