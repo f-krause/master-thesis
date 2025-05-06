@@ -61,7 +61,7 @@ class RiboNN(nn.Module):
         self.blocks = nn.ModuleList([ConvBlockRiboNN(self.input_dim, config.dropout) for _ in range(config.num_layers)])
         # ---- end conv-tower ----
 
-        self.predictor: Optional[Predictor] = None
+        self.predictor: Optional[Predictor] = None  # lazy-init predictor network
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """
@@ -89,8 +89,6 @@ class RiboNN(nn.Module):
         for blk in self.blocks:
             x = blk(x)                                                     # (B, E_s, L_out)
 
-        # 3) head
-        # flatten
         x = x.flatten(start_dim=1)                                         # (B, E_s * L_out)
 
         # lazy-init predictor network based on flattened size

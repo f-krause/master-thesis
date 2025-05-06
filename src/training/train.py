@@ -62,7 +62,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     model = get_model(config, device, logger)
 
     # PRETRAINING
-    if config.pretrain_path:
+    if config.pretrain:
         checkpoint = torch.load(config.pretrain_path)
         missing_keys, unexpected_keys = model.load_state_dict(checkpoint['state_dict'], strict=False)
         if missing_keys:
@@ -70,8 +70,6 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
         if unexpected_keys:
             print("Unexpected keys:", unexpected_keys)
 
-    if config.pretrain:
-        # Load necessary files (expensive, loads ~800MB)
         logger.info("Loading motif cache")
         with open("/export/share/krausef99dm/data/data_train/motif_matches_cache.pkl", 'rb') as f:
             motif_cache = pickle.load(f)

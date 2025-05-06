@@ -124,8 +124,7 @@ class RNADataset(torch.utils.data.Dataset):
         self.tissue_ids = self.tissue_ids.int()
         self.targets_bin = self.targets_bin.int()
 
-        # adding frequencies to rna_data
-        if config.model.lower() == "ptrnet":
+        if config.nucleotide_data:
             self.freqs = self._compute_frequencies_nucleotides(self.rna_data)
         else:
             self.freqs = self._compute_frequencies_codons(self.rna_data)
@@ -155,6 +154,36 @@ class RNADataset(torch.utils.data.Dataset):
             freq = counts.float() / counts.sum()
             freqs.append(freq)
         return torch.stack(freqs)
+
+    def _aug_align_sequences(self):
+        self.logger.info("Aligning sequences to AUG with UTR5 padding")
+        seq_meta = [t[:, 1] for t in self.rna_data]
+
+        utr_5_lengths = []
+        count_seq_without_utr = 0
+        for t in seq_meta:
+            unique_vals, counts = torch.unique(t, return_counts=True)
+            result = dict(zip(unique_vals.tolist(), counts.tolist()))
+            try:
+                utr_5_lengths.append(result[5])
+            except KeyError:
+                utr_5_lengths.append(0)
+                count_seq_without_utr += 1
+
+        self.logger.info(f"   Number of seqs without utr: {count_seq_without_utr}")
+
+        front_pads = [self.config.max_utr_5_len - l for l in utr_5_lengths]
+
+        self.rna_data = [
+            torch.cat([torch.zeros(pad, t.size(1), dtype=t.dtype), t], dim=0)
+            for t, pad in zip(self.rna_data, front_pads)
+        ]
+
+        # Sanity check
+        max_seq_len = max(torch.tensor([seq.size(0) for seq in self.rna_data]))
+        assert max_seq_len <= self.config.max_seq_length_aug_alignment, \
+            f"Max seq length {max_seq_len} exceeds max allowed length {self.config.max_seq_length_aug_alignment=}"
+
 
     def _get_train_val_indices(self, config: DictConfig, mrna_sequences, fold):
         if config.nr_folds == 3:
@@ -196,7 +225,7 @@ class RNADataset(torch.utils.data.Dataset):
 
     def _set_codon_or_nucl_setting(self, rna_data):
         if "binary_class" in self.config.train_data_file:
-            if self.config.model.lower() == "ptrnet":
+            if self.config.nucleotide_data:
                 rna_data = [d["nucleotide_rna_data"] for d in rna_data]
             else:
                 rna_data = [d["codon_rna_data"] for d in rna_data]
@@ -221,6 +250,7 @@ class RNADataset(torch.utils.data.Dataset):
 
 
 def _pad_sequences(batch):
+    # pad sequences to the same max length
     data, targets, targets_bin = zip(*batch)
     rna_data, tissue_ids, freqs = zip(*data)
     freqs = torch.stack(freqs)
@@ -294,15 +324,19 @@ if __name__ == "__main__":
         {
             "project_path": None, "log_file_path": None, "subproject": "dev/delete_me", "dev": True,
 
+            # NUCLEOTIDE
+            "nucleotide_data": True, "seq_encoding": "embedding", "max_seq_length": 1000,
+            "max_seq_length_aug_alignment": 13637, "max_utr_5_len": 4695, "align_aug": True,
             "model": "ptrnet", "train_data_file": "dev_train_9.0k_data.pkl", "val_data_file": "dev_val_9.0k_data.pkl",
             "test_data_file": "dev_test_9.0k_data.pkl",  # test nucleotide level data
 
+            # CODON
             # "model": "baseline", "train_data_file": "dev_codon_train_8.1k_data.pkl",
             # "val_data_file": "dev_codon_val_8.1k_data.pkl", "test_data_file": "dev_codon_test_8.1k_data.pkl", # test codon level data
 
-            "batch_size": 4, "num_workers": 4, "folding_algorithm": "viennarna", "seed": 42,
+            "batch_size": 4, "num_workers": 4, "folding_algorithm": "viennarna", "seed": 42, "scale_targets": False,
             "nr_folds": 0,
-            "random_reverse": True,
+            "random_reverse": False,
             "tissue_id": -1,
             "binary_class": True,
             "frequency_features": True,
@@ -310,7 +344,7 @@ if __name__ == "__main__":
             "evaluate_on_test": True
          }
     )
-    check_config(dev_config)
+    dev_config = check_config(dev_config)
     set_project_path(dev_config)
     set_log_file(dev_config)
 
