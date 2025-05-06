@@ -9,6 +9,11 @@ batch_size: 64
 num_workers: 1
 grad_clip_norm: 0.5  # 0 or negative → no clipping
 
+# Pretraining
+pretrain_path: ""
+masked_tokens: 0.15  # % of randomly masked tokens during pretraining
+pretrain_simple_warmup: 0  # number of epochs to warmup the pretraining with only random masked tokens (faster) # TODO IMPLEMENT
+
 # Model
 model: "ptrnet"
 dim_embedding_tissue: 64  # max 29 tissues
@@ -24,7 +29,7 @@ predictor_hidden_dim: 32  # hidden size of the output layer
 predictor_dropout: 0.3  # dropout rate of the output layer
 
 # Data
-align_aug: True  # if True, will align the sequences to the AUG start codon (no sequence reversal possible)
+align_aug: True  # if True, will align the sequences to the AUG start codon (needs random_reverse = False)
 random_reverse: False
 frequency_features: False
 scale_targets: False  # only works for binary_class == False
@@ -34,13 +39,13 @@ seq_encoding: "ohe" # ["embedding", "ohe" "word2vec"]
 # Optimizer
 optimizer:
   name: adam  # sgd, adam, ranger
-  lr: 0.001
+  lr: 0.0001
   weight_decay: 0.01
 
 # Scheduler (Cosine Annealing Warm Restarts)
 lr_scheduler:
   enable: False
-  warmup: 10
+  warmup: 20
   reset_epochs: 5
   T_mult: 2
   min_lr: 1e-7
