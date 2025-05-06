@@ -11,8 +11,8 @@ grad_clip_norm: 0.5  # 0 or negative → no clipping
 
 # Model
 model: "ptrnet"
-dim_embedding_tissue: 64  # max 29 tissues
-dim_embedding_token: 64  # 64 codons or 4 nucleotides/
+dim_embedding_tissue: 128  # max 29 tissues
+dim_embedding_token: 128  # 64 codons or 4 nucleotides/
 embedding_max_norm: 2
 
 # Model Architecture
@@ -34,7 +34,7 @@ seq_encoding: "ohe" # ["embedding", "ohe" "word2vec"]
 # Optimizer
 optimizer:
   name: adam  # sgd, adam, ranger
-  lr: 0.001
+  lr: 0.0018
   weight_decay: 0.01
 
 # Scheduler (Cosine Annealing Warm Restarts)
