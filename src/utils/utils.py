@@ -9,6 +9,7 @@ from fvcore.nn import FlopCountAnalysis, flop_count_table
 
 from log.logger import setup_logger
 from utils.knowledge_db import CODON_MAP_DNA
+from data_handling.data_utils import get_one_hot_tensors
 
 
 def mkdir(path: str):
@@ -145,6 +146,8 @@ def check_config(config: DictConfig):
         config.nucleotide_data = False
         config.seq_encoding = "embedding"
         config.align_aug = False
+    if config.seq_encoding not in ["embedding", "ohe", "word2vec"]:
+        raise ValueError(f"Unknown sequence encoding: {config.seq_encoding}. Choose from embedding, ohe, word2vec.")
     if config.align_aug:
         # Set new max_seq_length for alignment augmentation
         config.max_seq_length = config.max_seq_length_aug_alignment
@@ -215,9 +218,9 @@ def set_seed(seed):
 def get_model_stats(config: DictConfig, model, device, logger):
     logger.info("Computing model statistics, assuming input is max codon sequence and tissue type (only).")
     if config.nucleotide_data:
-        sequences, seq_lengths = [], []
+        rna_data, seq_lengths = [], []
         for i in range(config.batch_size):
-            length = torch.randint(100, config.max_seq_length + 1, (1,)).item()
+            length = torch.randint(100, config.max_seq_length_aug_alignment + 1, (1,)).item()
             # Generate each column with its own integer range
             col0 = torch.randint(low=6, high=10, size=(length,))  # values in [6,9] - seq ohe
             col1 = torch.randint(low=1, high=6, size=(length,))  # values in [1,5] - coding area
@@ -225,15 +228,21 @@ def get_model_stats(config: DictConfig, model, device, logger):
             col3 = torch.randint(low=13, high=20, size=(length,))  # values in [13,19] - sec structure pred
 
             seq = torch.stack([col0, col1, col2, col3], dim=-1)
-            sequences.append(seq)
+            rna_data.append(seq)
             seq_lengths.append(length)
 
+        tissue_ids = torch.randint(29, (config.batch_size,))  # tissue_ids (B)
+
+        if config.seq_encoding.lower() == "ohe":
+            rna_data = get_one_hot_tensors(config, rna_data, tissue_ids)
+
         sample_input = [
-            torch.nn.utils.rnn.pad_sequence(sequences, batch_first=True),  # rna_data_padded (B x N x D)
-            torch.randint(29, (config.batch_size,)),  # tissue_ids (B)
+            torch.nn.utils.rnn.pad_sequence(rna_data, batch_first=True),  # rna_data_padded (B x N x D)
+            tissue_ids,  # tissue_ids (B)
             torch.tensor(seq_lengths, dtype=torch.int64),  # seq_lengths (B)
             torch.randn(config.batch_size, len(CODON_MAP_DNA)),  # frequency_features (B x 64)
         ]
+
     else:
         sample_input = [
             # rna_data_padded (batch_size x max_seq_length)

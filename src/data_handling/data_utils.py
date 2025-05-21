@@ -3,6 +3,7 @@ import torch
 import pickle
 import time
 import pandas as pd
+import torch.nn.functional as F
 from sklearn.model_selection import cross_validate
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import (
@@ -10,7 +11,51 @@ from sklearn.metrics import (
     precision_score, recall_score, f1_score
 )
 
-from utils.knowledge_db import CODON_MAP_DNA, TISSUES
+from utils.knowledge_db import CODON_MAP_DNA, TISSUES, TOKENS
+
+
+def get_one_hot_tensors(config, rna_data, tissue_ids):
+    correction = torch.tensor([6, 1, 10, 13])  # make numerical encodings start from 0
+    num_classes = [4, 5, 3, 7]
+    if config.align_aug:
+        correction = torch.tensor([5, 0, 9, 12])  # make numerical encodings start from 1 (for 5'UTR 0 padding)
+        num_classes = [5, 6, 4, 8]  # 0 class as well
+
+    one_hot_tensors = []
+    for seq, tissue_id in zip(rna_data, tissue_ids):
+        seq = seq - correction
+        seq = seq.permute(1, 0)
+
+        new_tensor = []
+        for i in range(len(num_classes)):
+            one_hot = F.one_hot(seq[i].long(), num_classes=num_classes[i])  # B x L x D x num_classes
+            new_tensor.append(one_hot)
+        # legacy: also OHE the tissue ID and append
+        # new_tensor.append(F.one_hot(tissue_id, num_classes=len(TISSUES)))
+        one_hot_tensors.append(torch.hstack(new_tensor))
+    return one_hot_tensors
+
+
+def get_rna_data_kmers(config, rna_data, k=3):
+    """ Get k-mers from RNA data with encoding mapping from word2vec model """
+    with open("/export/share/krausef99dm/data/w2v_model_data.pkl", 'rb') as f:
+        model_data = pickle.load(f)
+
+    rna_seq_only = [rna_data[i][:, 0] for i in range(len(rna_data))]
+    int2token = {i + 1: token for i, token in enumerate(TOKENS)}
+
+    rna_data_kmers = []
+    for seq in rna_seq_only:
+        seq = seq.tolist()
+        seq = [int2token.get(i) for i in seq]
+        seq_kmers = ["".join(seq[i:i + k]) for i in range(len(seq) - k + 1)]  # FIXME with seq alignment
+        if config.align_aug:
+            seq_kmers_numeric = [model_data["kmer_to_index"][kmer] + 1 for kmer in seq_kmers]
+        else:
+            seq_kmers_numeric = [model_data["kmer_to_index"][kmer] for kmer in seq_kmers]
+        rna_data_kmers.append(torch.tensor(seq_kmers_numeric))
+
+    return rna_data_kmers
 
 
 def cv_simple_models(train_dataset, val_dataset, binary_class=False):

@@ -9,7 +9,8 @@ from log.logger import setup_logger
 from itertools import compress
 
 from data_handling.train_val_test_indices import get_train_val_test_indices
-from data_handling.data_utils import cv_simple_models, train_validate_simple_model
+from data_handling.data_utils import (cv_simple_models, train_validate_simple_model, get_one_hot_tensors,
+                                      get_rna_data_kmers)
 from utils.knowledge_db import CODON_MAP_DNA, TISSUES, TOKENS
 # from sklearn.model_selection import train_test_split
 
@@ -121,6 +122,7 @@ class RNADataset(torch.utils.data.Dataset):
 
         # cast from int8 to int for computations
         self.rna_data = [r.int() for r in self.rna_data]  # TODO isn't this only necessary for nucleotide data?
+        self.rna_data_backup = self.rna_data
         self.tissue_ids = self.tissue_ids.int()
         self.targets_bin = self.targets_bin.int()
 
@@ -128,6 +130,16 @@ class RNADataset(torch.utils.data.Dataset):
             self.freqs = self._compute_frequencies_nucleotides(self.rna_data)
         else:
             self.freqs = self._compute_frequencies_codons(self.rna_data)
+
+        if config.nucleotide_data and config.seq_encoding.lower() == "ohe":
+            self.rna_data = get_one_hot_tensors(config, self.rna_data, self.tissue_ids)
+
+        elif config.nucleotide_data and config.seq_encoding.lower() == "word2vec":
+            self.rna_data = get_rna_data_kmers(config, self.rna_data)
+
+        if config.nucleotide_data and config.align_aug:
+            self._aug_align_sequences()
+
 
     @staticmethod
     def _compute_frequencies_nucleotides(rna_data_nucleotides):
@@ -139,7 +151,7 @@ class RNADataset(torch.utils.data.Dataset):
                          range(0, len(rna_decoded), 3)]
             codon_seq = torch.tensor(codon_seq)
             codon_seq = codon_seq[codon_seq != -1]
-            counts = torch.bincount(torch.tensor(codon_seq), minlength=len(CODON_MAP_DNA) + 1)[1:len(CODON_MAP_DNA) + 1]
+            counts = torch.bincount(codon_seq, minlength=len(CODON_MAP_DNA) + 1)[1:len(CODON_MAP_DNA) + 1]
             freq = counts.float() / counts.sum()
             freqs.append(freq)
         return torch.stack(freqs)
@@ -157,7 +169,7 @@ class RNADataset(torch.utils.data.Dataset):
 
     def _aug_align_sequences(self):
         self.logger.info("Aligning sequences to AUG with UTR5 padding")
-        seq_meta = [t[:, 1] for t in self.rna_data]
+        seq_meta = [t[:, 1] for t in self.rna_data_backup]
 
         utr_5_lengths = []
         count_seq_without_utr = 0
@@ -183,7 +195,6 @@ class RNADataset(torch.utils.data.Dataset):
         max_seq_len = max(torch.tensor([seq.size(0) for seq in self.rna_data]))
         assert max_seq_len <= self.config.max_seq_length_aug_alignment, \
             f"Max seq length {max_seq_len} exceeds max allowed length {self.config.max_seq_length_aug_alignment=}"
-
 
     def _get_train_val_indices(self, config: DictConfig, mrna_sequences, fold):
         if config.nr_folds == 3:
@@ -325,10 +336,12 @@ if __name__ == "__main__":
             "project_path": None, "log_file_path": None, "subproject": "dev/delete_me", "dev": True,
 
             # NUCLEOTIDE
-            "nucleotide_data": True, "seq_encoding": "embedding", "max_seq_length": 1000,
-            "max_seq_length_aug_alignment": 13637, "max_utr_5_len": 4695, "align_aug": True,
-            "model": "ptrnet", "train_data_file": "dev_train_9.0k_data.pkl", "val_data_file": "dev_val_9.0k_data.pkl",
+            "nucleotide_data": True, "model": "ptrnet", "max_seq_length": 1000, "max_seq_length_aug_alignment": 13637,
+            "max_utr_5_len": 4695,
+            "train_data_file": "dev_train_9.0k_data.pkl", "val_data_file": "dev_val_9.0k_data.pkl",
             "test_data_file": "dev_test_9.0k_data.pkl",  # test nucleotide level data
+            "align_aug": True,
+            "seq_encoding": "ohe",
 
             # CODON
             # "model": "baseline", "train_data_file": "dev_codon_train_8.1k_data.pkl",

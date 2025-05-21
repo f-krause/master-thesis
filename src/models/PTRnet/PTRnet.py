@@ -10,30 +10,12 @@ from utils.knowledge_db import TISSUES, CODON_MAP_DNA
 from models.predictor import Predictor
 from data_handling.train_data_seq import TOKENS
 
+# TODO
 # Idea: put together what you think works, then tune it fully (also predictor layer and much more stuff!
 # Then do proper ablation study
 # also tune freq model for fairness
 # hopefully it will be beaten!
 
-
-class CNNFeatureExtractor(nn.Module):
-    # TODO
-    # deep with small kernel size better than shallow with large kernels
-    # maybe treat each feature of the model as one channel?
-    def __init__(self, in_channels=19, conv_filters=64, kernel_size=5, stride=1, pool_size=3, pool_stride=1):
-        super().__init__()
-        self.conv1 = nn.Conv1d(in_channels, conv_filters, kernel_size, stride, padding="same")
-        self.relu = nn.ReLU()
-        # self.pool = nn.MaxPool1d(pool_size, stride=pool_stride, padding=1)
-        # self.conv2 = nn.Conv1d(conv_filters, int(conv_filters * 2), kernel_size * 2, stride, padding="same")
-
-    def forward(self, x):
-        x = x.permute(0, 2, 1)  # Convert (batch, seq_len, channels) → (batch, channels, seq_len)
-        x = self.relu(self.conv1(x))
-        # x = self.pool(x)
-        # x = self.relu(self.conv2(x))  # second relu necessary?
-        # x = self.conv2(x)
-        return x  # (batch, conv_filters, reduced_seq_len)
 
 
 # word to vec approach
@@ -46,7 +28,7 @@ class KMerEmbedding(nn.Module):
         num_kmers, embedding_dim = model_data["embedding_matrix"].shape
         self.embedding = nn.Embedding(num_kmers, embedding_dim)
         self.embedding.weight.data.copy_(model_data["embedding_matrix"])
-        self.embedding.weight.requires_grad = True  # Freeze embeddings with False
+        self.embedding.weight.requires_grad = False  # Freeze embeddings with False
 
     def forward(self, kmer_indices):
         return self.embedding(kmer_indices)
@@ -96,29 +78,35 @@ class PTRnetRiboNN(nn.Module):
         self.frequency_features = config.frequency_features
         self.seq_only = config.seq_only
         self.pretrain = config.pretrain
-        self.single_tissue = config.tissue_id < 0
+        self.all_tissues = config.tissue_id < 0
 
-        # embeddings (exactly as before)
-        if self.single_tissue:
+        if config.seq_encoding == "embedding":
+            nr_tokens = len(TOKENS) + 2
+            self.seq_encoder = nn.Embedding(nr_tokens, config.dim_embedding_token, padding_idx=0,
+                                            max_norm=config.embedding_max_norm)
+            nr_channels = config.dim_embedding_token
+        elif config.seq_encoding == "word2vec":
+            self.seq_encoder = KMerEmbedding().to(device)
+            nr_channels = 64  # FIXME verify
+        elif config.seq_encoding == "ohe":
+            # Just pass through OHE data
+            self.seq_encoder = nn.Identity()
+            nr_channels = 23 + config.dim_embedding_tissue
+        else:
+            raise ValueError(f"Unknown sequence encoding: {config.seq_encoding}")
+
+        if self.all_tissues:
             self.tissue_encoder = nn.Embedding(
                 num_embeddings=len(TISSUES),
                 embedding_dim=config.dim_embedding_tissue,
                 max_norm=config.embedding_max_norm,
             )
-        nr_tokens = len(TOKENS) + 2
-        self.seq_encoder = nn.Embedding(
-            num_embeddings=nr_tokens,
-            embedding_dim=config.dim_embedding_token,
-            padding_idx=0,
-            max_norm=config.embedding_max_norm,
-        )
 
         # ---- begin conv-tower ----
-        C = config.dim_embedding_token
-        D = config.predictor_dropout
-        N = config.num_layers  # we will interpret num_layers=10 → 10 conv-blocks
-        self.conv_in = nn.Conv1d(C, C, kernel_size=5, stride=1)
-        self.blocks = nn.ModuleList([ConvBlockRiboNN(C, D) for _ in range(N)])
+        self.conv_in = nn.Conv1d(nr_channels, nr_channels, kernel_size=5, stride=1)
+        self.blocks = nn.ModuleList(
+            [ConvBlockRiboNN(nr_channels, config.predictor_dropout) for _ in range(config.num_layers)]
+        )
         # ---- end conv-tower ----
 
         self.predictor: Optional[Predictor] = None  # lazy-init predictor network
@@ -137,23 +125,29 @@ class PTRnetRiboNN(nn.Module):
         rna_data_pad = F.pad(rna_data, (0, 0, 0, self.max_seq_length - rna_data.size(1)), value=0)  # (B, L, 4)
 
         # 1) embed sequence + tissue exactly as before
-        seq_emb = self.seq_encoder(rna_data_pad)                           # (B, L, 4, E_s)
+        x = self.seq_encoder(rna_data_pad)                           # (B, L, 4, E_s)
 
-        if self.seq_only:
-            # pick only nucleotide channel
-            x = seq_emb[:, :, 0, :]                                  # (B, L, E_s)
-        else:
-            # sum the four feature‐channels
-            x = seq_emb.sum(dim=2)                                   # (B, L, E_s)
+        if self.config.seq_encoding == "embedding":
+            if self.seq_only:
+                # pick only nucleotide channel
+                x = x[:, :, 0, :]                                  # (B, L, E_s)
+            else:
+                # sum the four feature‐channels
+                x = x.sum(dim=2)                                   # (B, L, E_s)
 
         # add tissue
-        if self.single_tissue:
-            tissue_emb = self.tissue_encoder(tissue_id)  # (B, E_t)
-            x = x + tissue_emb.unsqueeze(1)                              # (B, L, E_s)
+        if self.all_tissues and self.config.seq_encoding == "embedding":
+            tissue_embedding = self.tissue_encoder(tissue_id)  # (B, E_t)
+            x = x + tissue_embedding.unsqueeze(1)  # (B, L, E_s)
+        elif self.all_tissues:
+            tissue_embedding = self.tissue_encoder(tissue_id)  # (B, E_t)
+            tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, x.size(1), -1)
+            x = torch.cat([x, tissue_embedding_expanded], dim=-1)  # (B, L, E_s + E_t)
 
         # mask padding
-        mask = torch.arange(x.size(1), device=x.device)[None, :] < seq_lengths[:, None]
-        x = x * mask.unsqueeze(-1).to(x.dtype)
+        if not self.config.align_aug:
+            mask = torch.arange(x.size(1), device=x.device)[None, :] < seq_lengths[:, None]
+            x = x * mask.unsqueeze(-1).to(x.dtype)
 
         # 2) conv-tower
         # move to (B, C, L)
@@ -204,7 +198,7 @@ if __name__ == "__main__":
         "seq_encoding": "embedding",
         "pretrain": False,
         "frequency_features": False,
-        "seq_only": False,
+        "seq_only": True,
     })
 
     sequences, seq_lengths = [], []
