@@ -34,7 +34,7 @@ random_reverse: False
 frequency_features: False
 scale_targets: False  # only works for binary_class == False
 seq_only: False
-seq_encoding: "ohe" # ["embedding", "ohe" "word2vec"]
+seq_encoding: "embedding" # ["embedding", "ohe" "word2vec"]
 
 # Optimizer
 optimizer:
