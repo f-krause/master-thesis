@@ -10,12 +10,12 @@ from utils.knowledge_db import TISSUES, CODON_MAP_DNA
 from models.predictor import Predictor
 from data_handling.train_data_seq import TOKENS
 
+
 # TODO
 # Idea: put together what you think works, then tune it fully (also predictor layer and much more stuff!
 # Then do proper ablation study
 # also tune freq model for fairness
 # hopefully it will be beaten!
-
 
 
 # word to vec approach
@@ -43,6 +43,7 @@ class ConvBlockRiboNN(nn.Module):
       4) Dropout
       5) MaxPool1d(kernel_size=2)
     """
+
     def __init__(self, channels: int, dropout: float) -> None:
         super().__init__()
         self.norm = nn.LayerNorm(channels)
@@ -70,6 +71,7 @@ class PTRnetRiboNN(nn.Module):
     Embeds the 4 sequence features + tissue exactly as before, masks,
     then runs through a Conv1d input layer + 10 ConvBlocks + 2-layer head.
     """
+
     def __init__(self, config: DictConfig, device: torch.device):
         super().__init__()
         self.config = config
@@ -84,7 +86,13 @@ class PTRnetRiboNN(nn.Module):
             nr_tokens = len(TOKENS) + 2
             self.seq_encoder = nn.Embedding(nr_tokens, config.dim_embedding_token, padding_idx=0,
                                             max_norm=config.embedding_max_norm)
-            nr_channels = config.dim_embedding_token
+            if self.config.concat_tissue_feature:
+                nr_channels = config.dim_embedding_token + config.dim_embedding_tissue
+                if config.dim_embedding_tissue > 16:
+                    raise Exception(
+                        f"WARNING: concatenating seq and tissue embedding, tissue embedding seems too large {config.dim_embedding_tissue}")
+            else:
+                nr_channels = config.dim_embedding_token
         elif config.seq_encoding == "word2vec":
             self.seq_encoder = KMerEmbedding().to(device)
             nr_channels = 64  # FIXME verify
@@ -125,7 +133,7 @@ class PTRnetRiboNN(nn.Module):
         rna_data_pad = F.pad(rna_data, (0, 0, 0, self.max_seq_length - rna_data.size(1)), value=0)  # (B, L, 4)
 
         # 1) embed sequence + tissue exactly as before
-        x = self.seq_encoder(rna_data_pad)                           # (B, L, 4, E_s)
+        x = self.seq_encoder(rna_data_pad)                         # (B, L, 4, E_s)
 
         if self.config.seq_encoding == "embedding":
             if self.seq_only:
@@ -136,13 +144,14 @@ class PTRnetRiboNN(nn.Module):
                 x = x.sum(dim=2)                                   # (B, L, E_s)
 
         # add tissue
-        if self.all_tissues and self.config.seq_encoding == "embedding":
+        if self.all_tissues:
             tissue_embedding = self.tissue_encoder(tissue_id)  # (B, E_t)
-            x = x + tissue_embedding.unsqueeze(1)  # (B, L, E_s)
-        elif self.all_tissues:
-            tissue_embedding = self.tissue_encoder(tissue_id)  # (B, E_t)
-            tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, x.size(1), -1)
-            x = torch.cat([x, tissue_embedding_expanded], dim=-1)  # (B, L, E_s + E_t)
+            if self.config.concat_tissue_feature or self.config.seq_encoding == "ohe":
+                tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, x.size(1), -1)
+                x = torch.cat([x, tissue_embedding_expanded], dim=-1)  # (B, L, E_s + E_t)
+            else:
+                tissue_embedding = self.tissue_encoder(tissue_id)  # (B, E_t)
+                x = x + tissue_embedding.unsqueeze(1)  # (B, L, E_s)
 
         # mask padding
         if not self.config.align_aug:
@@ -197,7 +206,8 @@ if __name__ == "__main__":
         "tissue_id": -1,
         "seq_encoding": "embedding",
         "pretrain": False,
-        "frequency_features": False,
+        "frequency_features": True,
+        "concat_tissue_feature": False,
         "seq_only": True,
     })
 
