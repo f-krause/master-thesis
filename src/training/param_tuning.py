@@ -153,15 +153,20 @@ def set_trial_parameters(trial, config):
 
     # set the hyperparameters for the trial
     # config.batch_size = trial.suggest_categorical('batch_size', params_general.batch_size)
-    config.dim_embedding_tissue = trial.suggest_categorical('dim_embedding', params_general.dim_embedding)
-    config.dim_embedding_token = config.dim_embedding_tissue  # needs to be of same size as summed
     config.predictor_hidden = trial.suggest_categorical('predictor_hidden', params_general.predictor_hidden)
-    # config.predictor_dropout = trial.suggest_categorical('predictor_dropout', params_general.predictor_dropout)
+    # config.random_reverse = trial.suggest_categorical('random_reverse', params_general.random_reverse)
     config.lr = trial.suggest_float('lr', params_general.lr.min, params_general.lr.max, log=True)
-    # config.weight_decay = trial.suggest_float('weight_decay', params_general.weight_decay.min,
-    #                                            params_general.weight_decay.max, log=True)
-    # config.lr_scheduler.reset_epochs = trial.suggest_categorical('reset_epochs', params_general.reset_epochs)
-    config.random_reverse = trial.suggest_categorical('random_reverse', params_general.random_reverse)
+
+    if config.model == "ptrnet":
+        config.predictor_dropout = trial.suggest_categorical('predictor_dropout', params_general.predictor_dropout)
+        config.weight_decay = trial.suggest_float('weight_decay', params_general.weight_decay.min,
+                                                  params_general.weight_decay.max, log=True)
+        if params_general.lr_scheduler_enable:
+            config.lr_scheduler.enable = True
+            config.lr_scheduler.reset_epochs = trial.suggest_categorical('reset_epochs', params_general.reset_epochs)
+            config.lr_scheduler.T_mult = trial.suggest_categorical('T_mult', params_general.T_mult)
+        else:
+            config.lr_scheduler.enable = False
 
     try:
         params_model = OmegaConf.load(f'config/param_tuning/{config.model}_param.yml')
@@ -169,7 +174,7 @@ def set_trial_parameters(trial, config):
         raise Exception(f"No yml file for {config.model} found at config/param_tuning for hyperparameter tuning.")
 
     for key, values in params_model.items():
-        if config.model == "RiboNN" and key == "grad_clip_norm":
+        if config.model in ["RiboNN", "ptrnet"] and key == "grad_clip_norm":
             # Edge case handling
             continue
         config[key] = trial.suggest_categorical(key, values)
@@ -186,9 +191,32 @@ def set_trial_parameters(trial, config):
         else:
             config.slstm_at = []
 
-    if config.model == "RiboNN":
+    if config.model in ["RiboNN", "ptrnet"]:
         config.grad_clip_norm = trial.suggest_float("grad_clip_norm", params_model.grad_clip_norm.min,
                                                     params_model.grad_clip_norm.max, log=True)
+
+    if config.model == "ptrnet":
+        if config.seq_encoding == "ohe":
+            config.seq_only = False
+
+        if config.seq_encoding == "embedding":
+            if config.concat_tissue_feature:
+                config.dim_embedding_token = trial.suggest_categorical('dim_embedding', params_general.dim_embedding)
+                config.dim_embedding_tissue = trial.suggest_categorical('dim_embedding_tissue',
+                                                                        params_general.dim_embedding_tissue)
+            else:
+                config.dim_embedding_token = trial.suggest_categorical('dim_embedding', params_general.dim_embedding)
+                config.dim_embedding_tissue = config.dim_embedding_token
+        elif config.seq_encoding == "ohe":
+            # only need embedding for tissue
+            config.dim_embedding_tissue = trial.suggest_categorical('dim_embedding_tissue',
+                                                                    params_general.dim_embedding_tissue)
+            config.concat_tissue_feature = True
+        else:
+            raise Exception(f"Unsupported seq_encoding {config.seq_encoding} for ptrnet model.")
+    else:
+        config.dim_embedding_token = trial.suggest_categorical('dim_embedding', params_general.dim_embedding)
+        config.dim_embedding_tissue = config.dim_embedding_token  # needs to be of same size as summed
 
     if config.model == "mamba2":
         if (config.dim_embedding_token * config.expand / config.head_dim) % 8 != 0:
