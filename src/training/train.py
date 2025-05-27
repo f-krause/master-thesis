@@ -126,7 +126,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
 
             with torch.amp.autocast(device_type=device.type, enabled=use_amp):
                 if config.pretrain:
-                    mutated_data, targets, mask = get_pretrain_mask_data(data, config, motif_cache, motif_tree_dict)
+                    mutated_data, targets, mask = get_pretrain_mask_data(epoch, data, config, motif_cache, motif_tree_dict)
                     output = model(mutated_data)
                     # compute combined loss, need to subtract the min token value from the target to get the correct index
                     loss = (criterion(output[0][mask], targets[0] - 6) +

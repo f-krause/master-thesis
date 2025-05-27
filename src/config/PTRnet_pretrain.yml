@@ -2,6 +2,7 @@
 
 # Training
 epochs: 200
+efficient_masking_epochs: 50  # epochs with efficient base level and subsequence masking, then expensive motif masking
 save_freq: 1
 val_freq: 1
 warmup: 0

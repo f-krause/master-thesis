@@ -234,11 +234,14 @@ def motif_level_masking(data, config, motif_cache, motif_tree_dict):
     return [rna_data, tissue_ids, seq_lengths, freq], targets, mask
 
 
-def get_pretrain_mask_data(data, config: DictConfig, motif_cache, motif_tree_dict):
+def get_pretrain_mask_data(epoch, data, config: DictConfig, motif_cache, motif_tree_dict):
     # data: [rna_data: (B,N,D), tissue_ids: (B,), seq_lengths: (B,)]
     # motif masking 10 times slower than others, hence in total around 3 times slower as without
+    if epoch < config.efficient_masking_epochs:
+        masking_strategy = random.choice([base_level_masking, subsequence_masking])
+    else:
+        masking_strategy = random.choice([base_level_masking, subsequence_masking, motif_level_masking])
 
-    masking_strategy = random.choice([base_level_masking, subsequence_masking, motif_level_masking])
     # masking_strategy = motif_level_masking  # for dev
     return masking_strategy(data, config, motif_cache, motif_tree_dict)
 
