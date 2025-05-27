@@ -17,7 +17,8 @@ def train_tune_fold(config: DictConfig, train_loader, val_loader, trial):
     device = get_device(config)
     model = get_model(config, device)
     optimizer = get_optimizer(model, config.optimizer)
-    criterion = torch.nn.BCELoss() if config.binary_class else torch.nn.MSELoss()
+    # criterion = torch.nn.BCELoss() if config.binary_class else torch.nn.MSELoss()
+    criterion = torch.nn.BCEWithLogitsLoss() if config.binary_class else torch.nn.MSELoss()
     early_stopper = EarlyStopper(patience=config.early_stopper_patience, min_delta=config.early_stopper_delta)
 
     if config.lr_scheduler.enable:
