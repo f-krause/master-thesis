@@ -29,6 +29,7 @@ def train_tune_fold(config: DictConfig, train_loader, val_loader, trial):
 
     best_epoch = 1
     y_true_val_best, y_pred_val_best = None, None
+    iters = len(train_loader)
     for epoch in range(1, config.epochs + 1):
         model.train()
 
@@ -67,8 +68,8 @@ def train_tune_fold(config: DictConfig, train_loader, val_loader, trial):
             y_true.append(target.unsqueeze(1).cpu().detach().numpy())
             y_pred.append(output.cpu().detach().numpy())
 
-        if config.lr_scheduler.enable:
-            scheduler.step(epoch)
+            if config.lr_scheduler.enable:
+                scheduler.step(epoch + batch_idx / iters)
 
         train_loss = running_loss / len(train_loader)
         losses[epoch] = {"epoch": epoch, "train_loss": train_loss}

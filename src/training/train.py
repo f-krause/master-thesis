@@ -112,6 +112,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     best_epoch = 1
     y_true_train_best, y_pred_train_best = None, None
     y_true_val_best, y_pred_val_best = None, None
+    iters = len(train_loader)
     for epoch in range(1, config.epochs + 1):
         model.train()
 
@@ -167,9 +168,10 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             optimizer.zero_grad()
             running_loss += loss.item()
 
-        if config.lr_scheduler.enable and epoch > config.lr_scheduler.warmup:
-            scheduler.step(epoch - config.lr_scheduler.warmup)
-            aim_run.track(scheduler.get_last_lr(), name='learning_rate_curr', epoch=epoch)
+            if config.lr_scheduler.enable:
+                scheduler.step(epoch + batch_idx / iters)
+
+        aim_run.track(scheduler.get_last_lr(), name='learning_rate_curr', epoch=epoch)
 
         train_loss = running_loss / len(train_loader)
         losses[epoch] = {"epoch": epoch, "train_loss": train_loss}
