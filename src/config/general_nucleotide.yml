@@ -21,7 +21,6 @@ test_data_file: "test_9.0k_data.pkl"
 
 
 # Optional
-pretrain: False
 project_path: ""  # project path (data and model weights)
 log_file_path: ""
 
@@ -51,7 +50,7 @@ clean_up_weights: True  # if True, will remove the non-optimal model weights aft
 # Optuna params
 optuna:
   storage: 'sqlite:////export/share/krausef99dm/tuning_dbs/'  # will set up subfolder for model
-  study_name: 'base'
-  n_trials: 250
-  n_startup_trials: 20
-  timeout: 86400  # in seconds (86400 = 24h)
+  study_name: 'final_1'
+  n_trials: 400
+  n_startup_trials: 40
+  timeout: 172800  # in seconds (86400 = 24h)
