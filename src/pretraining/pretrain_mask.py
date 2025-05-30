@@ -1,11 +1,13 @@
 # ideas from https://github.com/CatIIIIIIII/RNAErnie/blob/main/rna_pretrainer.py (last accessed 10.12.2024)
 import torch
 import random
+import pickle
 from omegaconf import OmegaConf, DictConfig
 
 from data_handling.train_data_seq import TOKENS
 from pretraining.pretrain_utils import hash_sequence, get_motif_tree_dict
 from pretraining.store_identified_motifs import precompute_motif_matches
+from utils.knowledge_db import CODON_MAP_DNA
 
 MASK_TOKEN = len(TOKENS) + 1
 
@@ -252,11 +254,13 @@ if __name__ == "__main__":
 
     config_dev = OmegaConf.create({
         "batch_size": 8,
+        "efficient_masking_epochs": 0,
         "max_seq_length": 1000,
         "binary_class": True,
         "embedding_max_norm": 2,
         "gpu_id": 0,
         "pretrain": True,
+        "masked_tokens": 0.1,
     })
 
     sequences, seq_lengths = [], []
@@ -275,10 +279,18 @@ if __name__ == "__main__":
     sample_batch = [
         torch.nn.utils.rnn.pad_sequence(sequences, batch_first=True),  # rna_data_padded (B x N x D)
         torch.randint(29, (config_dev.batch_size,)),  # tissue_ids (B)
-        torch.tensor(seq_lengths, dtype=torch.int64)  # seq_lengths (B)
+        torch.tensor(seq_lengths, dtype=torch.int64),  # seq_lengths (B)
+        torch.randn(config_dev.batch_size, len(CODON_MAP_DNA)),  # frequency_features (B x 64)
     ]
     sample_batch_copy = copy.deepcopy(sample_batch)
-    mutated_data, targets, mask = get_pretrain_mask_data(sample_batch, config_dev)
+
+    with open("/export/share/krausef99dm/data/data_train/motif_matches_cache.pkl", 'rb') as f:
+        motif_cache = pickle.load(f)
+    motif_tree_dict = get_motif_tree_dict()
+
+    mutated_data, targets, mask = get_pretrain_mask_data(100, sample_batch, config_dev, motif_cache,
+                                                         motif_tree_dict)
+
     print(mutated_data[0].shape)
     print(mask.shape)
     print(targets.shape)
