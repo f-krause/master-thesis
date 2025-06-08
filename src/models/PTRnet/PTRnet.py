@@ -5,22 +5,17 @@ import torch.nn.functional as F
 from torch import Tensor
 from typing import Optional
 from omegaconf import DictConfig, OmegaConf
-from utils.knowledge_db import TISSUES, CODON_MAP_DNA
 
+from utils.knowledge_db import TISSUES, CODON_MAP_DNA
+from utils.utils import check_config
 from models.predictor import Predictor
 from data_handling.train_data_seq import TOKENS
-
-
-# TODO
-# Idea: put together what you think works, then tune it fully (also predictor layer and much more stuff!
-# Then do proper ablation study
-# also tune freq model for fairness
-# hopefully it will be beaten!
 
 
 # word to vec approach
 # https://github.com/mat310/W2VC/blob/master/code/wanmei2.ipynb
 class KMerEmbedding(nn.Module):
+    # LEGACY
     def __init__(self):
         super().__init__()
         with open("/export/share/krausef99dm/data/w2v_model_data.pkl", 'rb') as f:
@@ -48,9 +43,9 @@ class ConvBlockRiboNN(nn.Module):
         super().__init__()
         self.norm = nn.LayerNorm(channels)
         self.act = nn.ReLU(inplace=True)
-        self.conv = nn.Conv1d(channels, channels, kernel_size=5, stride=1)
+        self.conv = nn.Conv1d(channels, channels, kernel_size=5, stride=1, padding=2)
         self.drop = nn.Dropout(dropout)
-        self.pool = nn.MaxPool1d(kernel_size=2)
+        self.pool = nn.MaxPool1d(kernel_size=2, stride=2, padding=0)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # x: (B, C, L)
@@ -62,6 +57,79 @@ class ConvBlockRiboNN(nn.Module):
         x = self.conv(x)            # → (B, C, L-4)
         x = self.drop(x)
         x = self.pool(x)            # → (B, C, ⌊(L-4)/2⌋)
+        return x
+
+
+class ConvEncoderRiboNN(nn.Module):
+    def __init__(self, nr_channels, config):
+        super().__init__()
+        self.conv_in = nn.Conv1d(nr_channels, nr_channels, kernel_size=5, stride=1, padding=2)
+        self.blocks = nn.ModuleList(
+            [ConvBlockRiboNN(nr_channels, config.predictor_dropout)
+             for _ in range(config.num_layers)]
+        )
+
+    def forward(self, x):
+        x = self.conv_in(x)
+        for block in self.blocks:
+            x = block(x)
+        return x
+
+
+class DeconvBlockRiboNN(nn.Module):
+    """
+    One “inverse” conv‐block for decoding:
+      1) Upsample by factor 2 (undoes MaxPool1d(kernel_size=2))
+      2) ConvTranspose1d(kernel_size=5) (undoes Conv1d(kernel_size=5))
+      3) ReLU
+      4) LayerNorm over channels (via transpose)
+    """
+    def __init__(self, channels: int) -> None:
+        super().__init__()
+        self.upsample = nn.Upsample(scale_factor=2, mode='nearest')
+        # ConvTranspose1d with same kernel_size=5, stride=1, no padding
+        self.deconv = nn.ConvTranspose1d(channels, channels, kernel_size=5, stride=1, padding=2, output_padding=0)
+        self.act = nn.ReLU(inplace=True)
+        self.norm = nn.LayerNorm(channels)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # x: (B, C, L′) where L′ was pooled by 2 and reduced by conv
+        x = self.upsample(x)               # → (B, C, 2·L′)
+        x = self.deconv(x)                 # → (B, C, 2·L′ + 4)
+        x = self.act(x)
+        # apply LayerNorm on channels → need to swap (B, L, C)
+        x = x.transpose(1, 2)              # → (B, L_out, C)
+        x = self.norm(x)
+        x = x.transpose(1, 2)              # → (B, C, L_out)
+        return x
+
+
+class ConvDecoderRiboNN(nn.Module):
+    """
+    Decoder that mirrors:
+        conv_in → [ ConvBlockRiboNN ] * num_layers
+    by using:
+        [ DeconvBlockRiboNN ] * num_layers → conv_out
+    """
+    def __init__(self, nr_channels: int, num_layers: int) -> None:
+        super().__init__()
+        # Build one DeconvBlock per encoder block, in reverse order
+        self.blocks = nn.ModuleList(
+            [DeconvBlockRiboNN(nr_channels) for _ in range(num_layers)]
+        )
+        # Final ConvTranspose1d to “undo” the initial conv_in(kernel_size=5)
+        self.conv_out = nn.ConvTranspose1d(nr_channels, nr_channels, kernel_size=5, stride=1, padding=2)
+
+    def forward(self, x: torch.Tensor, L_target) -> torch.Tensor:
+        # x: (B, C, L_latent), output of the last encoder block
+        for block in self.blocks:
+            x = block(x)
+        x = self.conv_out(x)   # → (B, C, original_length)
+        if x.size(2) > L_target:
+            x = x[:, :, :L_target]
+        elif x.size(2) < L_target:
+            pad = L_target - x.size(2)
+            x = nn.functional.pad(x, (0, pad))  # pad on the right
         return x
 
 
@@ -88,14 +156,15 @@ class PTRnetRiboNN(nn.Module):
                                             max_norm=config.embedding_max_norm)
             if self.config.concat_tissue_feature:
                 nr_channels = config.dim_embedding_token + config.dim_embedding_tissue
-                if config.dim_embedding_tissue > 16:
+                if config.dim_embedding_tissue > 32:
                     raise Exception(
                         f"WARNING: concatenating seq and tissue embedding, tissue embedding seems too large {config.dim_embedding_tissue}")
             else:
                 nr_channels = config.dim_embedding_token
         elif config.seq_encoding == "word2vec":
-            self.seq_encoder = KMerEmbedding().to(device)
-            nr_channels = 64  # FIXME verify
+            raise NotImplementedError("Word2Vec encoding is not implemented in this version.")
+            # self.seq_encoder = KMerEmbedding().to(device)
+            # nr_channels = 64
         elif config.seq_encoding == "ohe":
             # Just pass through OHE data
             self.seq_encoder = nn.Identity()
@@ -103,25 +172,21 @@ class PTRnetRiboNN(nn.Module):
         else:
             raise ValueError(f"Unknown sequence encoding: {config.seq_encoding}")
 
-        if self.all_tissues:
+        if self.all_tissues and not self.pretrain:
             self.tissue_encoder = nn.Embedding(
                 num_embeddings=len(TISSUES),
                 embedding_dim=config.dim_embedding_tissue,
                 max_norm=config.embedding_max_norm,
             )
 
-        # ---- begin conv-tower ----
-        self.conv_in = nn.Conv1d(nr_channels, nr_channels, kernel_size=5, stride=1)
-        self.blocks = nn.ModuleList(
-            [ConvBlockRiboNN(nr_channels, config.predictor_dropout) for _ in range(config.num_layers)]
-        )
-        # ---- end conv-tower ----
+        self.encoder = ConvEncoderRiboNN(nr_channels=nr_channels, config=config).to(device)
 
-        self.predictor: Optional[Predictor] = None  # lazy-init predictor network
-
-        # if someone still flips on pretrain, we haven’t implemented that here
+        # ---- head (lazy init) ----
         if self.pretrain:
-            raise NotImplementedError("Conv-based PTRnetRiboNN does not support pretrain mode.")
+            self.predictors: Optional[nn.ModuleList] = None
+            self.decoder = ConvDecoderRiboNN(nr_channels, config.num_layers).to(device)
+        else:
+            self.predictor: Optional[Predictor] = None
 
     def forward(self, inputs: Tensor) -> Tensor:
         """
@@ -144,7 +209,7 @@ class PTRnetRiboNN(nn.Module):
                 x = x.sum(dim=2)                                   # (B, L, E_s)
 
         # add tissue
-        if self.all_tissues:
+        if self.all_tissues and not self.pretrain:
             tissue_embedding = self.tissue_encoder(tissue_id)  # (B, E_t)
             if self.config.concat_tissue_feature or self.config.seq_encoding == "ohe":
                 tissue_embedding_expanded = tissue_embedding.unsqueeze(1).expand(-1, x.size(1), -1)
@@ -161,26 +226,46 @@ class PTRnetRiboNN(nn.Module):
         # 2) conv-tower
         # move to (B, C, L)
         x = x.permute(0, 2, 1)                                             # (B, E_s, L)
-        x = self.conv_in(x)                                                # (B, E_s, L-4)
-        for blk in self.blocks:
-            x = blk(x)                                                     # (B, E_s, L_out)
+        L_target = x.size(2)
+        x = self.encoder(x)                                                # (B, E_s, L_out)
+        out_dim = x.size(1)
 
-        # 3) head
-        # flatten
-        x = x.flatten(start_dim=1)                                         # (B, E_s * L_out)
+        # if pretrain
+        if self.pretrain:
+            # deconv-tower
+            x = self.decoder(x, L_target)                                             # (B, E_s, L_out)
+            x = x.permute(0, 2, 1)                                                    # (B, L_out, E_s)
 
-        # optionally concat codon freqs
-        if self.frequency_features:
-            x = torch.cat([x, codon_freqs], dim=1)                         # (B, E_s*L_out + F)
+            if self.predictors is None:
+                self.predictors = nn.ModuleList(
+                    [
+                        nn.Linear(out_dim, 4 + 1),  # sequence_ohe + padding token
+                        nn.Linear(out_dim, 5 + 1),  # coding_area_ohe
+                        nn.Linear(out_dim, 3 + 1),  # sec_struc_ohe
+                        nn.Linear(out_dim, 7 + 1),  # loop_type_ohe
+                    ]
+                ).to(self.device)
 
-        # lazy-init predictor network based on flattened size
-        if self.predictor is None:
-            in_dim = x.size(1)
-            self.predictor = Predictor(self.config, input_size=in_dim).to(self.device)
+            probs = []
+            for predictor in self.predictors:
+                logits = predictor(x)
+                probs.append(F.softmax(logits, dim=-1))
 
-        probs = self.predictor(x)  # (B, 1)
+            return probs
+        else:
+            # flatten
+            x = x.flatten(start_dim=1)  # (B, E_s * L_out)
 
-        return probs
+            # optionally concat codon freqs
+            if self.frequency_features:
+                x = torch.cat([x, codon_freqs], dim=1)  # (B, E_s*L_out + F)
+                out_dim = x.size(1)
+
+            # lazy-init predictor network based on flattened size
+            if self.predictor is None:
+                self.predictor = Predictor(self.config, input_size=out_dim).to(self.device)
+
+            return self.predictor(x)  # (B, 1)
 
 
 class PTRnet(nn.Module):
@@ -199,17 +284,23 @@ if __name__ == "__main__":
     config_dev = OmegaConf.load("config/PTRnet.yml")
     config_dev = OmegaConf.merge(config_dev, {
         "batch_size": 8,
-        "max_seq_length": 9000,
+        "max_seq_length": 13637,
         "binary_class": True,
         "embedding_max_norm": 0.5,
         "gpu_id": 0,
+        "nr_folds": 1,
         "tissue_id": -1,
-        "seq_encoding": "embedding",
-        "pretrain": False,
-        "frequency_features": True,
+
+        "pretrain": True,
+        "align_aug": True,
+        "random_reverse": False,
         "concat_tissue_feature": False,
-        "seq_only": True,
+        "frequency_features": True,
+        "seq_only": False,
+        "seq_encoding": "embedding",
     })
+
+    config_dev = check_config(config_dev)
 
     sequences, seq_lengths = [], []
     for i in range(config_dev.batch_size):
@@ -223,7 +314,7 @@ if __name__ == "__main__":
         seq = torch.stack([col0, col1, col2, col3], dim=-1)
 
         if config_dev.seq_encoding == "ohe":
-            seq = torch.randint(0, 2, (length, 19))
+            seq = torch.randint(0, 2, (length, 23)).float()
         elif config_dev.seq_encoding == "word2vec":
             seq = torch.randint(0, 64, (length,))
 
