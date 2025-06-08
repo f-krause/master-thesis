@@ -3,12 +3,14 @@ import torch
 import time
 import pickle
 import aim  # https://aimstack.io/#demos
+import copy
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from sklearn.metrics import roc_auc_score
 from omegaconf import OmegaConf, DictConfig
 from knockknock import discord_sender
+from scipy.special import expit
 
 from log.logger import setup_logger
 from utils.utils import *
@@ -62,7 +64,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     model = get_model(config, device, logger)
 
     # PRETRAINING
-    if config.pretrain:
+    if config.pretrain_path:
         checkpoint = torch.load(config.pretrain_path)
         missing_keys, unexpected_keys = model.load_state_dict(checkpoint['state_dict'], strict=False)
         if missing_keys:
@@ -70,9 +72,14 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
         if unexpected_keys:
             print("Unexpected keys:", unexpected_keys)
 
+    if config.pretrain:
         logger.info("Loading motif cache")
-        with open("/export/share/krausef99dm/data/data_train/motif_matches_cache.pkl", 'rb') as f:
-            motif_cache = pickle.load(f)
+        if not config.align_aug:
+            with open("/export/share/krausef99dm/data/data_train/motif_matches_cache.pkl", 'rb') as f:
+                motif_cache = pickle.load(f)
+        else:
+            logger.warning("Motif cache currently not built for aligned sequences, expect slightly slower training.")
+            motif_cache = None  # disable as cache not working with aligned sequences
         motif_tree_dict = get_motif_tree_dict()
 
     # OPTIMIZER
@@ -119,7 +126,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
 
         running_loss = 0.0
         y_true, y_pred, tissue_ids = [], [], []
-        for batch_idx, (data, target, target_bin) in enumerate(tqdm(train_loader)):
+        for batch_idx, (data, target, target_bin) in enumerate(tqdm(train_loader, desc="Train Epoch")):
             data = [d.to(device) for d in data]
 
             if config.scale_targets and not config.binary_class:
@@ -127,13 +134,22 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
 
             with torch.amp.autocast(device_type=device.type, enabled=use_amp):
                 if config.pretrain:
-                    mutated_data, targets, mask = get_pretrain_mask_data(epoch, data, config, motif_cache, motif_tree_dict)
+                    mutated_data, _, _ = get_pretrain_mask_data(epoch, copy.deepcopy(data), config, motif_cache, motif_tree_dict)
                     output = model(mutated_data)
                     # compute combined loss, need to subtract the min token value from the target to get the correct index
-                    loss = (criterion(output[0][mask], targets[0] - 6) +
-                            criterion(output[1][mask], targets[1] - 1) +
-                            criterion(output[2][mask], targets[2] - 10) +
-                            criterion(output[3][mask], targets[3] - 13))
+                    max_batch_len = mutated_data[0].size(1)
+
+                    loss = (
+                            criterion(output[0][:, :max_batch_len, :].permute(0, 2, 1),
+                                      torch.where(data[0][:, :, 0] == 0, data[0][:, :, 0], data[0][:, :, 0] - 5).long()) +
+                            criterion(output[1][:, :max_batch_len, :].permute(0, 2, 1),
+                                      data[0][:, :, 1].long()) +
+                            criterion(output[2][:, :max_batch_len, :].permute(0, 2, 1),
+                                      torch.where(data[0][:, :, 2] == 0, data[0][:, :, 2], data[0][:, :, 2] - 9).long()) +
+                            criterion(output[3][:, :max_batch_len, :].permute(0, 2, 1),
+                                      torch.where(data[0][:, :, 3] == 0, data[0][:, :, 3], data[0][:, :, 3] - 12).long())
+                    )
+
                     loss = loss / 4  # average loss over the 4 tasks
                     y_true.append(torch.tensor(0))  # dummy
                     y_pred.append(torch.tensor(0))  # dummy
@@ -172,7 +188,8 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             if config.lr_scheduler.enable:
                 scheduler.step(epoch + batch_idx / iters)
 
-        aim_run.track(scheduler.get_last_lr(), name='learning_rate_curr', epoch=epoch)
+        if config.lr_scheduler.enable:
+            aim_run.track(scheduler.get_last_lr(), name='learning_rate_curr', epoch=epoch)
 
         train_loss = running_loss / len(train_loader)
         losses[epoch] = {"epoch": epoch, "train_loss": train_loss}
@@ -211,16 +228,29 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                         target = scale_y(target, **scaler_cfg)
 
                     if config.pretrain:
-                        mutated_data, targets, mask = get_pretrain_mask_data(data, config, motif_cache, motif_tree_dict)
+                        mutated_data, _, _ = get_pretrain_mask_data(epoch, copy.deepcopy(data), config, motif_cache,
+                                                                    motif_tree_dict)
                         output = model(mutated_data)
                         # compute combined loss, need to subtract the min token value from the target to get the correct index
-                        loss = (criterion(output[0][mask], targets[0] - 6) +
-                                criterion(output[1][mask], targets[1] - 1) +
-                                criterion(output[2][mask], targets[2] - 10) +
-                                criterion(output[3][mask], targets[3] - 13))
+                        max_batch_len = mutated_data[0].size(1)
+
+                        loss = (
+                                criterion(output[0][:, :max_batch_len, :].permute(0, 2, 1),
+                                          torch.where(data[0][:, :, 0] == 0, data[0][:, :, 0],
+                                                      data[0][:, :, 0] - 5).long()) +
+                                criterion(output[1][:, :max_batch_len, :].permute(0, 2, 1),
+                                          data[0][:, :, 1].long()) +
+                                criterion(output[2][:, :max_batch_len, :].permute(0, 2, 1),
+                                          torch.where(data[0][:, :, 2] == 0, data[0][:, :, 2],
+                                                      data[0][:, :, 2] - 9).long()) +
+                                criterion(output[3][:, :max_batch_len, :].permute(0, 2, 1),
+                                          torch.where(data[0][:, :, 3] == 0, data[0][:, :, 3],
+                                                      data[0][:, :, 3] - 12).long())
+                        )
                         loss = loss / 4  # average loss over the 4 tasks
                         y_true_val.append(torch.tensor(0))  # dummy
                         y_pred_val.append(torch.tensor(0))  # dummy
+                        tissue_ids_val.append(torch.tensor(0))  # dummy
                     else:
                         if config.binary_class:
                             target = target_bin
@@ -258,7 +288,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                     y_true_val_best, y_pred_val_best = y_true_val.flatten(), y_pred_val.flatten()
                     y_true_train_best, y_pred_train_best = y_true.flatten(), y_pred.flatten()
 
-                    evaluate(y_true_val_best, y_pred_val_best, tissue_ids_val, "val", best_epoch,
+                    evaluate(y_true_val_best, expit(y_pred_val_best), tissue_ids_val, "val", best_epoch,
                              fold, config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
             else:
                 if val_loss <= losses[best_epoch].get("val_loss", np.inf):
@@ -267,7 +297,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                     y_true_val_best, y_pred_val_best = y_true_val.flatten(), y_pred_val.flatten()
                     y_true_train_best, y_pred_train_best = y_true.flatten(), y_pred.flatten()
 
-                    evaluate(y_true_val_best, y_pred_val_best, tissue_ids_val, "val", best_epoch,
+                    evaluate(y_true_val_best, expit(y_pred_val_best), tissue_ids_val, "val", best_epoch,
                              fold, config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
 
             if early_stopper.early_stop(val_loss):
@@ -302,9 +332,9 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     logger.info(f"Weights path: {checkpoint_path}")
 
     if config.final_evaluation and not config.pretrain:
-        metric_val = evaluate(y_true_val_best, y_pred_val_best, tissue_ids_val, "val", best_epoch, fold,
+        metric_val = evaluate(y_true_val_best, expit(y_pred_val_best), tissue_ids_val, "val", best_epoch, fold,
                               config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
-        metric_train = evaluate(y_true_train_best, y_pred_train_best, tissue_ids, "train", best_epoch, fold,
+        metric_train = evaluate(y_true_train_best, expit(y_pred_train_best), tissue_ids, "train", best_epoch, fold,
                                 config.binary_class, os.environ["SUBPROJECT"], logger, aim_run)
         aim_run.close()
         return {"metric_val": float(metric_val), "metric_train": float(metric_train), "best_epoch": best_epoch,
