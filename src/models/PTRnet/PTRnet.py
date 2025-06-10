@@ -255,6 +255,7 @@ class PTRnetRiboNN(nn.Module):
         else:
             # flatten
             x = x.flatten(start_dim=1)  # (B, E_s * L_out)
+            out_dim = x.size(1)
 
             # optionally concat codon freqs
             if self.frequency_features:
