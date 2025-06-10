@@ -36,8 +36,8 @@ max_utr_5_len: 4695  # max length of the 5' UTR in train, val and test data of 9
 
 # Misc
 nr_folds: 1  # only 1 supported, as cross validation only for codon based models supported
-concat_train_val: False
-evaluate_on_test: False
+concat_train_val: True  # concat train and validation set for training model
+evaluate_on_test: True  # evaluate on test set after training
 mixed_precision: True  # enables torch.cuda.amp for regression setting and if CUDA is available
 
 early_stopper_patience: 8  # disabled if < 0

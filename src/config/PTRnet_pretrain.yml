@@ -4,7 +4,7 @@
 # PTRnet - nucleotide level model
 
 # Training
-epochs: 150
+epochs: 150  # model training usually failed with "RuntimeError: The total norm of order 2.0 for gradients from `parameters` is non-finite" error after 60-90 epochs
 save_freq: 1
 val_freq: 1
 warmup: 0
@@ -13,7 +13,7 @@ num_workers: 1
 grad_clip_norm: 0.15  # 0 or negative → no clipping
 
 # Pretraining
-pretrain: True  # if True, will pretrain the model on the training set
+pretrain: True  # if True, will pretrain the model on train, val and test set combined!
 efficient_masking_epochs: 0  # number of epochs to use efficient masking strategies only
 pretrain_path: ""  # if given, will load model checkpoints from this path
 masked_tokens: 0.2  # nr of of randomly masked tokens during pretraining
