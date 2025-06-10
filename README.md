@@ -122,10 +122,19 @@ aim up
 ssh -f -N -L 43800:localhost:43800 krausef99dm@jyn.dm.univie.ac.at
 ```
 
+How to search and filter runs in AIM: https://aimstack.readthedocs.io/en/latest/using/search.html
+
+
+
 ### Use Optuna dashboard
 From within the data folder for optuna, run:
 ```shell
 optuna-dashboard sqlite:////export/share/krausef99dm/tuning_dbs/baseline.db
+```
+
+### start jupyter server manually
+```shell
+jupyter notebook --no-browser --port=8888
 ```
 
 
