@@ -194,27 +194,29 @@ def motif_level_masking(data, config, motif_cache, motif_tree_dict):
             print("WARNING: No motifs found for sequence")
             continue
 
-        num_to_predict = int(length * config.masked_tokens)
+        num_to_predict = min(length, config.nr_masked_tokens)
 
         # Select motifs without overlap until we reach num_to_predict
         covered_indexes = set()
         selected_indexes = []
         tokens_chosen = 0
         for ngram in ngram_candidates:
-            # Check if adding this motif would exceed the number we need
+            if tokens_chosen >= num_to_predict:
+                break
             if tokens_chosen + len(ngram) > num_to_predict:
+                needed = num_to_predict - tokens_chosen
+                available = [idx for idx in ngram if idx < length and idx not in covered_indexes]
+                if len(available) >= needed:
+                    selected = random.sample(available, needed)
+                    covered_indexes.update(selected)
+                    selected_indexes.extend(selected)
+                    tokens_chosen += needed
                 continue
-
-            # Check for overlap
             if any(idx in covered_indexes for idx in ngram):
                 continue
-
-            # Accept this motif
             covered_indexes.update(ngram)
             selected_indexes.extend(ngram)
             tokens_chosen += len(ngram)
-            if tokens_chosen >= num_to_predict:
-                break
 
         if selected_indexes:
             # Ensure we're not out of range (accounting for shorter sequences)
@@ -261,7 +263,7 @@ if __name__ == "__main__":
         "embedding_max_norm": 2,
         "gpu_id": 0,
         "pretrain": True,
-        "masked_tokens": 0.1,
+        "nr_masked_tokens": 10,
     })
 
     sequences, seq_lengths = [], []
@@ -285,10 +287,18 @@ if __name__ == "__main__":
     ]
     sample_batch_copy = copy.deepcopy(sample_batch)
 
+    # Single masking strategies testing
+    motif_cache, motif_tree_dict = None, None
+    masking_base_level = base_level_masking(sample_batch, config_dev, motif_cache, motif_tree_dict)
+    # masking_subseq = subsequence_masking(sample_batch, config_dev, motif_cache, motif_tree_dict)
+
     with open("/export/share/krausef99dm/data/data_train/motif_matches_cache.pkl", 'rb') as f:
         motif_cache = pickle.load(f)
     motif_tree_dict = get_motif_tree_dict()
 
+    masking_motif = motif_level_masking(sample_batch, config_dev, motif_cache, motif_tree_dict)
+
+    # full pipeline testing
     mutated_data, targets, mask = get_pretrain_mask_data(100, sample_batch, config_dev, motif_cache,
                                                          motif_tree_dict)
 
