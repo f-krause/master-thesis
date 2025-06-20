@@ -134,15 +134,3 @@ Count files in a directory
 ```shell
 ls -1 | wc -l
 ```
-
-### Aider
-```bash
-aider --model o3-mini --api-key openai=<key> --no-auto-commits
-```
-
-
-
-## More
-TBW
-
-
