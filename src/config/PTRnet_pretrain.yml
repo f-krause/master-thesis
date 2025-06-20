@@ -1,52 +1,55 @@
 # PTRnet - nucleotide level model
+# DOC of pretrain para
+
+# PTRnet - nucleotide level model
 
 # Training
-epochs: 200
-efficient_masking_epochs: 50  # epochs with efficient base level and subsequence masking, then expensive motif masking
+epochs: 150  # model training usually failed with "RuntimeError: The total norm of order 2.0 for gradients from `parameters` is non-finite" error after 60-90 epochs
 save_freq: 1
 val_freq: 1
 warmup: 0
 batch_size: 64
 num_workers: 1
-grad_clip_norm: 0.5  # 0 or negative → no clipping
+grad_clip_norm: 0.15  # 0 or negative → no clipping
 
 # Pretraining
-pretrain_path: ""
-masked_tokens: 0.15  # % of randomly masked tokens during pretraining
-pretrain_simple_warmup: 0  # number of epochs to warmup the pretraining with only random masked tokens (faster) # TODO IMPLEMENT
+pretrain: True  # if True, will pretrain the model on train, val and test set combined!
+efficient_masking_epochs: 0  # number of epochs to use efficient masking strategies only
+pretrain_path: ""  # if given, will load model checkpoints from this path
+masked_tokens: 0.2  # nr of of randomly masked tokens during pretraining
 
 # Model
 model: "ptrnet"
-dim_embedding_tissue: 64  # max 29 tissues
-dim_embedding_token: 64  # 64 codons or 4 nucleotides/
+dim_embedding_tissue: 32  # max 29 tissues
+dim_embedding_token: 32  # 64 codons or 4 nucleotides/
 embedding_max_norm: 2
 
 # Model Architecture
-num_layers: 4  # number of layers in the model, more than 8 not possible for seq len 2700
-dropout: 0.1  # dropout rate of the model
+num_layers: 6  # number of layers in the model, more than 8 not possible for seq len 2700
+dropout: 0  # dropout rate of the model
 
 # Output Predictor
 predictor_hidden_dim: 32  # hidden size of the output layer
-predictor_dropout: 0.3  # dropout rate of the output layer
+predictor_dropout: 0  # dropout rate of the output layer
 
 # Data
-align_aug: True  # if True, will align the sequences to the AUG start codon (needs random_reverse = False)
+align_aug: True  # if True, will align the sequences to the AUG start codon (no sequence reversal possible)
 random_reverse: False
-frequency_features: False
+concat_tissue_feature: False
+frequency_features: True
 scale_targets: False  # only works for binary_class == False
 seq_only: False
-seq_encoding: "embedding" # ["embedding", "ohe" "word2vec"]
+seq_encoding: "embedding"  # ["embedding", "ohe"]
 
 # Optimizer
 optimizer:
   name: adam  # sgd, adam, ranger
-  lr: 0.0001
-  weight_decay: 0.01
+  lr: 0.00046
+  weight_decay: 0.00068
 
 # Scheduler (Cosine Annealing Warm Restarts)
 lr_scheduler:
   enable: False
-  warmup: 20
-  reset_epochs: 5
-  T_mult: 2
+  reset_epochs: 20
+  T_mult: 1
   min_lr: 1e-7

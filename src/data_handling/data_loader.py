@@ -60,7 +60,7 @@ class RNADataset(torch.utils.data.Dataset):
             rna_data_full, tissue_ids_full, targets_full, targets_bin_full = \
                 self._filter_data(rna_data_full, tissue_ids_full, targets_full, targets_bin_full)
 
-            if config.concat_train_val:
+            if config.concat_train_val or self.config.pretrain:
                 self.logger.info(f"Loading val data from: {config.val_data_file}")
                 with (open(os.path.join(os.environ["PROJECT_PATH"], "data/data_test", config.val_data_file),
                            'rb') as f):
@@ -75,6 +75,22 @@ class RNADataset(torch.utils.data.Dataset):
                 targets_bin_full = torch.cat((targets_bin_full, val_targets_bin))
 
                 self.logger.info(f"Adding validation dataset with {len(val_rna_data)} samples to train")
+
+            if self.config.pretrain:
+                # Also adding test data to pretraining
+                self.logger.info(f"Loading test data from: {config.test_data_file}")
+                with open(os.path.join(os.environ["PROJECT_PATH"], "data/data_test", config.test_data_file), 'rb') as f:
+                    test_rna_data, test_tissue_ids, test_targets, test_targets_bin = pickle.load(f)
+                test_rna_data = self._set_codon_or_nucl_setting(test_rna_data)
+                test_rna_data, test_tissue_ids, test_targets, test_targets_bin = \
+                    self._filter_data(test_rna_data, test_tissue_ids, test_targets, test_targets_bin)
+
+                rna_data_full += test_rna_data
+                tissue_ids_full = torch.cat((tissue_ids_full, test_tissue_ids))
+                targets_full = torch.cat((targets_full, test_targets))
+                targets_bin_full = torch.cat((targets_bin_full, test_targets_bin))
+
+                self.logger.info(f"Adding test dataset with {len(test_rna_data)} samples to train")
 
             if config.nr_folds > 1:
                 # Run Cross validation
@@ -108,7 +124,7 @@ class RNADataset(torch.utils.data.Dataset):
                     self._get_dataset_stats()
 
             else:
-                # No cross validation, just load the full data
+                # Only one fold, no cross validation, just load the full data
                 self.rna_data = rna_data_full
                 self.tissue_ids = tissue_ids_full
                 self.targets = targets_full

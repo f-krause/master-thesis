@@ -4,7 +4,7 @@ from tqdm import tqdm
 from pretraining.pretrain_utils import hash_sequence
 
 
-def precompute_motif_matches(sequences, motif_tree, store: bool = False, cache_path=None):
+def precompute_motif_matches(sequences, motif_tree, store: bool = False, cache_path=None, verbose: bool = False):
     """
     Precompute motif matches for all sequences in the dataset.
     :param sequences: An iterable that yields (seq_id, tokens_list).
@@ -14,7 +14,7 @@ def precompute_motif_matches(sequences, motif_tree, store: bool = False, cache_p
     """
     cache = {"DataBases": {}, "Statistics": {}}
 
-    for seq in tqdm(sequences, desc="Precomputing motif matches"):
+    for seq in tqdm(sequences, desc="Precomputing motif matches", disable=not verbose):
         # Run motif searches once per sequence
         seq_ls = seq.tolist()
         db_results = motif_tree["DataBases"].search_all(seq_ls)
@@ -83,4 +83,4 @@ if __name__ == '__main__':
 
     # Precompute the motif matches
     # TODO remove dev and run for full data!
-    precompute_motif_matches(sequences, motif_tree_dict, STORE, STORE_PATH)
+    precompute_motif_matches(sequences, motif_tree_dict, STORE, STORE_PATH, verbose=True)

@@ -172,14 +172,14 @@ def motif_level_masking(data, config, motif_cache, motif_tree_dict):
         # Retrieve precomputed candidates
         seq_hash = hash_sequence(sequence)
         seq_hash_reversed = hash_sequence(sequence.flip(0))
-        if seq_hash in motif_cache["DataBases"].keys():
+        if motif_cache and seq_hash in motif_cache["DataBases"].keys():
             ngram_candidates_db = motif_cache["DataBases"].get(seq_hash, [])
             ngram_candidates_stat = motif_cache["Statistics"].get(seq_hash, [])
-        elif seq_hash_reversed in motif_cache["DataBases"].keys():
+        elif motif_cache and seq_hash_reversed in motif_cache["DataBases"].keys():
             ngram_candidates_db = motif_cache["DataBases"].get(seq_hash_reversed, [])
             ngram_candidates_stat = motif_cache["Statistics"].get(seq_hash_reversed, [])
         else:
-            print("WARNING: No motifs found in cache, computing on-the-fly")
+            # print("WARNING: No motifs found in cache, computing on-the-fly")
             temp_generation = precompute_motif_matches([sequence], motif_tree_dict)  # this is expensive
             ngram_candidates_db = temp_generation["DataBases"].get(seq_hash, [])
             ngram_candidates_stat = temp_generation["Statistics"].get(seq_hash, [])
@@ -248,6 +248,7 @@ def get_pretrain_mask_data(epoch, data, config: DictConfig, motif_cache, motif_t
         masking_strategy = random.choice([base_level_masking, subsequence_masking, motif_level_masking])
 
     # masking_strategy = motif_level_masking  # for dev
+    # masking_strategy = base_level_masking  # for dev
     return masking_strategy(data, config, motif_cache, motif_tree_dict)
 
 

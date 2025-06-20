@@ -162,8 +162,9 @@ class PTRnetRiboNN(nn.Module):
             else:
                 nr_channels = config.dim_embedding_token
         elif config.seq_encoding == "word2vec":
-            self.seq_encoder = KMerEmbedding().to(device)
-            nr_channels = 64  # FIXME verify
+            raise NotImplementedError("Word2Vec encoding is not implemented in this version.")
+            # self.seq_encoder = KMerEmbedding().to(device)
+            # nr_channels = 64
         elif config.seq_encoding == "ohe":
             # Just pass through OHE data
             self.seq_encoder = nn.Identity()
@@ -226,25 +227,22 @@ class PTRnetRiboNN(nn.Module):
         # move to (B, C, L)
         x = x.permute(0, 2, 1)                                             # (B, E_s, L)
         L_target = x.size(2)
-        x_orig = x
         x = self.encoder(x)                                                # (B, E_s, L_out)
-        x_enc = x
         out_dim = x.size(1)
 
         # if pretrain
         if self.pretrain:
             # deconv-tower
             x = self.decoder(x, L_target)                                             # (B, E_s, L_out)
-            x_dec = x
             x = x.permute(0, 2, 1)                                                    # (B, L_out, E_s)
 
             if self.predictors is None:
                 self.predictors = nn.ModuleList(
                     [
-                        nn.Linear(out_dim, 4),  # sequence_ohe
-                        nn.Linear(out_dim, 5),  # coding_area_ohe
-                        nn.Linear(out_dim, 3),  # sec_struc_ohe
-                        nn.Linear(out_dim, 7),  # loop_type_ohe
+                        nn.Linear(out_dim, 4 + 1),  # sequence_ohe + padding token
+                        nn.Linear(out_dim, 5 + 1),  # coding_area_ohe
+                        nn.Linear(out_dim, 3 + 1),  # sec_struc_ohe
+                        nn.Linear(out_dim, 7 + 1),  # loop_type_ohe
                     ]
                 ).to(self.device)
 
@@ -253,14 +251,16 @@ class PTRnetRiboNN(nn.Module):
                 logits = predictor(x)
                 probs.append(F.softmax(logits, dim=-1))
 
-            return probs  # TODO implement loss for this
+            return probs
         else:
             # flatten
             x = x.flatten(start_dim=1)  # (B, E_s * L_out)
+            out_dim = x.size(1)
 
             # optionally concat codon freqs
             if self.frequency_features:
                 x = torch.cat([x, codon_freqs], dim=1)  # (B, E_s*L_out + F)
+                out_dim = x.size(1)
 
             # lazy-init predictor network based on flattened size
             if self.predictor is None:

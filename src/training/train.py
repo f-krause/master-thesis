@@ -3,6 +3,7 @@ import torch
 import time
 import pickle
 import aim  # https://aimstack.io/#demos
+import copy
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
@@ -63,7 +64,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     model = get_model(config, device, logger)
 
     # PRETRAINING
-    if config.pretrain_path:
+    if config.pretrain_path and not config.pretrain:
         checkpoint = torch.load(config.pretrain_path)
         missing_keys, unexpected_keys = model.load_state_dict(checkpoint['state_dict'], strict=False)
         if missing_keys:
@@ -73,14 +74,14 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
 
     if config.pretrain:
         logger.info("Loading motif cache")
-        if config.align_aug:
-            # FIXME currently no cache built for aug aligned data, will be generated and temporarily cached on the fly
-            motif_cache, motif_tree_dict = None, None
-        else:
+        if not config.align_aug:
             with open("/export/share/krausef99dm/data/data_train/motif_matches_cache.pkl", 'rb') as f:
                 motif_cache = pickle.load(f)
-            motif_tree_dict = get_motif_tree_dict()
-
+        else:
+            # TODO could also build motif cache for AUG aligned sequences
+            logger.warning("Motif cache currently not built for aligned sequences, expect slightly slower training.")
+            motif_cache = {"DataBases": {}, "Statistics": {}}
+        motif_tree_dict = get_motif_tree_dict()
 
     # OPTIMIZER
     optimizer = get_optimizer(model, config.optimizer)
@@ -126,7 +127,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
 
         running_loss = 0.0
         y_true, y_pred, tissue_ids = [], [], []
-        for batch_idx, (data, target, target_bin) in enumerate(tqdm(train_loader)):
+        for batch_idx, (data, target, target_bin) in enumerate(tqdm(train_loader, desc="Train Epoch")):
             data = [d.to(device) for d in data]
 
             if config.scale_targets and not config.binary_class:
@@ -134,15 +135,26 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
 
             with torch.amp.autocast(device_type=device.type, enabled=use_amp):
                 if config.pretrain:
-                    mutated_data, _, _ = get_pretrain_mask_data(epoch, data, config, motif_cache, motif_tree_dict)
+                    mutated_data, _, _ = get_pretrain_mask_data(epoch, copy.deepcopy(data), config, motif_cache,
+                                                                motif_tree_dict)
                     output = model(mutated_data)
                     # compute combined loss, need to subtract the min token value from the target to get the correct index
                     max_batch_len = mutated_data[0].size(1)
 
-                    loss = (criterion(output[0][:, :max_batch_len, :], data[0][:, :, 0] - 6) +
-                            criterion(output[1][:, :max_batch_len, :], data[0][:, :, 1] - 1) +
-                            criterion(output[2][:, :max_batch_len, :], data[0][:, :, 2] - 10) +
-                            criterion(output[3][:, :max_batch_len, :], data[0][:, :, 3] - 13))
+                    loss = (
+                            criterion(output[0][:, :max_batch_len, :].permute(0, 2, 1),
+                                      torch.where(data[0][:, :, 0] == 0, data[0][:, :, 0],
+                                                  data[0][:, :, 0] - 5).long()) +
+                            criterion(output[1][:, :max_batch_len, :].permute(0, 2, 1),
+                                      data[0][:, :, 1].long()) +
+                            criterion(output[2][:, :max_batch_len, :].permute(0, 2, 1),
+                                      torch.where(data[0][:, :, 2] == 0, data[0][:, :, 2],
+                                                  data[0][:, :, 2] - 9).long()) +
+                            criterion(output[3][:, :max_batch_len, :].permute(0, 2, 1),
+                                      torch.where(data[0][:, :, 3] == 0, data[0][:, :, 3],
+                                                  data[0][:, :, 3] - 12).long())
+                    )
+
                     loss = loss / 4  # average loss over the 4 tasks
                     y_true.append(torch.tensor(0))  # dummy
                     y_pred.append(torch.tensor(0))  # dummy
@@ -208,7 +220,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
             aim_run.track(1, name='checkpoint_stored', epoch=epoch)
 
         # Validation
-        if epoch % config.val_freq == 0 or epoch % config.save_freq == 0 or epoch == config.epochs:
+        if (epoch % config.val_freq == 0 or epoch % config.save_freq == 0 or epoch == config.epochs) and not config.pretrain:
             model.eval()
 
             val_loss = 0.0
@@ -220,31 +232,19 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
                     if config.scale_targets and not config.binary_class:
                         target = scale_y(target, **scaler_cfg)
 
-                    if config.pretrain:
-                        mutated_data, targets, mask = get_pretrain_mask_data(epoch, data, config, motif_cache, motif_tree_dict)
-                        output = model(mutated_data)
-                        # compute combined loss, need to subtract the min token value from the target to get the correct index
-                        loss = (criterion(output[0][mask], targets[0] - 6) +
-                                criterion(output[1][mask], targets[1] - 1) +
-                                criterion(output[2][mask], targets[2] - 10) +
-                                criterion(output[3][mask], targets[3] - 13))
-                        loss = loss / 4  # average loss over the 4 tasks
-                        y_true_val.append(torch.tensor(0))  # dummy
-                        y_pred_val.append(torch.tensor(0))  # dummy
-                    else:
-                        if config.binary_class:
-                            target = target_bin
-                        target = target.to(device)
-                        output = model(data)
-                        loss = criterion(output.squeeze().float(), target.float())
+                    if config.binary_class:
+                        target = target_bin
+                    target = target.to(device)
+                    output = model(data)
+                    loss = criterion(output.squeeze().float(), target.float())
 
-                        if config.scale_targets and not config.binary_class:
-                            target = scale_y(target, **scaler_cfg, inverse=True)
-                            output = scale_y(output, **scaler_cfg, inverse=True)
+                    if config.scale_targets and not config.binary_class:
+                        target = scale_y(target, **scaler_cfg, inverse=True)
+                        output = scale_y(output, **scaler_cfg, inverse=True)
 
-                        y_true_val.append(target.unsqueeze(1).cpu().numpy())
-                        y_pred_val.append(output.cpu().numpy())
-                        tissue_ids_val.append(data[1].cpu().numpy())
+                    y_true_val.append(target.unsqueeze(1).cpu().numpy())
+                    y_pred_val.append(output.cpu().numpy())
+                    tissue_ids_val.append(data[1].cpu().numpy())
 
                     val_loss += loss.item()
 
@@ -306,7 +306,7 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
         aim_run.track(nr_params, name='nr_params')
         aim_run.track(nr_flops, name='nr_flops')
 
-    if config.clean_up_weights:
+    if config.clean_up_weights and not config.pretrain:
         clean_model_weights(best_epoch, fold, checkpoint_path, logger)
 
     logger.info(f"Weights path: {checkpoint_path}")

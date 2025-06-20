@@ -10,10 +10,12 @@ num_workers: 1
 grad_clip_norm: 0.15  # 0 or negative → no clipping
 
 # Pretraining
-pretrain: True  # if True, will pretrain the model on the training set
+pretrain: False  # if True, will pretrain the model on train, val and test set combined!
 efficient_masking_epochs: 0  # number of epochs to use efficient masking strategies only
-pretrain_path: ""  # if given, will load model checkpoints from this path
-nr_masked_tokens: 1350  # nr of of randomly masked tokens during pretraining
+pretrain_path: "/export/share/krausef99dm/runs/pretrain/ptrnet/14_ptrnet_freq/weights/checkpoint_60_fold-0.pth.tar"  # final pretrain
+#pretrain_path: "/export/share/krausef99dm/runs/pretrain/ptrnet/7_ptrnet_freq/weights/checkpoint_92_fold-0.pth.tar"  # longest pretrain and high val acc
+#pretrain_path: ""  # if given, will load model checkpoints from this path
+masked_tokens: 0.2  # nr of of randomly masked tokens during pretraining
 
 # Model
 model: "ptrnet"
