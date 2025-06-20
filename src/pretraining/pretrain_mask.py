@@ -21,7 +21,7 @@ def naive_masking(data, config: DictConfig):
     mask = torch.zeros(batch_size, max_len, dtype=torch.bool, device=device)
     for i in range(batch_size):
         length = seq_lengths[i].item()
-        num_to_mask = min(length, config.nr_masked_tokens)
+        num_to_mask = int(length * config.masked_tokens)
         if num_to_mask > 0:
             positions = torch.randperm(length, device=device)[:num_to_mask]
             mask[i, positions] = True
@@ -63,8 +63,7 @@ def apply_masking_strategy(rna_data, mask, device):
         mask80 = rand_replacements < 0.8   # 80% -> [MASK]
         mask10 = rand_replacements >= 0.9  # 10% random
 
-        rna_data_copy = rna_data.clone()
-        mutated_rna_mask = rna_data_copy[mask]
+        mutated_rna_mask = rna_data[mask]
         mutated_rna_mask[mask80] = MASK_TOKEN  # Apply 80%: [MASK] token
         mutated_rna_mask[mask10] = random_tokens[mask10]  # 10%: random token
         # remaining 10% of masked: original (do nothing)
@@ -89,7 +88,7 @@ def base_level_masking(data, config: DictConfig, motif_cache=None, motif_tree_di
 
     for i in range(batch_size):
         length = seq_lengths[i].item()
-        num_to_mask = min(length, config.nr_masked_tokens)
+        num_to_mask = int(length * config.masked_tokens)
         if num_to_mask > 0:
             positions = torch.randperm(length, device=device)[:num_to_mask]
             mask[i, positions] = True
@@ -121,7 +120,7 @@ def subsequence_masking(data, config: DictConfig, motif_cache=None, motif_tree_d
     # We'll choose subsequence lengths randomly (e.g., lengths 2-5) until we reach num_to_mask
     for i in range(batch_size):
         length = seq_lengths[i].item()
-        num_to_mask = min(length, config.nr_masked_tokens)
+        num_to_mask = int(length * config.masked_tokens)
         if num_to_mask > 0:
             tokens_to_mask = 0
             while tokens_to_mask < num_to_mask:
@@ -194,29 +193,27 @@ def motif_level_masking(data, config, motif_cache, motif_tree_dict):
             print("WARNING: No motifs found for sequence")
             continue
 
-        num_to_predict = min(length, config.nr_masked_tokens)
+        num_to_predict = int(length * config.masked_tokens)
 
         # Select motifs without overlap until we reach num_to_predict
         covered_indexes = set()
         selected_indexes = []
         tokens_chosen = 0
         for ngram in ngram_candidates:
-            if tokens_chosen >= num_to_predict:
-                break
+            # Check if adding this motif would exceed the number we need
             if tokens_chosen + len(ngram) > num_to_predict:
-                needed = num_to_predict - tokens_chosen
-                available = [idx for idx in ngram if idx < length and idx not in covered_indexes]
-                if len(available) >= needed:
-                    selected = random.sample(available, needed)
-                    covered_indexes.update(selected)
-                    selected_indexes.extend(selected)
-                    tokens_chosen += needed
                 continue
+
+            # Check for overlap
             if any(idx in covered_indexes for idx in ngram):
                 continue
+
+            # Accept this motif
             covered_indexes.update(ngram)
             selected_indexes.extend(ngram)
             tokens_chosen += len(ngram)
+            if tokens_chosen >= num_to_predict:
+                break
 
         if selected_indexes:
             # Ensure we're not out of range (accounting for shorter sequences)
