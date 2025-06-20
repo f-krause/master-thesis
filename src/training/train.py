@@ -73,9 +73,14 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
 
     if config.pretrain:
         logger.info("Loading motif cache")
-        with open("/export/share/krausef99dm/data/data_train/motif_matches_cache.pkl", 'rb') as f:
-            motif_cache = pickle.load(f)
-        motif_tree_dict = get_motif_tree_dict()
+        if config.align_aug:
+            # FIXME currently no cache built for aug aligned data, will be generated and temporarily cached on the fly
+            motif_cache, motif_tree_dict = None, None
+        else:
+            with open("/export/share/krausef99dm/data/data_train/motif_matches_cache.pkl", 'rb') as f:
+                motif_cache = pickle.load(f)
+            motif_tree_dict = get_motif_tree_dict()
+
 
     # OPTIMIZER
     optimizer = get_optimizer(model, config.optimizer)
