@@ -190,6 +190,13 @@ class RNADataset(torch.utils.data.Dataset):
             for t, pad in zip(self.rna_data, front_pads)
         ]
 
+        # Legacy
+        # if self.config.seq_encoding == "word2vec":
+        #     self.rna_data = [
+        #         torch.cat([torch.zeros(pad, t, dtype=t.dtype), t], dim=0)
+        #         for t, pad in zip(self.rna_data, front_pads)
+        #     ]
+
         # Sanity check
         max_seq_len = max(torch.tensor([seq.size(0) for seq in self.rna_data]))
         assert max_seq_len <= self.config.max_seq_length_aug_alignment, \
