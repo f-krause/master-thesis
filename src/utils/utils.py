@@ -122,8 +122,7 @@ def get_config(args):
     if args.gpu_id is not None:
         OmegaConf.update(config, "gpu_id", args.gpu_id)
 
-    OmegaConf.update(config, "pretrain", args.pretrain)
-    if args.pretrain:
+    if config.pretrain:
         # If pretraining, force model to not be in binary classification mode
         OmegaConf.update(config, "binary_class", False)
 
@@ -146,11 +145,15 @@ def check_config(config: DictConfig):
         config.nucleotide_data = False
         config.seq_encoding = "embedding"
         config.align_aug = False
-    if config.seq_encoding not in ["embedding", "ohe", "word2vec"]:
+    if config.seq_encoding not in ["embedding", "ohe"]:  # legacy: word2vec
         raise ValueError(f"Unknown sequence encoding: {config.seq_encoding}. Choose from embedding, ohe, word2vec.")
     if config.align_aug:
         # Set new max_seq_length for alignment augmentation
         config.max_seq_length = config.max_seq_length_aug_alignment
+    if config.pretrain and config.model != "ptrnet":
+        raise ValueError("Pretraining is only supported for PTRnet model.")
+    if config.pretrain and config.random_reverse:
+        raise ValueError("Random reverse is not supported for pretraining.")
     return config
 
 

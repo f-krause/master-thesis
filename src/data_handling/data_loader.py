@@ -140,7 +140,6 @@ class RNADataset(torch.utils.data.Dataset):
         if config.nucleotide_data and config.align_aug:
             self._aug_align_sequences()
 
-
     @staticmethod
     def _compute_frequencies_nucleotides(rna_data_nucleotides):
         freqs = []
@@ -225,6 +224,16 @@ class RNADataset(torch.utils.data.Dataset):
             mask = mask_bin & mask
             targets_bin -= 1  # make binary class 0/1 encoded
             self.logger.warning("Only keeping data for binary CLASSIFICATION")
+
+        if self.config.pretrain:
+            mask_pretrain = torch.zeros(len(rna_data), dtype=torch.bool)
+            seen = set()
+            for i, rna in enumerate(rna_data):
+                key = rna.cpu().numpy().tobytes()
+                if key not in seen:
+                    seen.add(key)
+                    mask_pretrain[i] = True
+            mask = mask_pretrain & mask
 
         if "binary_class" in self.config.train_data_file:
             mask_len = torch.tensor([len(d) <= self.config.max_seq_length for d in rna_data])

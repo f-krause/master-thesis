@@ -21,7 +21,7 @@ def naive_masking(data, config: DictConfig):
     mask = torch.zeros(batch_size, max_len, dtype=torch.bool, device=device)
     for i in range(batch_size):
         length = seq_lengths[i].item()
-        num_to_mask = int(length * config.masked_tokens)
+        num_to_mask = min(length, config.nr_masked_tokens)
         if num_to_mask > 0:
             positions = torch.randperm(length, device=device)[:num_to_mask]
             mask[i, positions] = True
@@ -63,7 +63,8 @@ def apply_masking_strategy(rna_data, mask, device):
         mask80 = rand_replacements < 0.8   # 80% -> [MASK]
         mask10 = rand_replacements >= 0.9  # 10% random
 
-        mutated_rna_mask = rna_data[mask]
+        rna_data_copy = rna_data.clone()
+        mutated_rna_mask = rna_data_copy[mask]
         mutated_rna_mask[mask80] = MASK_TOKEN  # Apply 80%: [MASK] token
         mutated_rna_mask[mask10] = random_tokens[mask10]  # 10%: random token
         # remaining 10% of masked: original (do nothing)
@@ -88,7 +89,7 @@ def base_level_masking(data, config: DictConfig, motif_cache=None, motif_tree_di
 
     for i in range(batch_size):
         length = seq_lengths[i].item()
-        num_to_mask = int(length * config.masked_tokens)
+        num_to_mask = min(length, config.nr_masked_tokens)
         if num_to_mask > 0:
             positions = torch.randperm(length, device=device)[:num_to_mask]
             mask[i, positions] = True
@@ -120,7 +121,7 @@ def subsequence_masking(data, config: DictConfig, motif_cache=None, motif_tree_d
     # We'll choose subsequence lengths randomly (e.g., lengths 2-5) until we reach num_to_mask
     for i in range(batch_size):
         length = seq_lengths[i].item()
-        num_to_mask = int(length * config.masked_tokens)
+        num_to_mask = min(length, config.nr_masked_tokens)
         if num_to_mask > 0:
             tokens_to_mask = 0
             while tokens_to_mask < num_to_mask:

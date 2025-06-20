@@ -13,7 +13,7 @@ grad_clip_norm: 0.15  # 0 or negative → no clipping
 pretrain: True  # if True, will pretrain the model on the training set
 efficient_masking_epochs: 0  # number of epochs to use efficient masking strategies only
 pretrain_path: ""  # if given, will load model checkpoints from this path
-masked_tokens: 0.15  # % of randomly masked tokens during pretraining
+nr_masked_tokens: 1350  # nr of of randomly masked tokens during pretraining
 
 # Model
 model: "ptrnet"
