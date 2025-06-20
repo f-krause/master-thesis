@@ -21,7 +21,6 @@ test_data_file: "test_9.0k_data.pkl"
 
 
 # Optional
-pretrain: False
 project_path: ""  # project path (data and model weights)
 log_file_path: ""
 
@@ -37,8 +36,8 @@ max_utr_5_len: 4695  # max length of the 5' UTR in train, val and test data of 9
 
 # Misc
 nr_folds: 1  # only 1 supported, as cross validation only for codon based models supported
-concat_train_val: False
-evaluate_on_test: False
+concat_train_val: True  # concat train and validation set for training model
+evaluate_on_test: True  # evaluate on test set after training
 mixed_precision: True  # enables torch.cuda.amp for regression setting and if CUDA is available
 
 early_stopper_patience: 8  # disabled if < 0
@@ -51,7 +50,7 @@ clean_up_weights: True  # if True, will remove the non-optimal model weights aft
 # Optuna params
 optuna:
   storage: 'sqlite:////export/share/krausef99dm/tuning_dbs/'  # will set up subfolder for model
-  study_name: 'base'
-  n_trials: 250
-  n_startup_trials: 20
-  timeout: 86400  # in seconds (86400 = 24h)
+  study_name: 'final_1'
+  n_trials: 400
+  n_startup_trials: 40
+  timeout: 172800  # in seconds (86400 = 24h)

@@ -1,11 +1,13 @@
 # ideas from https://github.com/CatIIIIIIII/RNAErnie/blob/main/rna_pretrainer.py (last accessed 10.12.2024)
 import torch
 import random
+import pickle
 from omegaconf import OmegaConf, DictConfig
 
 from data_handling.train_data_seq import TOKENS
 from pretraining.pretrain_utils import hash_sequence, get_motif_tree_dict
 from pretraining.store_identified_motifs import precompute_motif_matches
+from utils.knowledge_db import CODON_MAP_DNA
 
 MASK_TOKEN = len(TOKENS) + 1
 
@@ -169,14 +171,14 @@ def motif_level_masking(data, config, motif_cache, motif_tree_dict):
         # Retrieve precomputed candidates
         seq_hash = hash_sequence(sequence)
         seq_hash_reversed = hash_sequence(sequence.flip(0))
-        if seq_hash in motif_cache["DataBases"].keys():
+        if motif_cache and seq_hash in motif_cache["DataBases"].keys():
             ngram_candidates_db = motif_cache["DataBases"].get(seq_hash, [])
             ngram_candidates_stat = motif_cache["Statistics"].get(seq_hash, [])
-        elif seq_hash_reversed in motif_cache["DataBases"].keys():
+        elif motif_cache and seq_hash_reversed in motif_cache["DataBases"].keys():
             ngram_candidates_db = motif_cache["DataBases"].get(seq_hash_reversed, [])
             ngram_candidates_stat = motif_cache["Statistics"].get(seq_hash_reversed, [])
         else:
-            print("WARNING: No motifs found in cache, computing on-the-fly")
+            # print("WARNING: No motifs found in cache, computing on-the-fly")
             temp_generation = precompute_motif_matches([sequence], motif_tree_dict)  # this is expensive
             ngram_candidates_db = temp_generation["DataBases"].get(seq_hash, [])
             ngram_candidates_stat = temp_generation["Statistics"].get(seq_hash, [])
@@ -234,12 +236,16 @@ def motif_level_masking(data, config, motif_cache, motif_tree_dict):
     return [rna_data, tissue_ids, seq_lengths, freq], targets, mask
 
 
-def get_pretrain_mask_data(data, config: DictConfig, motif_cache, motif_tree_dict):
+def get_pretrain_mask_data(epoch, data, config: DictConfig, motif_cache, motif_tree_dict):
     # data: [rna_data: (B,N,D), tissue_ids: (B,), seq_lengths: (B,)]
     # motif masking 10 times slower than others, hence in total around 3 times slower as without
+    if epoch < config.efficient_masking_epochs:
+        masking_strategy = random.choice([base_level_masking, subsequence_masking])
+    else:
+        masking_strategy = random.choice([base_level_masking, subsequence_masking, motif_level_masking])
 
-    masking_strategy = random.choice([base_level_masking, subsequence_masking, motif_level_masking])
     # masking_strategy = motif_level_masking  # for dev
+    # masking_strategy = base_level_masking  # for dev
     return masking_strategy(data, config, motif_cache, motif_tree_dict)
 
 
@@ -249,11 +255,13 @@ if __name__ == "__main__":
 
     config_dev = OmegaConf.create({
         "batch_size": 8,
+        "efficient_masking_epochs": 0,
         "max_seq_length": 1000,
         "binary_class": True,
         "embedding_max_norm": 2,
         "gpu_id": 0,
         "pretrain": True,
+        "nr_masked_tokens": 10,
     })
 
     sequences, seq_lengths = [], []
@@ -272,10 +280,26 @@ if __name__ == "__main__":
     sample_batch = [
         torch.nn.utils.rnn.pad_sequence(sequences, batch_first=True),  # rna_data_padded (B x N x D)
         torch.randint(29, (config_dev.batch_size,)),  # tissue_ids (B)
-        torch.tensor(seq_lengths, dtype=torch.int64)  # seq_lengths (B)
+        torch.tensor(seq_lengths, dtype=torch.int64),  # seq_lengths (B)
+        torch.randn(config_dev.batch_size, len(CODON_MAP_DNA)),  # frequency_features (B x 64)
     ]
     sample_batch_copy = copy.deepcopy(sample_batch)
-    mutated_data, targets, mask = get_pretrain_mask_data(sample_batch, config_dev)
+
+    # Single masking strategies testing
+    motif_cache, motif_tree_dict = None, None
+    masking_base_level = base_level_masking(sample_batch, config_dev, motif_cache, motif_tree_dict)
+    # masking_subseq = subsequence_masking(sample_batch, config_dev, motif_cache, motif_tree_dict)
+
+    with open("/export/share/krausef99dm/data/data_train/motif_matches_cache.pkl", 'rb') as f:
+        motif_cache = pickle.load(f)
+    motif_tree_dict = get_motif_tree_dict()
+
+    masking_motif = motif_level_masking(sample_batch, config_dev, motif_cache, motif_tree_dict)
+
+    # full pipeline testing
+    mutated_data, targets, mask = get_pretrain_mask_data(100, sample_batch, config_dev, motif_cache,
+                                                         motif_tree_dict)
+
     print(mutated_data[0].shape)
     print(mask.shape)
     print(targets.shape)
