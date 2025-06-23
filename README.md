@@ -1,6 +1,8 @@
 # Master Thesis Repo
 
-Main Repository for Data Science Master Thesis at University of Vienna 2024
+Main Repository for Data Science Master Thesis at University of Vienna 2024-25:
+
+"Benchmarking and Optimizing Deep Learning Architectures for Protein-to-mRNA Ratio Prediction"
 
 
 ## Link selection
