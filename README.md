@@ -42,9 +42,7 @@ root
 ```
 
 
-
-## File Structure
-### 📦 Repository Overview
+## 📦 Repository Overview
 This repository supports a deep learning benchmark study for predicting protein-to-mRNA (PTR) ratios using mRNA sequence and structure features.
 
 #### 🔧 Configuration
