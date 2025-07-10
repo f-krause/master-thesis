@@ -105,8 +105,10 @@ def train_fold(config: DictConfig, logger, fold: int = 0):
     if config.pretrain:
         criterion = torch.nn.CrossEntropyLoss()
     elif config.binary_class:
-        # criterion = torch.nn.BCELoss()
-        criterion = torch.nn.BCEWithLogitsLoss()  # FIXME TEST IN PROPER RUN
+        if config.nucleotide_data:
+            criterion = torch.nn.BCEWithLogitsLoss()
+        else:
+            criterion = torch.nn.BCELoss()
     else:
         criterion = torch.nn.MSELoss()
 

@@ -122,10 +122,6 @@ def get_config(args):
     if args.gpu_id is not None:
         OmegaConf.update(config, "gpu_id", args.gpu_id)
 
-    if config.pretrain:
-        # If pretraining, force model to not be in binary classification mode
-        OmegaConf.update(config, "binary_class", False)
-
     config = check_config(config)
 
     return config
@@ -136,8 +132,6 @@ def check_config(config: DictConfig):
         raise ValueError("If running cv, concat_train_val should be True to run on train + val data.")
     if config.nr_folds > 1 and config.evaluate_on_test:
         raise ValueError("If running cv, evaluate_on_test should be False to evaluate on validation fold.")
-    if config.align_aug and config.random_reverse:
-        raise ValueError("If using alignment augmentation, random reverse should be False.")
     if config.scale_targets and config.binary_class:
         raise ValueError("If using target scaling, binary classification should be False.")
     if not config.get("nucleotide_data", False):
@@ -145,6 +139,9 @@ def check_config(config: DictConfig):
         config.nucleotide_data = False
         config.seq_encoding = "embedding"
         config.align_aug = False
+        config.pretrain = False
+    if config.align_aug and config.random_reverse:
+        raise ValueError("If using alignment augmentation, random reverse should be False.")
     if config.seq_encoding not in ["embedding", "ohe"]:  # legacy: word2vec
         raise ValueError(f"Unknown sequence encoding: {config.seq_encoding}. Choose from embedding, ohe, word2vec.")
     if config.align_aug:
@@ -154,6 +151,9 @@ def check_config(config: DictConfig):
         raise ValueError("Pretraining is only supported for PTRnet model.")
     if config.pretrain and config.random_reverse:
         raise ValueError("Random reverse is not supported for pretraining.")
+    if config.pretrain:
+        # If pretraining, force model to not be in binary classification mode
+        OmegaConf.update(config, "binary_class", False)
     return config
 
 

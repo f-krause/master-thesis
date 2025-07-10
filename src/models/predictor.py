@@ -17,9 +17,8 @@ class Predictor(nn.Module):
             nn.Linear(config.predictor_hidden_dim, 1)
         ]
 
-        # FIXME
-        # if config.binary_class:
-        #     layers.append(nn.Sigmoid())
+        if config.binary_class and not config.nucleotide_data:
+            layers.append(nn.Sigmoid())
 
         self.predictor = nn.Sequential(*layers)
 
